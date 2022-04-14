@@ -11,7 +11,8 @@
 struct GameSettings {
     SDL_Window *window;
     SDL_Renderer *renderer;
-    SDL_Surface *surface;
+    SDL_Surface *bitmapSurface;         //Används för bakgrunden
+    SDL_Texture *bitmapTexture;             //Används för bakgrunden
     SDL_Event event;
 };
 
@@ -24,7 +25,7 @@ PUBLIC Game createGame() {
     }
     printf("SDL initialized!\n");
 
-    game->window = SDL_CreateWindow("Exploder man", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+    game->window = SDL_CreateWindow("Exploder Man", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
     if (!game->window) {
         printf("Window could not be created. Error code: %s\n", SDL_GetError());
         SDL_Quit();
@@ -39,8 +40,34 @@ PUBLIC Game createGame() {
         SDL_Quit();
         return NULL;
     }
-    printf("Renderer created.\n");
+    else {
+        printf("Renderer created.\n");
+    }
+    
+    game->bitmapSurface = SDL_LoadBMP("Walls/Background.bmp");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske måste ändra bildens position)
+    if (!game->bitmapSurface) {
+        printf("Could not load the bitmapSurface: %s\n", SDL_GetError());
+    }
+    else {
+        printf("BitmapSurface loaded.\n");
+    }
 
+    game->bitmapTexture = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);    //Skapar en Texture från bitmapSurface
+    if (!game->bitmapTexture) {
+        printf("Could not load the bitmapTex: %s\n", SDL_GetError());
+    }
+    else {
+        printf("BitmapTexture loaded.\n");
+    }
+
+    SDL_FreeSurface(game->bitmapSurface);                                           //Raderar bitmapSurface (frigör minnet) (bitmapTexture finns fortfarande kvar)
+    if (!game->bitmapTexture) {
+        printf("Could not free bitmapSurface: %s\n", SDL_GetError());
+    }
+    else {
+        printf("BitmapSurface freed.\n");
+    }
+    
     return game;
 }
 
@@ -56,6 +83,9 @@ PUBLIC void updateGame(Game game) {
                 default: break;
             }
         }
+        SDL_RenderClear(game->renderer);
+        SDL_RenderCopy(game->renderer, game->bitmapTexture, NULL, NULL);
+        SDL_RenderPresent(game->renderer);
     }
 }
 
