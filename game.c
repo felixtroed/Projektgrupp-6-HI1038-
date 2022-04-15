@@ -1,4 +1,5 @@
 #include "game.h"
+#include "box.h"
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -7,12 +8,16 @@
 
 #define WINDOW_WIDTH 1088
 #define WINDOW_HEIGHT 832
+#define ROW_SIZE 11
+#define COLUMN_SIZE 15
 
 struct GameSettings {
     SDL_Window *window;
     SDL_Renderer *renderer;
-    SDL_Surface *bitmapSurface;         //Används för bakgrunden
-    SDL_Texture *background;             //Används för bakgrunden
+    SDL_Surface *bitmapSurface;         //Används för ladda upp bilder
+    SDL_Texture *background;             //Används för att ladda in bilden av bakgrunden
+    SDL_Texture *box;                   //Används för att ladda in bilden av lådan
+    SDL_Rect position;                  //Används för positionen av lådorna
     SDL_Event event;
 };
 
@@ -46,18 +51,18 @@ PUBLIC Game createGame() {
     
     game->bitmapSurface = SDL_LoadBMP("Walls/Background.bmp");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske måste ändra bildens position)
     if (!game->bitmapSurface) {
-        printf("Could not load the bitmapSurface: %s\n", SDL_GetError());
+        printf("Could not load Background to bitmapSurface: %s\n", SDL_GetError());
     }
     else {
-        printf("BitmapSurface loaded.\n");
+        printf("Background loaded to bitmapSurface.\n");
     }
 
     game->background = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);    //Skapar en Texture från bitmapSurface
     if (!game->background) {
-        printf("Could not load the bitmapTex: %s\n", SDL_GetError());
+        printf("Could not create texture from bitmapSurface: %s\n", SDL_GetError());
     }
     else {
-        printf("Background loaded.\n");
+        printf("Background loaded as texture.\n");
     }
 
     SDL_FreeSurface(game->bitmapSurface);                                           //Raderar bitmapSurface (frigör minnet) (Background finns fortfarande kvar)
@@ -67,9 +72,34 @@ PUBLIC Game createGame() {
     else {
         printf("BitmapSurface freed.\n");
     }
+
+    game->bitmapSurface = SDL_LoadBMP("Walls/Box.bmp");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske måste ändra bildens position)
+    if (!game->bitmapSurface) {
+        printf("Could not load Box to bitmapSurface: %s\n", SDL_GetError());
+    }
+    else {
+        printf("Box loaded to bitmapSurface.\n");
+    }
+
+    game->box = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);    //Skapar en Texture från bitmapSurface
+    if (!game->box) {
+        printf("Could not create texture from bitmapSurface: %s\n", SDL_GetError());
+    }
+    else {
+        printf("Box loaded as texture.\n");
+    }
+    
+    SDL_FreeSurface(game->bitmapSurface);                                           //Raderar bitmapSurface (frigör minnet) (Background finns fortfarande kvar)
+    if (!game->box) {
+        printf("Could not free bitmapSurface: %s\n", SDL_GetError());
+    }
+    else {
+        printf("BitmapSurface freed.\n");
+    }
     
     return game;
 }
+
 
 PUBLIC void updateGame(Game game) {
     bool running = true;
@@ -85,6 +115,21 @@ PUBLIC void updateGame(Game game) {
         }
         SDL_RenderClear(game->renderer);
         SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
+
+        //// RENDERAR LÅDORNA, INTE OPTIMERAT ////
+        game->position.w = 64;                  //Utanför loopen, alltid samma värde (höjd/bredd på lådan)
+        game->position.h = 64;
+        for (int row = 0; row < ROW_SIZE; row++) {
+            for (int column = 0; column < COLUMN_SIZE; column++) {
+                if (activeBox[row][column] != 0) {
+                    game->position.x = column * 64 + 64;
+                    game->position.y = row * 64 + 64;
+                    SDL_RenderCopy(game->renderer, game->box, NULL, &game->position);       // Renderar en låda i taget
+                }
+            }
+        }
+        ////
+
         SDL_RenderPresent(game->renderer);
     }
 }
