@@ -8,14 +8,6 @@
 #define WINDOW_WIDTH 1088
 #define WINDOW_HEIGHT 832
 
-struct GameSettings {
-    SDL_Window *window;
-    SDL_Renderer *renderer;
-    SDL_Surface *bitmapSurface;         //Anv�nds f�r bakgrunden
-    SDL_Texture *background;             //Anv�nds f�r bakgrunden
-    SDL_Event event;
-};
-
 PUBLIC Game createGame() {
     Game game = malloc(sizeof(struct GameSettings));
 
@@ -67,6 +59,11 @@ PUBLIC Game createGame() {
     else {
         printf("BitmapSurface freed.\n");
     }
+
+    Player p1 = createPlayer(320, 256, 0, game);
+
+
+
     
     return game;
 }
@@ -84,12 +81,14 @@ PUBLIC void updateGame(Game game) {
             }
         }
         SDL_RenderClear(game->renderer);
+        // SDL_RenderCopyEx(game->renderer, game->p1->texture, &game->p1->spriteClips[0], &game->p1->position, 0, NULL, SDL_FLIP_NONE); // Causes segmentation fault
         SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
         SDL_RenderPresent(game->renderer);
     }
 }
 
 PUBLIC void exitGame(Game game) {
+    SDL_DestroyTexture(game->p1->texture);
     SDL_DestroyRenderer(game->renderer);
     SDL_DestroyWindow(game->window);
     SDL_Quit();
