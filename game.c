@@ -11,8 +11,8 @@
 struct GameSettings {
     SDL_Window *window;
     SDL_Renderer *renderer;
-    SDL_Surface *bitmapSurface;         //Används för bakgrunden
-    SDL_Texture *background;             //Används för bakgrunden
+    SDL_Surface *bitmapSurface;         //Anvï¿½nds fï¿½r bakgrunden
+    SDL_Texture *background;             //Anvï¿½nds fï¿½r bakgrunden
     SDL_Event event;
 };
 
@@ -44,7 +44,7 @@ PUBLIC Game createGame() {
         printf("Renderer created.\n");
     }
     
-    game->bitmapSurface = SDL_LoadBMP("Walls/Background.bmp");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske måste ändra bildens position)
+    game->bitmapSurface = SDL_LoadBMP("resources/Background.bmp");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske mï¿½ste ï¿½ndra bildens position)
     if (!game->bitmapSurface) {
         printf("Could not load the bitmapSurface: %s\n", SDL_GetError());
     }
@@ -52,7 +52,7 @@ PUBLIC Game createGame() {
         printf("BitmapSurface loaded.\n");
     }
 
-    game->background = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);    //Skapar en Texture från bitmapSurface
+    game->background = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);    //Skapar en Texture frï¿½n bitmapSurface
     if (!game->background) {
         printf("Could not load the bitmapTex: %s\n", SDL_GetError());
     }
@@ -60,7 +60,7 @@ PUBLIC Game createGame() {
         printf("Background loaded.\n");
     }
 
-    SDL_FreeSurface(game->bitmapSurface);                                           //Raderar bitmapSurface (frigör minnet) (Background finns fortfarande kvar)
+    SDL_FreeSurface(game->bitmapSurface);                                           //Raderar bitmapSurface (frigï¿½r minnet) (Background finns fortfarande kvar)
     if (!game->background) {
         printf("Could not free bitmapSurface: %s\n", SDL_GetError());
     }
