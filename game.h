@@ -1,22 +1,19 @@
+#include <SDL.h>
+#include "player.h"
+
 #ifndef GAME_H
 #define GAME_H
 
 typedef struct GameSettings *Game;
 
-#include <SDL2/SDL.h>
-#include "player.h"
-
-struct GameSettings {
-    SDL_Window *window;
-    SDL_Renderer *renderer;
-    SDL_Surface *bitmapSurface;         //Anv�nds f�r bakgrunden
-    SDL_Texture *background;             //Anv�nds f�r bakgrunden
-    SDL_Event event;
-    Player p1;
-};
+typedef struct PlayerSettings* Player;
 
 Game createGame();
-void updateGame(Game game);
+Player makePlayer(); 
+
+void setBackground(game);
+void updateGame(Game game, Player player);
+void setUpTheRest(Game game, Player player);
 void exitGame(Game game);
 
 #endif /* GAME_H */
