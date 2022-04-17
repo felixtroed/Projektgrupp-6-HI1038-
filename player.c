@@ -38,6 +38,7 @@ PUBLIC Player createPlayer(int x, int y, Game game) {
     return player;
 }
 
+
 PRIVATE void initClips(Player player) {
     player->clip[0].x = 0;
     player->clip[0].y = 0;
@@ -57,5 +58,74 @@ PRIVATE void initClips(Player player) {
     player->clip[3].x = 192;
     player->clip[3].y = 0;
     player->clip[3].w = PLAYER_WIDTH;
-    player->clip[3].h = PLAYER_HEIGHT;
+    player->clip[3].h = PLAYER_HEIGHT; // gubben går ner
+
+
+    player->clip[4].x = 0;
+    player->clip[4].y = 192;
+    player->clip[4].w = PLAYER_WIDTH;
+    player->clip[4].h = PLAYER_HEIGHT; 
+
+    player->clip[5].x = 64;
+    player->clip[5].y = 192;
+    player->clip[5].w = PLAYER_WIDTH;
+    player->clip[5].h = PLAYER_HEIGHT;
+
+    player->clip[6].x = 128;
+    player->clip[6].y = 192;
+    player->clip[6].w = PLAYER_WIDTH;
+    player->clip[6].h = PLAYER_HEIGHT;
+
+
+    player->clip[7].x = 192;
+    player->clip[7].y = 192;
+    player->clip[7].w = PLAYER_WIDTH;
+    player->clip[7].h = PLAYER_HEIGHT; // gubben går upp
+
+
+
+    player->clip[8].x = 0;
+    player->clip[8].y = 128;
+    player->clip[8].w = PLAYER_WIDTH;
+    player->clip[8].h = PLAYER_HEIGHT;
+
+    player->clip[9].x = 64;
+    player->clip[9].y = 128;
+    player->clip[9].w = PLAYER_WIDTH;
+    player->clip[9].h = PLAYER_HEIGHT;
+
+    player->clip[10].x = 128;
+    player->clip[10].y = 128;
+    player->clip[10].w = PLAYER_WIDTH;
+    player->clip[10].h = PLAYER_HEIGHT;
+
+
+    player->clip[11].x = 192;
+    player->clip[11].y = 128;
+    player->clip[11].w = PLAYER_WIDTH;
+    player->clip[11].h = PLAYER_HEIGHT; // gubben går höger
+    
+
+
+    player->clip[12].x = 0;
+    player->clip[12].y = 64;
+    player->clip[12].w = PLAYER_WIDTH;
+    player->clip[12].h = PLAYER_HEIGHT;
+
+    player->clip[13].x = 64;
+    player->clip[13].y = 64;
+    player->clip[13].w = PLAYER_WIDTH;
+    player->clip[13].h = PLAYER_HEIGHT;
+
+    player->clip[14].x = 128;
+    player->clip[14].y = 64;
+    player->clip[14].w = PLAYER_WIDTH;
+    player->clip[14].h = PLAYER_HEIGHT;
+
+
+    player->clip[15].x = 192;
+    player->clip[15].y = 64;
+    player->clip[15].w = PLAYER_WIDTH;
+    player->clip[15].h = PLAYER_HEIGHT; // gubben går vänster
+
  }

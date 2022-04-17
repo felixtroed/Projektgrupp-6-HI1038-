@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+
 #define PUBLIC /* empty */
 #define PRIVATE static
 
@@ -99,6 +100,7 @@ PUBLIC Game createGame() {
 
 PUBLIC void updateGame(Game game, Player p1) {
     bool running = true;
+    int lastMove = 0, newMove = 0;
 
     while (running) {
         while (SDL_PollEvent(&game->event) != 0) {
@@ -107,17 +109,60 @@ PUBLIC void updateGame(Game game, Player p1) {
             }
             else if (game->event.type == SDL_KEYDOWN) { // ifall en knapp �r netryckt 
                 switch (game->event.key.keysym.sym) {
+
+                case SDLK_s:
+                    p1->pos.y += 2;
+                    if (lastMove == newMove && p1->currentFrame<3)
+                    {
+                        p1->currentFrame++; 
+                        newMove = lastMove; 
+                    }
+                    else {
+                        p1->currentFrame = 0; 
+                        lastMove = newMove;
+                    }
+                    printf("Down\n");
+                    break;
+
                     case SDLK_w:
+                        p1->pos.y -= 2;
+                        if (lastMove == newMove && p1->currentFrame < 7)
+                        {
+                            p1->currentFrame++;
+                            newMove = lastMove;
+                        }
+                        else {
+                            p1->currentFrame = 4;
+                            lastMove = newMove;
+                        }
                         printf("Up\n");
                         break;
-                    case SDLK_s:
-                        printf("Down\n");
-                        break;
+             
                     case SDLK_a:
                         printf("Left\n");
-                        break;
+                        p1->pos.x -= 2;
+                        if (lastMove == newMove && p1->currentFrame < 15)
+                        {
+                            p1->currentFrame++;
+                            newMove = lastMove;
+                        }
+                        else {
+                            p1->currentFrame = 12;
+                            lastMove = newMove;
+                        }
+                             break;
                     case SDLK_d:
                         printf("Right\n");
+                        p1->pos.x += 2;
+                        if (lastMove == newMove && p1->currentFrame < 11)
+                        {
+                            p1->currentFrame++;
+                            newMove = lastMove;
+                        }
+                        else {
+                            p1->currentFrame = 8;
+                            lastMove = newMove;
+                        }
                         break;
                     case SDLK_SPACE:
                         printf("Space\n");
@@ -133,6 +178,8 @@ PUBLIC void updateGame(Game game, Player p1) {
         SDL_RenderPresent(game->renderer);
     }
 }
+
+
 
  void exitGame(Game game) {
     IMG_Quit();
@@ -155,7 +202,5 @@ PUBLIC void updateGame(Game game, Player p1) {
          }
      }
  }
-
-
 
 
