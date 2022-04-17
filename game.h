@@ -1,19 +1,25 @@
-#include <SDL.h>
-#include "player.h"
-
 #ifndef GAME_H
 #define GAME_H
 
-typedef struct GameSettings *Game;
+#include <SDL2/SDL.h>
+#include "player.h"
+#include "box.h"
 
 typedef struct PlayerSettings* Player;
 
-Game createGame();
-Player makePlayer(); 
+typedef struct GameSettings {
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    SDL_Surface *bitmapSurface;         //Anv�nds f�r ladda upp bilder
+    SDL_Texture *background;             //Anv�nds f�r att ladda in bilden av bakgrunden
+    SDL_Texture *box;                   //Anv�nds f�r att ladda in bilden av l�dan
+    SDL_Rect boxPos;                  //Anv�nds f�r positionen av l�dorna
+    SDL_Event event;
+} *Game;
 
-void setBackground(game);
-void updateGame(Game game, Player player);
-void setUpTheRest(Game game, Player player);
+Game createGame();
+
+void updateGame(Game game, Player p1);
 void exitGame(Game game);
 
 #endif /* GAME_H */
