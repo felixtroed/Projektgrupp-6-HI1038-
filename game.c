@@ -100,7 +100,7 @@ PUBLIC Game createGame() {
 
 PUBLIC void updateGame(Game game, Player p1) {
     bool running = true;
-    int lastMove = 0, newMove = 0;
+    int newMove = 1, lastMove = 0;
 
     while (running) {
         while (SDL_PollEvent(&game->event) != 0) {
@@ -112,28 +112,29 @@ PUBLIC void updateGame(Game game, Player p1) {
 
                 case SDLK_s:
                     p1->pos.y += 2;
-                    if (lastMove == newMove && p1->currentFrame<3)
+                    if (newMove == lastMove && p1->currentFrame<3)
                     {
                         p1->currentFrame++; 
-                        newMove = lastMove; 
+                        lastMove = newMove; 
                     }
                     else {
                         p1->currentFrame = 0; 
-                        lastMove = newMove;
-                    }
+                        lastMove = newMove = 0;
+                    }  // ändrar frame beronde på förregående flagga
                     printf("Down\n");
                     break;
 
                     case SDLK_w:
                         p1->pos.y -= 2;
-                        if (lastMove == newMove && p1->currentFrame < 7)
+                        if (newMove == lastMove && p1->currentFrame < 7 && p1->currentFrame >3)
                         {
                             p1->currentFrame++;
-                            newMove = lastMove;
+                            lastMove = newMove;
                         }
                         else {
+                            newMove = 4; 
                             p1->currentFrame = 4;
-                            lastMove = newMove;
+                            lastMove = newMove = 4; 
                         }
                         printf("Up\n");
                         break;
@@ -141,27 +142,28 @@ PUBLIC void updateGame(Game game, Player p1) {
                     case SDLK_a:
                         printf("Left\n");
                         p1->pos.x -= 2;
-                        if (lastMove == newMove && p1->currentFrame < 15)
+                        if (newMove == lastMove && p1->currentFrame < 15 && p1->currentFrame >11)
                         {
                             p1->currentFrame++;
-                            newMove = lastMove;
+                            lastMove = newMove;
                         }
                         else {
                             p1->currentFrame = 12;
-                            lastMove = newMove;
+                            lastMove = newMove = 12;
                         }
                              break;
                     case SDLK_d:
                         printf("Right\n");
                         p1->pos.x += 2;
-                        if (lastMove == newMove && p1->currentFrame < 11)
+                        if (newMove == lastMove && p1->currentFrame < 11 && p1->currentFrame >7)
                         {
                             p1->currentFrame++;
-                            newMove = lastMove;
+                            lastMove = newMove;
                         }
                         else {
                             p1->currentFrame = 8;
-                            lastMove = newMove;
+                            lastMove = newMove = 8;
+
                         }
                         break;
                     case SDLK_SPACE:
