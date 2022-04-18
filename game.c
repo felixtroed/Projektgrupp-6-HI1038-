@@ -92,7 +92,7 @@ PUBLIC void updateGame(Game game, Player p1) {
                              break;
                     case SDLK_d:
                         printf("Right\n");
-                        p1->pos.x += 4;
+                        p1->pos.x += ;
                         if (newMove == lastMove && p1->currentFrame < 11 && p1->currentFrame >7)
                         {
                             p1->currentFrame++;
