@@ -58,8 +58,7 @@ PRIVATE void initClips(Player player) {
     player->clip[3].x = 192;
     player->clip[3].y = 0;
     player->clip[3].w = PLAYER_WIDTH;
-    player->clip[3].h = PLAYER_HEIGHT; // gubben går ner
-
+    player->clip[3].h = PLAYER_HEIGHT; // gubben gï¿½r ner
 
     player->clip[4].x = 0;
     player->clip[4].y = 192;
@@ -76,13 +75,10 @@ PRIVATE void initClips(Player player) {
     player->clip[6].w = PLAYER_WIDTH;
     player->clip[6].h = PLAYER_HEIGHT;
 
-
     player->clip[7].x = 192;
     player->clip[7].y = 192;
     player->clip[7].w = PLAYER_WIDTH;
-    player->clip[7].h = PLAYER_HEIGHT; // gubben går upp
-
-
+    player->clip[7].h = PLAYER_HEIGHT; // gubben gï¿½r upp
 
     player->clip[8].x = 0;
     player->clip[8].y = 128;
@@ -99,13 +95,10 @@ PRIVATE void initClips(Player player) {
     player->clip[10].w = PLAYER_WIDTH;
     player->clip[10].h = PLAYER_HEIGHT;
 
-
     player->clip[11].x = 192;
     player->clip[11].y = 128;
     player->clip[11].w = PLAYER_WIDTH;
-    player->clip[11].h = PLAYER_HEIGHT; // gubben går höger
-    
-
+    player->clip[11].h = PLAYER_HEIGHT; // gubben gï¿½r hï¿½ger
 
     player->clip[12].x = 0;
     player->clip[12].y = 64;
@@ -122,10 +115,9 @@ PRIVATE void initClips(Player player) {
     player->clip[14].w = PLAYER_WIDTH;
     player->clip[14].h = PLAYER_HEIGHT;
 
-
     player->clip[15].x = 192;
     player->clip[15].y = 64;
     player->clip[15].w = PLAYER_WIDTH;
-    player->clip[15].h = PLAYER_HEIGHT; // gubben går vänster
+    player->clip[15].h = PLAYER_HEIGHT; // gubben gï¿½r vï¿½nster
 
  }

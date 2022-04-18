@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-
 #define PUBLIC /* empty */
 #define PRIVATE static
 
@@ -11,18 +10,17 @@
 #define ROW_SIZE 11
 #define COLUMN_SIZE 15
 
+PRIVATE bool initWinRen(Game game); 
+PRIVATE bool createBackGround(Game game); 
+PRIVATE bool createBoxes(Game game); 
 PRIVATE void renderBackground(Game game);
 
 PUBLIC Game createGame() {
     Game game = malloc(sizeof(struct GameSettings));
 
-
-    if (initWinRen(game)) 
-    {
-        if(createBackGround(game))
-        {
-            if (createBoxes(game)) 
-            {
+    if (initWinRen(game)) {
+        if(createBackGround(game)) {
+            if (createBoxes(game)) {
                 int imgFlags = IMG_INIT_PNG;
                 if (!(IMG_Init(imgFlags) & imgFlags)) 
                 {
@@ -30,9 +28,8 @@ PUBLIC Game createGame() {
                 }
             }
         }
-
-        return game;
     }
+    return game;
 }
 
 PUBLIC void updateGame(Game game, Player p1) {
@@ -51,12 +48,12 @@ PUBLIC void updateGame(Game game, Player p1) {
                     p1->pos.y += 4;
                     if (newMove == lastMove && p1->currentFrame<3)
                     {
-                        p1->currentFrame++; 
+                        p1->currentFrame++;
                         lastMove = newMove;
                     }
                     else 
                     {
-                        p1->currentFrame = 0; 
+                        p1->currentFrame = 0;
                         lastMove = newMove = 0;
                     }  // ändrar frame beronde på förregående flagga
                     printf("Down\n");
@@ -70,9 +67,9 @@ PUBLIC void updateGame(Game game, Player p1) {
                             lastMove = newMove;
                         }
                         else {
-                            newMove = 4; 
+                            newMove = 4;
                             p1->currentFrame = 4;
-                            lastMove = newMove = 4; 
+                            lastMove = newMove = 4;
                         }
                         printf("Up\n");
                         break;
@@ -92,7 +89,7 @@ PUBLIC void updateGame(Game game, Player p1) {
                              break;
                     case SDLK_d:
                         printf("Right\n");
-                        p1->pos.x += ;
+                        p1->pos.x += 4;
                         if (newMove == lastMove && p1->currentFrame < 11 && p1->currentFrame >7)
                         {
                             p1->currentFrame++;
@@ -119,9 +116,7 @@ PUBLIC void updateGame(Game game, Player p1) {
     }
 }
 
-
-
-bool initWinRen(Game game) {
+PRIVATE bool initWinRen(Game game) {
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         printf("SDL failed to initialize. Error code: %s\n", SDL_GetError());
@@ -146,8 +141,7 @@ bool initWinRen(Game game) {
     return true; 
 }
 
-bool createBackGround(Game game) {
-
+PRIVATE bool createBackGround(Game game) {
 
     game->bitmapSurface = SDL_LoadBMP("resources/Background.bmp");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske m�ste �ndra bildens position)
     if (!game->bitmapSurface) {
@@ -169,7 +163,7 @@ bool createBackGround(Game game) {
     return true;
 }
 
-bool createBoxes(Game game) {
+PRIVATE bool createBoxes(Game game) {
 
     game->bitmapSurface = SDL_LoadBMP("resources/Box.bmp");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske m�ste �ndra bildens position)
     if (!game->bitmapSurface) {
@@ -192,15 +186,14 @@ bool createBoxes(Game game) {
     return true; 
 }
 
-
- void exitGame(Game game) {
+PUBLIC void exitGame(Game game) {
     IMG_Quit();
     SDL_DestroyRenderer(game->renderer);
     SDL_DestroyWindow(game->window);
     SDL_Quit();
 }
 
- void renderBackground(Game game) {
+PRIVATE void renderBackground(Game game) {
      //// RENDERAR L�DORNA, INTE OPTIMERAT ////
      game->boxPos.w = 64;                  //Utanf�r loopen, alltid samma v�rde (h�jd/bredd p� l�dan)
      game->boxPos.h = 64;
