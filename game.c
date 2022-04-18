@@ -12,7 +12,7 @@
 #define COLUMN_SIZE 15
 
 PRIVATE bool initWinRen(Game game); 
-PRIVATE bool createBackGround(Game game); 
+PRIVATE bool createBackground(Game game); 
 PRIVATE bool createBoxes(Game game); 
 PRIVATE void renderBackground(Game game);
 
@@ -20,7 +20,7 @@ PUBLIC Game createGame() {
     Game game = malloc(sizeof(struct GameSettings));
 
     if (initWinRen(game)) {
-        if(createBackGround(game)) {
+        if(createBackground(game)) {
             if (createBoxes(game)) {
                 int imgFlags = IMG_INIT_PNG;
                 if (!(IMG_Init(imgFlags) & imgFlags)) 
@@ -142,7 +142,7 @@ PRIVATE bool initWinRen(Game game) {
     return true; 
 }
 
-PRIVATE bool createBackGround(Game game) {
+PRIVATE bool createBackground(Game game) {
 
     game->bitmapSurface = SDL_LoadBMP("resources/Background.bmp");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske m�ste �ndra bildens position)
     if (!game->bitmapSurface) {
@@ -159,30 +159,6 @@ PRIVATE bool createBackGround(Game game) {
     if (!game->background) {
         printf("Could not free bitmapSurface: %s\n", SDL_GetError());
         return false; 
-    }
-
-    game->bitmapSurface = SDL_LoadBMP("Walls/Box.bmp");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske m�ste �ndra bildens position)
-    if (!game->bitmapSurface) {
-        printf("Could not load Box to bitmapSurface: %s\n", SDL_GetError());
-    }
-    else {
-        printf("Box loaded to bitmapSurface.\n");
-    }
-
-    game->box = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);    //Skapar en Texture fr�n bitmapSurface
-    if (!game->box) {
-        printf("Could not create texture from bitmapSurface: %s\n", SDL_GetError());
-    }
-    else {
-        printf("Box loaded as texture.\n");
-    }
-    
-    SDL_FreeSurface(game->bitmapSurface);                                           //Raderar bitmapSurface (frig�r minnet) (Background finns fortfarande kvar)
-    if (!game->box) {
-        printf("Could not free bitmapSurface: %s\n", SDL_GetError());
-    }
-    else {
-        printf("BitmapSurface freed.\n");
     }
     
     return true;
@@ -206,7 +182,6 @@ PRIVATE bool createBoxes(Game game) {
     if (!game->box) {
         printf("Could not free bitmapSurface: %s\n", SDL_GetError());
         return false;
-
     }
     return true; 
 }
