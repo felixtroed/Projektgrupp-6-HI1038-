@@ -14,7 +14,7 @@
 PRIVATE bool initWinRen(Game game); 
 PRIVATE bool createBackground(Game game); 
 PRIVATE bool createBoxes(Game game); 
-PRIVATE void renderBackground(Game game);
+PRIVATE void renderBoxes(Game game);
 
 PUBLIC Game createGame() {
     Game game = malloc(sizeof(struct GameSettings));
@@ -112,9 +112,9 @@ PUBLIC void updateGame(Game game) {
             }
         }
         SDL_RenderClear(game->renderer);
-        SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
-        SDL_RenderCopyEx(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos, 0, NULL, SDL_FLIP_NONE);
-        renderBackground(game);  
+        SDL_RenderCopy(game->renderer, game->background, NULL, NULL);                                                                           // Renders background
+        renderBoxes(game);                                                                                                                      // Renders boxes
+        SDL_RenderCopyEx(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos, 0, NULL, SDL_FLIP_NONE);   // Renders character
         SDL_RenderPresent(game->renderer);
     }
 }
@@ -195,7 +195,7 @@ PUBLIC void exitGame(Game game) {
     SDL_Quit();
 }
 
-PRIVATE void renderBackground(Game game) {
+PRIVATE void renderBoxes(Game game) {
      //// RENDERAR L�DORNA, INTE OPTIMERAT ////
      game->boxPos.w = 64;                  //Utanf�r loopen, alltid samma v�rde (h�jd/bredd p� l�dan)
      game->boxPos.h = 64;
