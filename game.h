@@ -15,10 +15,11 @@ typedef struct GameSettings {
     SDL_Texture *box;                   //Anv�nds f�r att ladda in bilden av l�dan
     SDL_Rect boxPos;                  //Anv�nds f�r positionen av l�dorna
     SDL_Event event;
+    Player p1;
 } *Game;
 
 Game createGame();
-void updateGame(Game game, Player p1);
+void updateGame(Game game);
 void exitGame(Game game);
 
 #endif /* GAME_H */

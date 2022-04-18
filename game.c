@@ -30,10 +30,12 @@ PUBLIC Game createGame() {
             }
         }
     }
+    game->p1 = createPlayer(64, 64, game);
+
     return game;
 }
 
-PUBLIC void updateGame(Game game, Player p1) {
+PUBLIC void updateGame(Game game) {
     bool running = true;
     int newMove = 1, lastMove = 0;
 
@@ -46,30 +48,30 @@ PUBLIC void updateGame(Game game, Player p1) {
                 switch (game->event.key.keysym.sym) {
 
                 case SDLK_s:
-                    p1->pos.y += 4;
-                    if (newMove == lastMove && p1->currentFrame<3)
+                    game->p1->pos.y += 4;
+                    if (newMove == lastMove && game->p1->currentFrame<3)
                     {
-                        p1->currentFrame++;
+                        game->p1->currentFrame++;
                         lastMove = newMove;
                     }
                     else 
                     {
-                        p1->currentFrame = 0;
+                        game->p1->currentFrame = 0;
                         lastMove = newMove = 0;
                     }  // ändrar frame beronde på förregående flagga
                     printf("Down\n");
                     break;
 
                     case SDLK_w:
-                        p1->pos.y -= 4;
-                        if (newMove == lastMove && p1->currentFrame < 7 && p1->currentFrame >3)
+                        game->p1->pos.y -= 4;
+                        if (newMove == lastMove && game->p1->currentFrame < 7 && game->p1->currentFrame >3)
                         {
-                            p1->currentFrame++;
+                            game->p1->currentFrame++;
                             lastMove = newMove;
                         }
                         else {
                             newMove = 4;
-                            p1->currentFrame = 4;
+                            game->p1->currentFrame = 4;
                             lastMove = newMove = 4;
                         }
                         printf("Up\n");
@@ -77,27 +79,27 @@ PUBLIC void updateGame(Game game, Player p1) {
              
                     case SDLK_a:
                         printf("Left\n");
-                        p1->pos.x -= 4;
-                        if (newMove == lastMove && p1->currentFrame < 15 && p1->currentFrame >11)
+                        game->p1->pos.x -= 4;
+                        if (newMove == lastMove && game->p1->currentFrame < 15 && game->p1->currentFrame >11)
                         {
-                            p1->currentFrame++;
+                            game->p1->currentFrame++;
                             lastMove = newMove;
                         }
                         else {
-                            p1->currentFrame = 12;
+                            game->p1->currentFrame = 12;
                             lastMove = newMove = 12;
                         }
                              break;
                     case SDLK_d:
                         printf("Right\n");
-                        p1->pos.x += 4;
-                        if (newMove == lastMove && p1->currentFrame < 11 && p1->currentFrame >7)
+                        game->p1->pos.x += 4;
+                        if (newMove == lastMove && game->p1->currentFrame < 11 && game->p1->currentFrame >7)
                         {
-                            p1->currentFrame++;
+                            game->p1->currentFrame++;
                             lastMove = newMove;
                         }
                         else {
-                            p1->currentFrame = 8;
+                            game->p1->currentFrame = 8;
                             lastMove = newMove = 8;
 
                         }
@@ -111,7 +113,7 @@ PUBLIC void updateGame(Game game, Player p1) {
         }
         SDL_RenderClear(game->renderer);
         SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
-        SDL_RenderCopyEx(game->renderer, p1->texture, &p1->clip[p1->currentFrame], &p1->pos, 0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos, 0, NULL, SDL_FLIP_NONE);
         renderBackground(game);  
         SDL_RenderPresent(game->renderer);
     }
