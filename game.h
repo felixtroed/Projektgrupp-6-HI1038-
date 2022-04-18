@@ -18,7 +18,9 @@ typedef struct GameSettings {
 } *Game;
 
 Game createGame();
-
+bool initWinRen(Game game); 
+bool createBackGround(Game game); 
+bool createBoxes(Game game); 
 void updateGame(Game game, Player p1);
 void exitGame(Game game);
 
