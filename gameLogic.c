@@ -39,7 +39,7 @@ bool checkMovement(Player p1) {
 
 bool checkIFBoxes()
 {
-
+    return true;
 
 }
 
@@ -59,7 +59,7 @@ void movement(Player p1,int *lastMove, int *newMove, char key) {
             p1->currentFrame = 0;
             *lastMove = *newMove = 0;
             printf("%d Down\n", p1->pos.y);
-        }  // ändrar frame beronde på förregående flagga
+        }  // ï¿½ndrar frame beronde pï¿½ fï¿½rregï¿½ende flagga
         break;
 
     case 'w':
