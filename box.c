@@ -1,5 +1,6 @@
 #include <stdbool.h>
-
+#include <stdio.h>
+#include <stdlib.h>
 #define PUBLIC /* EMPTY */
 #define PRIVATE static
 

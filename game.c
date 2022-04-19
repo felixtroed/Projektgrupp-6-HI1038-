@@ -9,12 +9,18 @@
 #define WINDOW_WIDTH 1088
 #define WINDOW_HEIGHT 832
 #define ROW_SIZE 11
-#define COLUMN_SIZE 15
+#define COLUMN_SIZE 15 
+
+#define KEYDOWN 's'
+#define KEYUP 'w'
+#define KEYRIGHT 'd'
+#define KEYLEFT 'a'
+
 
 PRIVATE bool initWinRen(Game game); 
 PRIVATE bool createBackground(Game game); 
 PRIVATE bool createBoxes(Game game); 
-PRIVATE void renderBoxes(Game game);
+PRIVATE void renderBackground(Game game);
 
 PUBLIC Game createGame() {
     Game game = malloc(sizeof(struct GameSettings));
@@ -46,75 +52,33 @@ PUBLIC void updateGame(Game game) {
             }
             else if (game->event.type == SDL_KEYDOWN) { // ifall en knapp �r netryckt 
                 switch (game->event.key.keysym.sym) {
-
-                case SDLK_s:
-                    game->p1->pos.y += 4;
-                    if (newMove == lastMove && game->p1->currentFrame<3)
-                    {
-                        game->p1->currentFrame++;
-                        lastMove = newMove;
-                    }
-                    else 
-                    {
-                        game->p1->currentFrame = 0;
-                        lastMove = newMove = 0;
-                    }  // ändrar frame beronde på förregående flagga
-                    printf("Down\n");
+                case SDLK_w: 
+                    if(checkMovement(game->p1))
+                        movement(game->p1, &newMove, &lastMove, KEYUP);
                     break;
 
-                    case SDLK_w:
-                        game->p1->pos.y -= 4;
-                        if (newMove == lastMove && game->p1->currentFrame < 7 && game->p1->currentFrame >3)
-                        {
-                            game->p1->currentFrame++;
-                            lastMove = newMove;
-                        }
-                        else {
-                            newMove = 4;
-                            game->p1->currentFrame = 4;
-                            lastMove = newMove = 4;
-                        }
-                        printf("Up\n");
-                        break;
-             
-                    case SDLK_a:
-                        printf("Left\n");
-                        game->p1->pos.x -= 4;
-                        if (newMove == lastMove && game->p1->currentFrame < 15 && game->p1->currentFrame >11)
-                        {
-                            game->p1->currentFrame++;
-                            lastMove = newMove;
-                        }
-                        else {
-                            game->p1->currentFrame = 12;
-                            lastMove = newMove = 12;
-                        }
-                             break;
-                    case SDLK_d:
-                        printf("Right\n");
-                        game->p1->pos.x += 4;
-                        if (newMove == lastMove && game->p1->currentFrame < 11 && game->p1->currentFrame >7)
-                        {
-                            game->p1->currentFrame++;
-                            lastMove = newMove;
-                        }
-                        else {
-                            game->p1->currentFrame = 8;
-                            lastMove = newMove = 8;
+                case SDLK_s:
+                    if (checkMovement(game->p1))
+                    movement(game->p1, &newMove, &lastMove, KEYDOWN);
+                    break;
 
-                        }
-                        break;
-                    case SDLK_SPACE:
-                        printf("Space\n");
-                        break;
-                    default: break;
+                case SDLK_a:
+                    if (checkMovement(game->p1))
+                    movement(game->p1, &newMove, &lastMove, KEYLEFT);
+                    break;
+
+                case SDLK_d: 
+                    if (checkMovement(game->p1))
+                    movement(game->p1, &newMove, &lastMove, KEYRIGHT);
+                    break;
+
                 }
             }
         }
         SDL_RenderClear(game->renderer);
-        SDL_RenderCopy(game->renderer, game->background, NULL, NULL);                                                                           // Renders background
-        renderBoxes(game);                                                                                                                      // Renders boxes
-        SDL_RenderCopyEx(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos, 0, NULL, SDL_FLIP_NONE);   // Renders character
+        SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
+        SDL_RenderCopyEx(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos, 0, NULL, SDL_FLIP_NONE);
+        renderBackground(game);  
         SDL_RenderPresent(game->renderer);
     }
 }
@@ -195,7 +159,7 @@ PUBLIC void exitGame(Game game) {
     SDL_Quit();
 }
 
-PRIVATE void renderBoxes(Game game) {
+PRIVATE void renderBackground(Game game) {
      //// RENDERAR L�DORNA, INTE OPTIMERAT ////
      game->boxPos.w = 64;                  //Utanf�r loopen, alltid samma v�rde (h�jd/bredd p� l�dan)
      game->boxPos.h = 64;

@@ -33,7 +33,7 @@ PUBLIC Player createPlayer(int x, int y, Game game) {
     player->pos.w = PLAYER_WIDTH;
     player->pos.h = PLAYER_HEIGHT;
     player->currentFrame = 0;
-    player->speed = 0;
+    player->speed = 6;
     initClips(player);
     return player;
 }

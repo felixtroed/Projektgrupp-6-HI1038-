@@ -1,9 +1,11 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
+//#include <SDL2/SDL.h>
 #include "player.h"
 #include "box.h"
+#include "gameLogic.h"
 
 typedef struct PlayerSettings* Player;
 
