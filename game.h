@@ -1,13 +1,15 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <SDL.h>
-//#include <SDL2/SDL.h>
+// #include <SDL.h>
+#include <SDL2/SDL.h>
 #include "player.h"
 #include "box.h"
+#include "bomb.h"
 #include "gameLogic.h"
 
 typedef struct PlayerSettings* Player;
+typedef struct Bomb* Bomb;
 
 typedef struct GameSettings {
     SDL_Window *window;
@@ -18,6 +20,7 @@ typedef struct GameSettings {
     SDL_Rect boxPos;                  //Anv�nds f�r positionen av l�dorna
     SDL_Event event;
     Player p1;
+    Bomb bombs[4];                    // Contains all simultaneously allowed bombs
 } *Game;
 
 Game createGame();

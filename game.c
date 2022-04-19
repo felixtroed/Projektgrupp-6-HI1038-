@@ -17,9 +17,9 @@
 #define KEYLEFT 'a'
 
 
-PRIVATE bool initWinRen(Game game); 
-PRIVATE bool createBackground(Game game); 
-PRIVATE bool createBoxes(Game game); 
+PRIVATE bool initWinRen(Game game);
+PRIVATE bool createBackground(Game game);
+PRIVATE bool createBoxes(Game game);
 PRIVATE void renderBoxes(Game game);
 
 PUBLIC Game createGame() {
@@ -78,14 +78,14 @@ PUBLIC void updateGame(Game game) {
         SDL_RenderClear(game->renderer);
         SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
         SDL_RenderCopyEx(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos, 0, NULL, SDL_FLIP_NONE);
-        renderBoxes(game);  
+        renderBoxes(game);
         SDL_RenderPresent(game->renderer);
     }
 }
 
 PRIVATE bool initWinRen(Game game) {
 
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
         printf("SDL failed to initialize. Error code: %s\n", SDL_GetError());
         return false;
     }

@@ -119,5 +119,4 @@ PRIVATE void initClips(Player player) {
     player->clip[15].y = 64;
     player->clip[15].w = PLAYER_WIDTH;
     player->clip[15].h = PLAYER_HEIGHT; // gubben g�r v�nster
-
  }
