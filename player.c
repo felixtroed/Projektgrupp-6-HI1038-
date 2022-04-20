@@ -14,18 +14,17 @@ PUBLIC Player createPlayer(int x, int y, Game game) {
     player->texture = NULL;
     player->surface = IMG_Load("resources/old-man.png");
     if(player->surface == NULL ) {
-            printf( "Unable to load image! SDL_image Error: %s\n", IMG_GetError());
+        printf( "Unable to load player image! SDL_image Error: %s\n", IMG_GetError());
     }
     else {
         // Create texture from surface pixels
         player->texture = SDL_CreateTextureFromSurface(game->renderer, player->surface);
         if(player->texture == NULL ) {
-            printf( "Unable to create texture! SDL Error: %s\n", SDL_GetError());
+            printf( "Unable to create player texture! SDL Error: %s\n", SDL_GetError());
         }
 
         // Get rid of old loaded surface
         SDL_FreeSurface(player->surface);
-        printf("Player surface freed.\n");
     }
 
     player->pos.x = x;
@@ -34,10 +33,10 @@ PUBLIC Player createPlayer(int x, int y, Game game) {
     player->pos.h = PLAYER_HEIGHT;
     player->currentFrame = 0;
     player->speed = 6;
+    player->bombsAvailable = 1;
     initClips(player);
     return player;
 }
-
 
 PRIVATE void initClips(Player player) {
     player->clip[0].x = 0;

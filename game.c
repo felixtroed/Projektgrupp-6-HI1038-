@@ -9,18 +9,19 @@
 #define WINDOW_WIDTH 1088
 #define WINDOW_HEIGHT 832
 #define ROW_SIZE 11
-#define COLUMN_SIZE 15 
+#define COLUMN_SIZE 15
 
 #define KEYDOWN 's'
 #define KEYUP 'w'
 #define KEYRIGHT 'd'
 #define KEYLEFT 'a'
 
-
 PRIVATE bool initWinRen(Game game);
 PRIVATE bool createBackground(Game game);
 PRIVATE bool createBoxes(Game game);
 PRIVATE void renderBoxes(Game game);
+
+Uint32 callback(Uint32 interval, void *bomb);
 
 PUBLIC Game createGame() {
     Game game = malloc(sizeof(struct GameSettings));
@@ -37,12 +38,15 @@ PUBLIC Game createGame() {
         }
     }
     game->p1 = createPlayer(64, 64, game);
+    initBombs(game->bombs);                           // Sets all bombs to NULL
+    // game->bombs[0] = createBomb(64+12, 128+12, game); // Creates temporary bomb for testing
 
     return game;
 }
 
 PUBLIC void updateGame(Game game) {
     bool running = true;
+    bool bombCreated = false;
     int newMove = 1, lastMove = 0;
 
     while (running) {
@@ -72,12 +76,28 @@ PUBLIC void updateGame(Game game) {
                     movement(game->p1, &newMove, &lastMove, KEYRIGHT);
                     break;
 
+                case SDLK_SPACE:
+                    printf("Space\n");
+
+                    if (game->p1->bombsAvailable) {
+                        placeBomb(game);
+                    }
+
+                    break;
                 }
             }
         }
         SDL_RenderClear(game->renderer);
         SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
-        SDL_RenderCopyEx(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos, 0, NULL, SDL_FLIP_NONE);
+        // SDL_RenderCopy(game->renderer, game->bombs[0]->texture, NULL, &game->bombs[0]->pos);    // Copies temporary bomb to renderer
+        SDL_RenderCopy(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos);
+
+        if (game->bombs[0] != NULL) {
+            if (game->bombs[0]->exploded) {
+                printf("Timer done.\n");
+                game->bombs[0]->exploded = false; 
+            }
+        }
         renderBoxes(game);
         SDL_RenderPresent(game->renderer);
     }
@@ -154,6 +174,7 @@ PRIVATE bool createBoxes(Game game) {
 
 PUBLIC void exitGame(Game game) {
     IMG_Quit();
+    SDL_DestroyTexture(game->p1->texture);
     SDL_DestroyRenderer(game->renderer);
     SDL_DestroyWindow(game->window);
     SDL_Quit();

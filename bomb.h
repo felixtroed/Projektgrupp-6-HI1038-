@@ -13,12 +13,14 @@ typedef struct Bomb {
     SDL_Rect clip[2];
     SDL_Rect pos;
     SDL_Surface *surface;
-    SDL_TimerID timer;
+    SDL_TimerID explosionTime;
     int currentFrame;
+    bool exploded;
     bool hasCollision;
     int explosionRange;
 } *Bomb;
 
-Bomb createBomb(int x, int y, Game game);
+void placeBomb(Game game);
+void initBombs(Bomb bombs[]);
 
 #endif /* BOMB_H */

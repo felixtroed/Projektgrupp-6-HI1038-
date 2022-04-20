@@ -17,6 +17,7 @@ typedef struct PlayerSettings {
     SDL_Surface *surface;
     int currentFrame;
     int speed;
+    uint8_t bombsAvailable;
 } *Player;
 
 Player createPlayer(int x, int y, Game game);
