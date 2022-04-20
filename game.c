@@ -77,12 +77,9 @@ PUBLIC void updateGame(Game game) {
                     break;
 
                 case SDLK_SPACE:
-                    printf("Space\n");
-
                     if (game->p1->bombsAvailable) {
                         placeBomb(game);
                     }
-
                     break;
                 }
             }
@@ -90,14 +87,8 @@ PUBLIC void updateGame(Game game) {
         SDL_RenderClear(game->renderer);
         SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
         // SDL_RenderCopy(game->renderer, game->bombs[0]->texture, NULL, &game->bombs[0]->pos);    // Copies temporary bomb to renderer
+        renderBombs(game);
         SDL_RenderCopy(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos);
-
-        if (game->bombs[0] != NULL) {
-            if (game->bombs[0]->exploded) {
-                printf("Timer done.\n");
-                game->bombs[0]->exploded = false; 
-            }
-        }
         renderBoxes(game);
         SDL_RenderPresent(game->renderer);
     }

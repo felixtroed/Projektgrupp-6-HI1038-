@@ -22,5 +22,6 @@ typedef struct Bomb {
 
 void placeBomb(Game game);
 void initBombs(Bomb bombs[]);
+void renderBombs(Game game);
 
 #endif /* BOMB_H */

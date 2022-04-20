@@ -9,10 +9,28 @@
 PRIVATE Uint32 bombExploded(Uint32 interval, void *bomb);
 PRIVATE Bomb createBomb(int x, int y, Game game);
 PUBLIC void placeBomb(Game game);
+PUBLIC void renderBombs(Game game);
 
 PUBLIC void placeBomb(Game game) {
-    game->bombs[0] = createBomb(64+12, 128+12, game);
+    game->bombs[0] = createBomb(game->p1->pos.x + 12, game->p1->pos.y + 12, game);
     game->bombs[0]->explosionTime = SDL_AddTimer(3000, bombExploded, game->bombs[0]);
+}
+
+PRIVATE Uint32 bombExploded(Uint32 interval, void *bomb) {
+    Bomb b = (Bomb) bomb;
+    printf("Callback function entered.\n");
+    b->exploded = true;
+    return 0;
+}
+
+PUBLIC void renderBombs(Game game) {
+    if (game->bombs[0] != NULL) {
+        SDL_RenderCopy(game->renderer, game->bombs[0]->texture, NULL, &game->bombs[0]->pos);
+        if (game->bombs[0]->exploded) {
+            printf("Timer done.\n");
+            game->bombs[0] = NULL;
+        }
+    }
 }
 
 PRIVATE Bomb createBomb(int x, int y, Game game) {
@@ -46,12 +64,7 @@ PRIVATE Bomb createBomb(int x, int y, Game game) {
     return bomb;
 }
 
-PRIVATE Uint32 bombExploded(Uint32 interval, void *bomb) {
-    Bomb b = (Bomb) bomb;
-    printf("Callback function entered.\n");
-    b->exploded = true;
-    return 0;
-}
+
 
 PUBLIC void initBombs(Bomb bombs[]) {
     for (int i = 0; i < BOMBS; i++) {
