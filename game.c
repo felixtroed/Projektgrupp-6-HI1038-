@@ -38,7 +38,10 @@ PUBLIC Game createGame() {
             }
         }
     }
-    game->p1 = createPlayer(64, 64, game);
+    game->p1 = createPlayer(1, 64, 64, game);
+    game->p2 = createPlayer(2, 960, 64, game);
+    game->p3 = createPlayer(3, 64, 704, game);
+    game->p4 = createPlayer(4, 960, 704, game);
     initBombs(game->bombs);                           // Sets all bombs to NULL
     // game->bombs[0] = createBomb(64+12, 128+12, game); // Creates temporary bomb for testing
 
@@ -87,6 +90,9 @@ PUBLIC void updateGame(Game game) {
         renderBoxes(game);
         renderBombs(game);
         SDL_RenderCopy(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos);
+        SDL_RenderCopy(game->renderer, game->p2->texture, &game->p2->clip[game->p2->currentFrame], &game->p2->pos);
+        SDL_RenderCopy(game->renderer, game->p3->texture, &game->p3->clip[game->p3->currentFrame], &game->p3->pos);
+        SDL_RenderCopy(game->renderer, game->p4->texture, &game->p4->clip[game->p4->currentFrame], &game->p4->pos);
         SDL_RenderPresent(game->renderer);
     }
 }

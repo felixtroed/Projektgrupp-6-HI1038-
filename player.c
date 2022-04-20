@@ -8,23 +8,61 @@ PRIVATE int PLAYER_HEIGHT = 64;
 
 PRIVATE void initClips(Player player);
 
-PUBLIC Player createPlayer(int x, int y, Game game) {
+PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
     Player player = malloc(sizeof(struct PlayerSettings));
 
-    player->texture = NULL;
-    player->surface = IMG_Load("resources/old-man.png");
-    if(player->surface == NULL ) {
-        printf( "Unable to load player image! SDL_image Error: %s\n", IMG_GetError());
-    }
-    else {
-        // Create texture from surface pixels
-        player->texture = SDL_CreateTextureFromSurface(game->renderer, player->surface);
-        if(player->texture == NULL ) {
-            printf( "Unable to create player texture! SDL Error: %s\n", SDL_GetError());
-        }
+    switch (playerNumber) {                                                 // Laddar upp rätt bild för rätt player
+        case 1:
+            player->surface = IMG_Load("resources/old-man.png");
+            if (player->surface == NULL) {
+                printf("Unable to load player 1 image! SDL_image Error: %s\n", IMG_GetError());
+            }
+            else {                                                          // Create texture from surface pixels
+                player->texture = SDL_CreateTextureFromSurface(game->renderer, player->surface);
+                if (player->texture == NULL) {
+                    printf("Unable to create player 1 texture! SDL Error: %s\n", SDL_GetError());
+                }
+                SDL_FreeSurface(player->surface);                           // Get rid of old loaded surface
+            } break;
 
-        // Get rid of old loaded surface
-        SDL_FreeSurface(player->surface);
+        case 2:
+            player->surface = IMG_Load("resources/green-man.png");
+            if (player->surface == NULL) {
+                printf("Unable to load player 2 image! SDL_image Error: %s\n", IMG_GetError());
+            }
+            else {                                                          // Create texture from surface pixels
+                player->texture = SDL_CreateTextureFromSurface(game->renderer, player->surface);
+                if (player->texture == NULL) {
+                    printf("Unable to create player 2 texture! SDL Error: %s\n", SDL_GetError());
+                }
+                SDL_FreeSurface(player->surface);                           // Get rid of old loaded surface
+            } break;
+
+        case 3:
+            player->surface = IMG_Load("resources/blue-man.png");
+            if (player->surface == NULL) {
+                printf("Unable to load player 3 image! SDL_image Error: %s\n", IMG_GetError());
+            }
+            else {                                                          // Create texture from surface pixels
+                player->texture = SDL_CreateTextureFromSurface(game->renderer, player->surface);
+                if (player->texture == NULL) {
+                    printf("Unable to create player 3 texture! SDL Error: %s\n", SDL_GetError());
+                }
+                SDL_FreeSurface(player->surface);                           // Get rid of old loaded surface
+            } break;
+
+        case 4:
+            player->surface = IMG_Load("resources/red-man.png");
+            if (player->surface == NULL) {
+                printf("Unable to load player 4 image! SDL_image Error: %s\n", IMG_GetError());
+            }
+            else {                                                          // Create texture from surface pixels
+                player->texture = SDL_CreateTextureFromSurface(game->renderer, player->surface);
+                if (player->texture == NULL) {
+                    printf("Unable to create player 4 texture! SDL Error: %s\n", SDL_GetError());
+                }
+                SDL_FreeSurface(player->surface);                           // Get rid of old loaded surface
+            } break;
     }
 
     player->pos.x = x;
