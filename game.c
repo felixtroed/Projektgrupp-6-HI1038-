@@ -52,23 +52,23 @@ PUBLIC void updateGame(Game game) {
             }
             else if (game->event.type == SDL_KEYDOWN) { // ifall en knapp �r netryckt 
                 switch (game->event.key.keysym.sym) {
-                case SDLK_w: 
-                    if(checkMovement(game->p1))
+                case SDLK_w:
+                    if(checkCollision(game->p1,KEYUP))
                         movement(game->p1, &newMove, &lastMove, KEYUP);
                     break;
 
                 case SDLK_s:
-                    if (checkMovement(game->p1))
+                    if (checkCollision(game->p1,KEYDOWN))
                     movement(game->p1, &newMove, &lastMove, KEYDOWN);
                     break;
 
                 case SDLK_a:
-                    if (checkMovement(game->p1))
+                    if (checkCollision(game->p1,KEYLEFT))
                     movement(game->p1, &newMove, &lastMove, KEYLEFT);
                     break;
 
                 case SDLK_d: 
-                    if (checkMovement(game->p1))
+                    if (checkCollision(game->p1,KEYRIGHT))
                     movement(game->p1, &newMove, &lastMove, KEYRIGHT);
                     break;
 
@@ -165,7 +165,7 @@ PRIVATE void renderBackground(Game game) {
      game->boxPos.h = 64;
      for (int row = 0; row < ROW_SIZE; row++) {
          for (int column = 0; column < COLUMN_SIZE; column++) {
-             if (activeBox[row][column] != 0) {
+             if (activeBox[row][column] == 1) {
                  game->boxPos.x = column * 64 + 64;
                  game->boxPos.y = row * 64 + 64;
                  SDL_RenderCopyEx(game->renderer, game->box, NULL, &game->boxPos, 0, NULL, SDL_FLIP_NONE);       // Renderar en l�da i taget

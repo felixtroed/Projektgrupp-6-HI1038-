@@ -2,12 +2,26 @@
 
 #define SCREENMAX_X 970
 #define SCREENMIN_X 48
-
 #define SCREENMAX_Y 700
 #define SCREENMIN_Y 48
 
+#define ROW_SIZE 11
+#define COLUMN_SIZE 15 
 
-bool checkMovement(Player p1) {
+
+
+bool checkCollision(Player p1,char key) {
+    if (!collisionMap(p1))
+        return false; 
+    if (!collisionBoxes(p1, key))
+        return false; 
+ 
+
+
+    return true; 
+}
+
+bool collisionMap(Player p1) {
     if (p1->pos.y < SCREENMIN_Y)
     {
         p1->pos.y += p1->speed; 
@@ -37,10 +51,40 @@ bool checkMovement(Player p1) {
 }
 
 
-bool checkIFBoxes()
+bool collisionBoxes(Player p1,char key)
 {
+    int posBoxX, posBoxY;
+     int sizeBox = 64; 
+     int sizePlayer = 54;
+        for (int row = 0; row < ROW_SIZE; row++) {
+            sizeBox = 64; 
+            for (int column = 0; column < COLUMN_SIZE; column++) {
+                if (activeBox[row][column]>0)
+                {
+                    posBoxX = column * 64 + 64;
+                    posBoxY= row * 64 + 64;
 
+                    if (!(p1->pos.x > posBoxX + sizeBox || posBoxX > p1->pos.x + sizePlayer|| p1->pos.y > posBoxY + sizeBox
+                        || p1->pos.y + sizePlayer < posBoxY)) {
+                        switch (key) {
+                        case 'd':  p1->pos.x -= p1->speed; p1->pos.y += p1->speed; return false;
+                           
+                        case 'a':  p1->pos.x += p1->speed;  p1->pos.y += p1->speed;  return false;
+                          
 
+                        case 's': p1->pos.y -= p1->speed;p1->pos.x += p1->speed; return false;
+                            
+
+                        case 'w': p1->pos.y += p1->speed;p1->pos.x += p1->speed; return false;
+
+                        }
+
+                    }
+                }
+            }
+        }
+
+    return true; 
 }
 
 
