@@ -10,29 +10,27 @@
 bool checkMovement(Player p1) {
     if (p1->pos.y < SCREENMIN_Y)
     {
-        p1->pos.y += p1->speed; 
+        p1->pos.y = SCREENMIN_Y;        // Ändrad till värdet för väggen, istället för att puttas ifrån väggen
         return false; 
     }
 
     if (p1->pos.y > SCREENMAX_Y)
     {
-        p1->pos.y -= p1->speed;
+        p1->pos.y = SCREENMAX_Y;
         return false;
     }
 
     if (p1->pos.x < SCREENMIN_X)
     {
-        p1->pos.x += p1->speed;
+        p1->pos.x = SCREENMIN_X;
         return false;
     }
-
 
     if (p1->pos.x > SCREENMAX_X)
     {
-        p1->pos.x -= p1->speed;
+        p1->pos.x = SCREENMAX_X;
         return false;
     }
-
     return true;
 }
 
@@ -48,6 +46,7 @@ void movement(Player p1,int *lastMove, int *newMove, char key) {
     switch (key) {
     case 's':
         p1->pos.y += p1->speed;
+        checkMovement(p1);
         if (*newMove == *lastMove && p1->currentFrame < 3)
         {
             p1->currentFrame++;
@@ -64,6 +63,7 @@ void movement(Player p1,int *lastMove, int *newMove, char key) {
 
     case 'w':
         p1->pos.y -= p1->speed;
+        checkMovement(p1);
         if (*newMove == *lastMove && p1->currentFrame < 7 && p1->currentFrame >3)
         {
             p1->currentFrame++;
@@ -80,6 +80,7 @@ void movement(Player p1,int *lastMove, int *newMove, char key) {
 
     case 'a':
         p1->pos.x -= p1->speed;
+        checkMovement(p1);
         if (*newMove == *lastMove && p1->currentFrame < 15 && p1->currentFrame >11)
         {
             p1->currentFrame++;
@@ -93,9 +94,10 @@ void movement(Player p1,int *lastMove, int *newMove, char key) {
 
         }
         break;
-    case 'd':
 
+    case 'd':
         p1->pos.x += p1->speed;
+        checkMovement(p1);
         if (*newMove == *lastMove && p1->currentFrame < 11 && p1->currentFrame >7)
         {
             p1->currentFrame++;
@@ -109,6 +111,7 @@ void movement(Player p1,int *lastMove, int *newMove, char key) {
 
         }
         break;
+
     case SDLK_SPACE:
         printf("Space\n");
         break;

@@ -1,5 +1,6 @@
 #include "game.h"
 #include "box.h"
+#include "bomb.h"
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -57,22 +58,18 @@ PUBLIC void updateGame(Game game) {
             else if (game->event.type == SDL_KEYDOWN) { // ifall en knapp �r netryckt 
                 switch (game->event.key.keysym.sym) {
                 case SDLK_w: 
-                    if(checkMovement(game->p1))
-                        movement(game->p1, &newMove, &lastMove, KEYUP);
+                    movement(game->p1, &newMove, &lastMove, KEYUP);     // "checkMovement" sker nu inne i "movement" i gameLogic.c
                     break;
 
                 case SDLK_s:
-                    if (checkMovement(game->p1))
                     movement(game->p1, &newMove, &lastMove, KEYDOWN);
                     break;
 
                 case SDLK_a:
-                    if (checkMovement(game->p1))
                     movement(game->p1, &newMove, &lastMove, KEYLEFT);
                     break;
 
                 case SDLK_d: 
-                    if (checkMovement(game->p1))
                     movement(game->p1, &newMove, &lastMove, KEYRIGHT);
                     break;
 
@@ -87,9 +84,9 @@ PUBLIC void updateGame(Game game) {
         SDL_RenderClear(game->renderer);
         SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
         // SDL_RenderCopy(game->renderer, game->bombs[0]->texture, NULL, &game->bombs[0]->pos);    // Copies temporary bomb to renderer
+        renderBoxes(game);
         renderBombs(game);
         SDL_RenderCopy(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos);
-        renderBoxes(game);
         SDL_RenderPresent(game->renderer);
     }
 }
