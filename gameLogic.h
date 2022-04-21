@@ -9,6 +9,6 @@
 typedef struct PlayerSettings* Player;
 typedef struct GameSettings* Game;
 bool collisionMap(Player p1);
-void movement(Player p1, int* lastMove, int* newMove, char key);
-bool collisionBoxes(Player p1, char key);
-bool checkCollision(Player p1, char key);
+void move(Player p1, int* lastMove, int* newMove, char key);
+bool collisionBoxes(Player p1);
+bool checkCollision(Player p1);

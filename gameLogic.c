@@ -10,13 +10,11 @@
 
 
 
-bool checkCollision(Player p1,char key) {
+bool checkCollision(Player p1) {
     if (!collisionMap(p1))
         return false; 
-    if (!collisionBoxes(p1, key))
+    if (!collisionBoxes(p1))
         return false; 
- 
-
 
     return true; 
 }
@@ -24,19 +22,17 @@ bool checkCollision(Player p1,char key) {
 bool collisionMap(Player p1) {
     if (p1->pos.y < SCREENMIN_Y)
     {
-        p1->pos.y += p1->speed; 
         return false; 
     }
 
     if (p1->pos.y > SCREENMAX_Y)
     {
-        p1->pos.y -= p1->speed;
         return false;
     }
 
     if (p1->pos.x < SCREENMIN_X)
     {
-        p1->pos.x += p1->speed;
+    
         return false;
     }
 
@@ -51,47 +47,45 @@ bool collisionMap(Player p1) {
 }
 
 
-bool collisionBoxes(Player p1,char key)
+bool collisionBoxes(Player p1)
 {
-    int posBoxX, posBoxY;
-     int sizeBox = 64; 
-     int sizePlayer = 54;
-        for (int row = 0; row < ROW_SIZE; row++) {
-            sizeBox = 64; 
-            for (int column = 0; column < COLUMN_SIZE; column++) {
-                if (activeBox[row][column]>0)
-                {
-                    posBoxX = column * 64 + 64;
-                    posBoxY= row * 64 + 64;
+    int posBoxX=0, posBoxY=0;
+    int sizeBox = 32, sizeBoxTop = 32;
+     int sizePlayer = 40;
+     for (int row = 0; row < ROW_SIZE; row++) {
+         sizeBox = 64;
+         for (int column = 0; column < COLUMN_SIZE; column++) {
+             if (activeBox[row][column] >0)
+             {
+            
+                 posBoxX = column * 64 + 64;
+                 posBoxY = row * 64 + 64;
 
-                    if (!(p1->pos.x > posBoxX + sizeBox || posBoxX > p1->pos.x + sizePlayer|| p1->pos.y > posBoxY + sizeBox
-                        || p1->pos.y + sizePlayer < posBoxY)) {
-                        switch (key) {
-                        case 'd':  p1->pos.x -= p1->speed; p1->pos.y += p1->speed; return false;
-                           
-                        case 'a':  p1->pos.x += p1->speed;  p1->pos.y += p1->speed;  return false;
-                          
+                 if (!(p1->pos.x > posBoxX + sizeBoxTop || posBoxX > p1->pos.x + sizePlayer || p1->pos.y > posBoxY + sizeBoxTop || p1->pos.y + sizePlayer < posBoxY))
+                 {
+                     return false; 
 
-                        case 's': p1->pos.y -= p1->speed;p1->pos.x += p1->speed; return false;
-                            
+                 }
+                
 
-                        case 'w': p1->pos.y += p1->speed;p1->pos.x += p1->speed; return false;
-
-                        }
-
-                    }
-                }
-            }
-        }
-
-    return true; 
+             }
+           
+         }
+     }
+        return true;
 }
 
 
-void movement(Player p1,int *lastMove, int *newMove, char key) {
+
+void move(Player p1,int *lastMove, int *newMove, char key) {
     switch (key) {
     case 's':
         p1->pos.y += p1->speed;
+        if (!checkCollision(p1))
+        {
+            p1->pos.y -= p1->speed; 
+        }
+
         if (*newMove == *lastMove && p1->currentFrame < 3)
         {
             p1->currentFrame++;
@@ -103,11 +97,17 @@ void movement(Player p1,int *lastMove, int *newMove, char key) {
             p1->currentFrame = 0;
             *lastMove = *newMove = 0;
             printf("%d Down\n", p1->pos.y);
-        }  // ändrar frame beronde på förregående flagga
+        }
+
+
         break;
 
     case 'w':
         p1->pos.y -= p1->speed;
+        if (!checkCollision(p1))
+        {
+            p1->pos.y += p1->speed;
+        }
         if (*newMove == *lastMove && p1->currentFrame < 7 && p1->currentFrame >3)
         {
             p1->currentFrame++;
@@ -120,10 +120,16 @@ void movement(Player p1,int *lastMove, int *newMove, char key) {
             *lastMove = *newMove = 4;
             printf("%d Up\n", p1->pos.y);
         }
+
         break;
 
     case 'a':
         p1->pos.x -= p1->speed;
+        if (!checkCollision(p1))
+        {
+            p1->pos.x += p1->speed;
+        }
+        
         if (*newMove == *lastMove && p1->currentFrame < 15 && p1->currentFrame >11)
         {
             p1->currentFrame++;
@@ -136,10 +142,14 @@ void movement(Player p1,int *lastMove, int *newMove, char key) {
             printf("%d Left\n", p1->pos.x);
 
         }
+
         break;
     case 'd':
-
         p1->pos.x += p1->speed;
+        if (!checkCollision(p1))
+        {
+            p1->pos.x -= p1->speed;
+        }
         if (*newMove == *lastMove && p1->currentFrame < 11 && p1->currentFrame >7)
         {
             p1->currentFrame++;
@@ -152,7 +162,9 @@ void movement(Player p1,int *lastMove, int *newMove, char key) {
             printf("%d Right\n", p1->pos.x);
 
         }
-        break;
+
+       break;
+
     case SDLK_SPACE:
         printf("Space\n");
         break;

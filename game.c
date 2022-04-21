@@ -43,38 +43,47 @@ PUBLIC Game createGame() {
 
 PUBLIC void updateGame(Game game) {
     bool running = true;
+    char keyresseed; 
     int newMove = 1, lastMove = 0;
 
     while (running) {
-        while (SDL_PollEvent(&game->event) != 0) {
-            if (game->event.type == SDL_QUIT) {
-                running = false; // st�nger programmet ifall man trycker p� kryss 
+        bool keyUp=true;
+        while (SDL_PollEvent(&game->event) != 0) 
+        {
+            switch (game->event.type)
+            {
+              case SDL_QUIT: running = false; 
+                break; 
+              case SDL_KEYUP: keyUp = true; 
+                break; 
+              case SDL_KEYDOWN: keyUp = false;
+                  break; 
+
             }
-            else if (game->event.type == SDL_KEYDOWN) { // ifall en knapp �r netryckt 
-                switch (game->event.key.keysym.sym) {
-                case SDLK_w:
-                    if(checkCollision(game->p1,KEYUP))
-                        movement(game->p1, &newMove, &lastMove, KEYUP);
+            if (!keyUp) { // ifall en knapp �r netryckt
+
+                switch (game->event.key.keysym.sym)
+                {
+                case SDLK_w: move(game->p1, &newMove, &lastMove, KEYUP);
                     break;
 
                 case SDLK_s:
-                    if (checkCollision(game->p1,KEYDOWN))
-                    movement(game->p1, &newMove, &lastMove, KEYDOWN);
+                        move(game->p1, &newMove, &lastMove, KEYDOWN);
                     break;
 
                 case SDLK_a:
-                    if (checkCollision(game->p1,KEYLEFT))
-                    movement(game->p1, &newMove, &lastMove, KEYLEFT);
+                        move(game->p1, &newMove, &lastMove, KEYLEFT);
                     break;
 
-                case SDLK_d: 
-                    if (checkCollision(game->p1,KEYRIGHT))
-                    movement(game->p1, &newMove, &lastMove, KEYRIGHT);
+                case SDLK_d:
+                        move(game->p1, &newMove, &lastMove, KEYRIGHT);
                     break;
 
                 }
+
             }
         }
+          
         SDL_RenderClear(game->renderer);
         SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
         SDL_RenderCopyEx(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos, 0, NULL, SDL_FLIP_NONE);
