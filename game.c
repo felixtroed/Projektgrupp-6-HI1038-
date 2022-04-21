@@ -84,7 +84,7 @@ PUBLIC void updateGame(Game game) {
         SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
         // SDL_RenderCopy(game->renderer, game->bombs[0]->texture, NULL, &game->bombs[0]->pos);    // Copies temporary bomb to renderer
         renderBoxes(game);
-        renderBombs(game);
+        renderBombsAndExplosions(game);
         SDL_RenderCopy(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos);
         SDL_RenderCopy(game->renderer, game->p2->texture, &game->p2->clip[game->p2->currentFrame], &game->p2->pos);
         SDL_RenderCopy(game->renderer, game->p3->texture, &game->p3->clip[game->p3->currentFrame], &game->p3->pos);
