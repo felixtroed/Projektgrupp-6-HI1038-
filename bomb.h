@@ -13,9 +13,9 @@ typedef struct PlayerSettings* Player;
 typedef struct Bomb {
     SDL_Texture *textureBomb;
     SDL_Texture *textureBombRed;
-    SDL_Texture *textureExplosionStart;
-    SDL_Texture *textureExplosionMiddle;
-    SDL_Texture *textureExplosionEnd;
+    SDL_Texture* textureExplosionStart;
+    SDL_Texture* textureExplosionMiddle;
+    SDL_Texture* textureExplosionEnd;
     SDL_Rect bombPos;
     SDL_Rect explosionPos;
     SDL_Surface *surface;

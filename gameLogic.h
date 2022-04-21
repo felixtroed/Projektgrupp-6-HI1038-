@@ -14,6 +14,6 @@ typedef struct GameSettings* Game;
 
 bool checkMovement(Player p1);
 void movement(Player p1, int* lastMove, int* newMove, char key);
-bool checkIFBoxes();
+bool checkIfBoxes();
 
 #endif /* GAME_LOGIC_H */

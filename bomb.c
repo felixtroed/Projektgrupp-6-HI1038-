@@ -1,4 +1,5 @@
 #include "bomb.h"
+#include "player.h"
 
 #define PUBLIC /* empty */
 #define PRIVATE static
@@ -6,38 +7,53 @@
 #define BOMB_WIDTH 50
 #define BOMB_HEIGHT 50
 
-PRIVATE Uint32 redBomb(Uint32 interval, void* switchToRedBomb);
-PRIVATE Uint32 bombExploded(Uint32 interval, void *bomb);
-PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer);
+typedef struct BombTimerCallbackArgs {
+    Bomb bomb;
+    uint8_t *bombsAvailable;
+} BombTimerCallbackArgs;
+
+PRIVATE Uint32 redBomb(Uint32 interval, void *switchToRedBomb);
+PRIVATE Uint32 bombExploded(Uint32 interval, void *args);
 PRIVATE Uint32 explosionDone(Uint32 interval, void *deleteBomb);
+PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer);
 PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer);
 PUBLIC void renderBombsAndExplosions(Game game);
 
 PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer) {
     if (p->bombsAvailable) {
-        bombs[0] = createBomb(p->pos.x, p->pos.y, renderer);
-        bombs[0]->redBombTime = SDL_AddTimer(2000, redBomb, bombs[0]);                              // Timer tills r�d bomb ska visas
-        bombs[0]->bombTime = SDL_AddTimer(3000, bombExploded, bombs[0]);                            // Timer tills bomben exploderar
-        bombs[0]->deleteBombTime = SDL_AddTimer(4000, explosionDone, bombs[0]);                     // Explosion klar, raderar bomben
+        (p->bombsAvailable)--;
+
+        BombTimerCallbackArgs *callbackArgs = malloc(sizeof(BombTimerCallbackArgs));
+        callbackArgs->bomb = bombs[p->bombsAvailable] = createBomb(p->pos.x, p->pos.y, renderer);
+        callbackArgs->bombsAvailable = &p->bombsAvailable;
+
+        bombs[p->bombsAvailable]->redBombTime = SDL_AddTimer(2000, redBomb, callbackArgs);                      // Timer tills r�d bomb ska visas
+        bombs[p->bombsAvailable]->bombTime = SDL_AddTimer(3000, bombExploded, callbackArgs);                    // Timer tills explosion
+        bombs[p->bombsAvailable]->deleteBombTime = SDL_AddTimer(4000, explosionDone, callbackArgs);
     }
 }
 
-PRIVATE Uint32 redBomb(Uint32 interval, void *switchToRedBomb) {
-    Bomb b = (Bomb) switchToRedBomb;
-    b->switchRedBomb = true;
+PRIVATE Uint32 redBomb(Uint32 interval, void *args) {
+    BombTimerCallbackArgs* bargs = (BombTimerCallbackArgs*) args;
+    bargs->bomb->switchRedBomb = true;
+
     return 0;
 }
 
-PRIVATE Uint32 bombExploded(Uint32 interval, void *bomb) {
-    Bomb b = (Bomb) bomb;
+PRIVATE Uint32 bombExploded(Uint32 interval, void *args) {
+    BombTimerCallbackArgs* bargs = (BombTimerCallbackArgs*) args;
+    bargs->bomb->startExplosion = true;
+
+    return 0;
+}
+
+PRIVATE Uint32 explosionDone(Uint32 interval, void *args) {
+    BombTimerCallbackArgs *bargs = (BombTimerCallbackArgs*) args;
+    bargs->bomb->endExplosion = true;
+    (*(bargs->bombsAvailable))++;
+
     printf("Callback function entered.\n");
-    b->startExplosion = true;
-    return 0;
-}
-
-PRIVATE Uint32 explosionDone(Uint32 interval, void *deleteBomb) {
-    Bomb b = (Bomb) deleteBomb;
-    b->endExplosion = true;
+    free(bargs);
     return 0;
 }
 
@@ -58,7 +74,7 @@ PUBLIC void renderBombsAndExplosions(Game game) {
                 SDL_RenderCopy(game->renderer, game->bombs[i]->textureExplosionStart, NULL, &game->bombs[i]->explosionPos);         // Renderar explosion-start
 
                 // skapa en if-sats. Om nästa ruta har kolission -> sluta rendera åt det hållet
-                
+
                 // Renderar explosion åt höger
                 for (int j = 0; j < range - 1; j++) {
                     game->bombs[i]->explosionPos.x += 64;
@@ -66,7 +82,7 @@ PUBLIC void renderBombsAndExplosions(Game game) {
                 }
                 game->bombs[i]->explosionPos.x += 64;
                 SDL_RenderCopy(game->renderer, game->bombs[i]->textureExplosionEnd, NULL, &game->bombs[i]->explosionPos);
-                game->bombs[i]->explosionPos.x = game->bombs[i]->bombPos.x - 7;                                                     // Återställer explosionPos
+                game->bombs[i]->explosionPos.x = game->bombs[i]->bombPos.x - 7;                                                     // Återställer explosionPos.x
 
                 // Renderar explosion åt vänster
                 for (int j = 0; j < range - 1; j++) {
@@ -75,7 +91,7 @@ PUBLIC void renderBombsAndExplosions(Game game) {
                 }
                 game->bombs[i]->explosionPos.x -= 64;
                 SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionEnd, NULL, &game->bombs[i]->explosionPos, 180, NULL, SDL_FLIP_NONE);
-                game->bombs[i]->explosionPos.x = game->bombs[i]->bombPos.x - 7;                                                     // Återställer explosionPos
+                game->bombs[i]->explosionPos.x = game->bombs[i]->bombPos.x - 7;                                                     // Återställer explosionPos.x
 
                 // Renderar explosion uppåt
                 for (int j = 0; j < range - 1; j++) {
@@ -84,7 +100,7 @@ PUBLIC void renderBombsAndExplosions(Game game) {
                 }
                 game->bombs[i]->explosionPos.y -= 64;
                 SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionEnd, NULL, &game->bombs[i]->explosionPos, 270, NULL, SDL_FLIP_NONE);
-                game->bombs[i]->explosionPos.y = game->bombs[i]->bombPos.y - 7;                                                     // Återställer explosionPos
+                game->bombs[i]->explosionPos.y = game->bombs[i]->bombPos.y - 7;                                                     // Återställer explosionPos.y
 
                 // Renderar explosion nedåt
                 for (int j = 0; j < range - 1; j++) {
@@ -93,13 +109,13 @@ PUBLIC void renderBombsAndExplosions(Game game) {
                 }
                 game->bombs[i]->explosionPos.y += 64;
                 SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionEnd, NULL, &game->bombs[i]->explosionPos, 90, NULL, SDL_FLIP_NONE);
-                game->bombs[i]->explosionPos.y = game->bombs[i]->bombPos.y - 7;                                                     // Återställer explosionPos
-                
-            }
+                game->bombs[i]->explosionPos.y = game->bombs[i]->bombPos.y - 7;                                                     // Återställer explosionPos.y
+
+            } 
             if (game->bombs[i]->endExplosion) {
                 game->bombs[i] = NULL;                                                                          // Raderar bomben
                 printf("Explosion timer done. Bomb deleted.\n");
-            }
+            } 
         }
     }
 }
@@ -108,8 +124,8 @@ PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer) 
     Bomb bomb = malloc(sizeof(struct Bomb));
 
     bomb->surface = IMG_Load("resources/bomb.png");                                     // Laddar in svart bomb
-    if(bomb->surface == NULL ) {
-        printf( "Unable to load bomb image. SDL_image error: %s\n", IMG_GetError());
+    if (bomb->surface == NULL) {
+        printf("Unable to load bomb image. SDL_image error: %s\n", IMG_GetError());
     }
     else {
         bomb->textureBomb = SDL_CreateTextureFromSurface(renderer, bomb->surface);
@@ -176,7 +192,7 @@ PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer) 
     bomb->explosionPos.w = 64;
     bomb->explosionPos.h = 64;
     bomb->currentFrame = 0;
-    bomb->switchRedBomb = false;
+    bomb->switchRedBomb = false;                                                  // R�d bomb avaktiverad fr�n b�rjan
     bomb->startExplosion = false;
     bomb->endExplosion = false;
     // bomb->hasCollision = false; // Maybe only use "exploded" boolean

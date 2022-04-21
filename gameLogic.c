@@ -35,7 +35,7 @@ bool checkMovement(Player p1) {
 }
 
 
-bool checkIFBoxes()
+bool checkIfBoxes()
 {
     return true;
 
