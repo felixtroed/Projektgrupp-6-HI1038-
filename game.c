@@ -22,8 +22,6 @@ PRIVATE bool createBackground(Game game);
 PRIVATE bool createBoxes(Game game);
 PRIVATE void renderBoxes(Game game);
 
-Uint32 callback(Uint32 interval, void *bomb);
-
 PUBLIC Game createGame() {
     Game game = malloc(sizeof(struct GameSettings));
 
