@@ -23,7 +23,7 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
                     printf("Unable to create player 1 texture! SDL Error: %s\n", SDL_GetError());
                 }
                 SDL_FreeSurface(player->surface);                           // Get rid of old loaded surface
-            player->currentFrame = 8;                                       // Player is turned right from start
+                player->currentFrame = 8;                                   // Player is turned right from start
             } break;
 
         case 2:
@@ -37,7 +37,7 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
                     printf("Unable to create player 2 texture! SDL Error: %s\n", SDL_GetError());
                 }
                 SDL_FreeSurface(player->surface);
-            player->currentFrame = 12;                                      // Player is turned left from start
+                player->currentFrame = 12;                                  // Player is turned left from start
             } break;
 
         case 3:

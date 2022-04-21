@@ -6,18 +6,28 @@
 #define BOMB_WIDTH 50
 #define BOMB_HEIGHT 50
 
+typedef struct BombTimerCallbackArgs {
+    Bomb bomb;
+    uint8_t *bombsAvailable;
+} BombTimerCallbackArgs;
+
 PRIVATE Uint32 redBomb(Uint32 interval, void* switchToRedBomb);
-PRIVATE Uint32 bombExploded(Uint32 interval, void *bomb);
+PRIVATE Uint32 bombExploded(Uint32 interval, void *args);
 PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer);
 PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer);
 PUBLIC void renderBombs(Game game);
 
 PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer) {
     if (p->bombsAvailable) {
-        bombs[0] = createBomb(p->pos.x, p->pos.y, renderer);
-        bombs[0]->switchRedBomb = false;                                                            // R�d bomb avaktiverad fr�n b�rjan
-        bombs[0]->redBombTime = SDL_AddTimer(2000, redBomb, bombs[0]);                              // Timer tills r�d bomb ska visas
-        bombs[0]->explosionTime = SDL_AddTimer(3000, bombExploded, bombs[0]);
+        (p->bombsAvailable)--;
+
+        BombTimerCallbackArgs *callbackArgs = malloc(sizeof(BombTimerCallbackArgs));
+        callbackArgs->bomb = bombs[0] = createBomb(p->pos.x, p->pos.y, renderer);
+        callbackArgs->bombsAvailable = &p->bombsAvailable;
+
+        bombs[0]->switchRedBomb = false;                                                  // R�d bomb avaktiverad fr�n b�rjan
+        bombs[0]->redBombTime = SDL_AddTimer(2000, redBomb, bombs[0]);                    // Timer tills r�d bomb ska visas
+        bombs[0]->explosionTime = SDL_AddTimer(3000, bombExploded, callbackArgs);
     }
 }
 
@@ -27,10 +37,13 @@ PRIVATE Uint32 redBomb(Uint32 interval, void *switchToRedBomb) {
     return 0;
 }
 
-PRIVATE Uint32 bombExploded(Uint32 interval, void *bomb) {
-    Bomb b = (Bomb) bomb;
+PRIVATE Uint32 bombExploded(Uint32 interval, void *args) {
+    BombTimerCallbackArgs *bargs = (BombTimerCallbackArgs*) args;
+    bargs->bomb->exploded = true;
+    (*(bargs->bombsAvailable))++;
+
     printf("Callback function entered.\n");
-    b->exploded = true;
+    free(bargs);
     return 0;
 }
 
@@ -44,7 +57,6 @@ PUBLIC void renderBombs(Game game) {
                 SDL_RenderCopy(game->renderer, game->bombs[i]->textureBomb, NULL, &game->bombs[i]->pos);        // Renderar svart bomb
             }
             if (game->bombs[i]->exploded) {
-                printf("Timer done.\n");
                 game->bombs[i] = NULL;
             }
         }
