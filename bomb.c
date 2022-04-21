@@ -8,15 +8,17 @@
 
 PRIVATE Uint32 redBomb(Uint32 interval, void* switchToRedBomb);
 PRIVATE Uint32 bombExploded(Uint32 interval, void *bomb);
-PRIVATE Bomb createBomb(int x, int y, Game game);
-PUBLIC void placeBomb(Game game);
+PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer);
+PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer);
 PUBLIC void renderBombs(Game game);
 
-PUBLIC void placeBomb(Game game) {
-    game->bombs[0] = createBomb(game->p1->pos.x + 12, game->p1->pos.y + 12, game);
-    game->bombs[0]->switchRedBomb = false;                                                                  // R�d bomb avaktiverad fr�n b�rjan
-    game->bombs[0]->redBombTime = SDL_AddTimer(2000, redBomb, game->bombs[0]);                              // Timer tills r�d bomb ska visas
-    game->bombs[0]->explosionTime = SDL_AddTimer(3000, bombExploded, game->bombs[0]);
+PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer) {
+    if (p->bombsAvailable) {
+        bombs[0] = createBomb(p->pos.x, p->pos.y, renderer);
+        bombs[0]->switchRedBomb = false;                                                            // R�d bomb avaktiverad fr�n b�rjan
+        bombs[0]->redBombTime = SDL_AddTimer(2000, redBomb, bombs[0]);                              // Timer tills r�d bomb ska visas
+        bombs[0]->explosionTime = SDL_AddTimer(3000, bombExploded, bombs[0]);
+    }
 }
 
 PRIVATE Uint32 redBomb(Uint32 interval, void *switchToRedBomb) {
@@ -49,7 +51,7 @@ PUBLIC void renderBombs(Game game) {
     }
 }
 
-PRIVATE Bomb createBomb(int x, int y, Game game) {
+PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer) {
     Bomb bomb = malloc(sizeof(struct Bomb));
 
     bomb->surface = IMG_Load("resources/bomb.png");                                     // Laddar in svart bomb
@@ -57,7 +59,7 @@ PRIVATE Bomb createBomb(int x, int y, Game game) {
         printf( "Unable to load bomb image. SDL_image error: %s\n", IMG_GetError());
     }
     else {
-        bomb->textureBomb = SDL_CreateTextureFromSurface(game->renderer, bomb->surface);
+        bomb->textureBomb = SDL_CreateTextureFromSurface(renderer, bomb->surface);
         if (bomb->textureBomb == NULL) {
             printf("Unable to create bomb texture. SDL error: %s\n", SDL_GetError());
         }
@@ -71,7 +73,7 @@ PRIVATE Bomb createBomb(int x, int y, Game game) {
         printf("Unable to load bomb-red image. SDL_image error: %s\n", IMG_GetError());
     }
     else {
-        bomb->textureBombRed = SDL_CreateTextureFromSurface(game->renderer, bomb->surface);
+        bomb->textureBombRed = SDL_CreateTextureFromSurface(renderer, bomb->surface);
         if (bomb->textureBombRed == NULL) {
             printf("Unable to create bomb-red texture. SDL error: %s\n", SDL_GetError());
         }
@@ -80,13 +82,12 @@ PRIVATE Bomb createBomb(int x, int y, Game game) {
         SDL_FreeSurface(bomb->surface);
     }
 
-    bomb->pos.x = ((game->p1->pos.x + 32) / 64) * 64 + 7;       // Formel f�r att placera bomben i n�rmaste ruta (utg�r fr�n karakt�rens mittpunkt)
-    bomb->pos.y = ((game->p1->pos.y + 32) / 64) * 64 + 7;       // +7 f�r bomben �r 50x50 pixlar (64-50=7) M�ste �ndras ifall karakt�rens eller bombens storlek �ndras!!!
+    bomb->pos.x = ((playerPosX + 32) / 64) * 64 + 7;       // Formel f�r att placera bomben i n�rmaste ruta (utg�r fr�n karakt�rens mittpunkt)
+    bomb->pos.y = ((playerPosY + 32) / 64) * 64 + 7;       // +7 f�r bomben �r 50x50 pixlar (64-50=7) M�ste �ndras ifall karakt�rens eller bombens storlek �ndras!!!
     bomb->pos.w = BOMB_WIDTH;
     bomb->pos.h = BOMB_HEIGHT;
     bomb->currentFrame = 0;
     bomb->exploded = false;
-    // bomb->explosionTime = SDL_AddTimer(3000, bombExploded, game->bombs[0]);
     // bomb->hasCollision = false; // Maybe only use "exploded" boolean
     bomb->explosionRange = 2;
 

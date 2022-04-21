@@ -75,9 +75,7 @@ PUBLIC void updateGame(Game game) {
                     break;
 
                 case SDLK_SPACE:
-                    if (game->p1->bombsAvailable) {
-                        placeBomb(game);
-                    }
+                    bombPlacement(game->p1, game->bombs, game->renderer);
                     break;
                 }
             }
@@ -165,10 +163,13 @@ PRIVATE bool createBoxes(Game game) {
 }
 
 PUBLIC void exitGame(Game game) {
-    IMG_Quit();
     SDL_DestroyTexture(game->p1->texture);
+    SDL_DestroyTexture(game->p2->texture);
+    SDL_DestroyTexture(game->p3->texture);
+    SDL_DestroyTexture(game->p4->texture);
     SDL_DestroyRenderer(game->renderer);
     SDL_DestroyWindow(game->window);
+    IMG_Quit();
     SDL_Quit();
 }
 

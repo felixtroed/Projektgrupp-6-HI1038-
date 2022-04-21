@@ -23,6 +23,7 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
                     printf("Unable to create player 1 texture! SDL Error: %s\n", SDL_GetError());
                 }
                 SDL_FreeSurface(player->surface);                           // Get rid of old loaded surface
+            player->currentFrame = 8;                                       // Player is turned right from start
             } break;
 
         case 2:
@@ -30,12 +31,13 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
             if (player->surface == NULL) {
                 printf("Unable to load player 2 image! SDL_image Error: %s\n", IMG_GetError());
             }
-            else {                                                          // Create texture from surface pixels
+            else {
                 player->texture = SDL_CreateTextureFromSurface(game->renderer, player->surface);
                 if (player->texture == NULL) {
                     printf("Unable to create player 2 texture! SDL Error: %s\n", SDL_GetError());
                 }
-                SDL_FreeSurface(player->surface);                           // Get rid of old loaded surface
+                SDL_FreeSurface(player->surface);
+            player->currentFrame = 12;                                      // Player is turned left from start
             } break;
 
         case 3:
@@ -43,12 +45,13 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
             if (player->surface == NULL) {
                 printf("Unable to load player 3 image! SDL_image Error: %s\n", IMG_GetError());
             }
-            else {                                                          // Create texture from surface pixels
+            else {
                 player->texture = SDL_CreateTextureFromSurface(game->renderer, player->surface);
                 if (player->texture == NULL) {
                     printf("Unable to create player 3 texture! SDL Error: %s\n", SDL_GetError());
                 }
-                SDL_FreeSurface(player->surface);                           // Get rid of old loaded surface
+                SDL_FreeSurface(player->surface);
+                player->currentFrame = 8;
             } break;
 
         case 4:
@@ -56,12 +59,13 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
             if (player->surface == NULL) {
                 printf("Unable to load player 4 image! SDL_image Error: %s\n", IMG_GetError());
             }
-            else {                                                          // Create texture from surface pixels
+            else {
                 player->texture = SDL_CreateTextureFromSurface(game->renderer, player->surface);
                 if (player->texture == NULL) {
                     printf("Unable to create player 4 texture! SDL Error: %s\n", SDL_GetError());
                 }
-                SDL_FreeSurface(player->surface);                           // Get rid of old loaded surface
+                SDL_FreeSurface(player->surface);
+                player->currentFrame = 12;
             } break;
     }
 
@@ -69,7 +73,6 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
     player->pos.y = y;
     player->pos.w = PLAYER_WIDTH;
     player->pos.h = PLAYER_HEIGHT;
-    player->currentFrame = 0;
     player->speed = 6;
     player->bombsAvailable = 1;
     initClips(player);

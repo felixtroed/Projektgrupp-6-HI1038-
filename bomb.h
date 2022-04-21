@@ -8,6 +8,7 @@
 #include "player.h"
 
 typedef struct GameSettings* Game;
+typedef struct PlayerSettings* Player;
 
 typedef struct Bomb {
     SDL_Texture *textureBomb;
@@ -24,7 +25,7 @@ typedef struct Bomb {
     int explosionRange;
 } *Bomb;
 
-void placeBomb(Game game);
+void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer);
 void initBombs(Bomb bombs[]);
 void renderBombs(Game game);
 
