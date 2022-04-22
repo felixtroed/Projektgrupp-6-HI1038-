@@ -16,21 +16,32 @@ PRIVATE Uint32 redBomb(Uint32 interval, void *switchToRedBomb);
 PRIVATE Uint32 bombExploded(Uint32 interval, void *args);
 PRIVATE Uint32 explosionDone(Uint32 interval, void *deleteBomb);
 PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer);
+PRIVATE uint8_t getBombIdx(Bomb bombs[]);
 PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer);
 PUBLIC void renderBombsAndExplosions(Game game);
 
 PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer) {
     if (p->bombsAvailable) {
+        uint8_t bombIdx = getBombIdx(bombs);             // Get first free index to store bomb
         (p->bombsAvailable)--;
 
         BombTimerCallbackArgs *callbackArgs = malloc(sizeof(BombTimerCallbackArgs));
-        callbackArgs->bomb = bombs[p->bombsAvailable] = createBomb(p->pos.x, p->pos.y, renderer);
+        callbackArgs->bomb = bombs[bombIdx] = createBomb(p->pos.x, p->pos.y, renderer);
         callbackArgs->bombsAvailable = &p->bombsAvailable;
 
-        bombs[p->bombsAvailable]->redBombTime = SDL_AddTimer(2000, redBomb, callbackArgs);                      // Timer tills r�d bomb ska visas
-        bombs[p->bombsAvailable]->bombTime = SDL_AddTimer(3000, bombExploded, callbackArgs);                    // Timer tills explosion
-        bombs[p->bombsAvailable]->deleteBombTime = SDL_AddTimer(4000, explosionDone, callbackArgs);
+        bombs[bombIdx]->redBombTime = SDL_AddTimer(2000, redBomb, callbackArgs);                      // Timer tills r�d bomb ska visas
+        bombs[bombIdx]->bombTime = SDL_AddTimer(3000, bombExploded, callbackArgs);                    // Timer tills explosion
+        bombs[bombIdx]->deleteBombTime = SDL_AddTimer(4000, explosionDone, callbackArgs);
     }
+}
+
+PRIVATE uint8_t getBombIdx(Bomb bombs[]) {
+    for (uint8_t i = BOMBS-1; i > 0; i--) {
+        if (bombs[i] == NULL) {
+            return i;
+        }
+    }
+    return 0;
 }
 
 PRIVATE Uint32 redBomb(Uint32 interval, void *args) {
