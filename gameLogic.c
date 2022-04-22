@@ -1,4 +1,6 @@
 #include "gameLogic.h"
+#include "game.h"
+#include "bomb.h"
 
 #define SCREENMAX_X 970
 #define SCREENMIN_X 48
@@ -8,13 +10,17 @@
 #define ROW_SIZE 11
 #define COLUMN_SIZE 15 
 
+#define BOMB_SIZE 34
 
 
-bool checkCollision(Player p1) {
+
+bool checkCollision(Player p1, Bomb bombs[]) {
     if (!collisionMap(p1))
         return false; 
     if (!collisionBoxes(p1))
         return false; 
+    if (!collisionBomb(p1, bombs))
+        return false;
 
     return true; 
 }
@@ -49,7 +55,6 @@ bool collisionBoxes(Player p1)
     int posBoxX=0, posBoxY=0;
      int sizeBox = 50;
      int sizePlayer = 50, sizePlayerGreyBox = 0;
-     int changeBoxs = 0;
      for (int row = 0; row < ROW_SIZE; row++) {
          for (int column = 0; column < COLUMN_SIZE; column++) {
              if (activeBox[row][column] >0)
@@ -64,39 +69,61 @@ bool collisionBoxes(Player p1)
                      sizePlayerGreyBox = 16;
                  }
 
-                 if (activeBox[row][column] == 1)
-                 {
-                     changeBoxs = 15;
-                 }
-
-
-                 if (!(p1->pos.x + changeBoxs> posBoxX + sizeBox || posBoxX + changeBoxs > p1->pos.x + sizePlayer  || p1->pos.y + changeBoxs> posBoxY + sizeBox || 
+                 if (!(p1->pos.x> posBoxX + sizeBox || posBoxX> p1->pos.x + sizePlayer  || p1->pos.y> posBoxY + sizeBox || 
                      p1->pos.y + sizePlayerGreyBox + sizePlayer < posBoxY))
                  {
                      printf("POS X: %d POS Y %d \n", p1->pos.x, p1->pos.y);
                      printf("BOX: POS X: %d POS Y:%d\n ", posBoxX, posBoxY);
                      return false; 
-
                  }  
-
              }
              sizeBox = 50;
              sizePlayer = 50;
              sizePlayerGreyBox = 0; 
-             changeBoxs = 0;
-           
          }
      }
         return true;
 }
 
 
+bool collisionBomb(Player p1, Bomb bombs[]) {
+    for (uint8_t i = 0; i < BOMBS; i++) {
+        if (bombs[i] != NULL) {
+            int left = (bombs[i]->bombPos.x);
+            int right = (bombs[i]->bombPos.x) + ((64 - BOMB_SIZE) / 2 - 7);
+            int up = (bombs[i]->bombPos.y);
+            int down = (bombs[i]->bombPos.y) + ((64 - BOMB_SIZE) / 2 - 7);
+        //    printf("Bomb pos: x: %d\ty:%d\n", bombs[i]->bombPos.x, bombs[i]->bombPos.y);
 
-void move(Player p1,int *lastMove, int *newMove, char key) {
+            if (bombs[i]->spawnInside) {
+                if (!(p1->pos.x > right || left > p1->pos.x + BOMB_SIZE || p1->pos.y > down || p1->pos.y + BOMB_SIZE < up))
+                {
+                    return true;
+                }
+                else
+                {
+                    bombs[i]->spawnInside = false;
+                    return true;
+                }
+            }
+
+            if (!(p1->pos.x > right || left > p1->pos.x + BOMB_SIZE || p1->pos.y > down || p1->pos.y + BOMB_SIZE < up))
+            {
+        //        printf("Char Pos: x: %d\ty: %d\n", p1->pos.x, p1->pos.y);
+        //        printf("BOMB: Left: %d\tRight: %d\tUp: %d\tDown: %d\n ", left, right, up, down);
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+
+void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[]) {
     switch (key) {
     case 's':
         p1->pos.y += p1->speed;
-        if (!checkCollision(p1))
+        if (!checkCollision(p1, bombs))
         {
             p1->pos.y -= p1->speed; 
         }
@@ -113,13 +140,11 @@ void move(Player p1,int *lastMove, int *newMove, char key) {
             *lastMove = *newMove = 0;
             printf("%d Down\n", p1->pos.y);
         }
-
-
         break;
 
     case 'w':
         p1->pos.y -= p1->speed;
-        if (!checkCollision(p1))
+        if (!checkCollision(p1, bombs))
         {
             p1->pos.y += p1->speed;
         }
@@ -128,19 +153,17 @@ void move(Player p1,int *lastMove, int *newMove, char key) {
             p1->currentFrame++;
             *lastMove = *newMove;
             printf("%d Up\n", p1->pos.y);
-
         }
         else {
             p1->currentFrame = 4;
             *lastMove = *newMove = 4;
             printf("%d Up\n", p1->pos.y);
         }
-
         break;
 
     case 'a':
         p1->pos.x -= p1->speed;
-        if (!checkCollision(p1))
+        if (!checkCollision(p1, bombs))
         {
             p1->pos.x += p1->speed;
         }
@@ -155,13 +178,12 @@ void move(Player p1,int *lastMove, int *newMove, char key) {
             p1->currentFrame = 12;
             *lastMove = *newMove = 12;
             printf("%d Left\n", p1->pos.x);
-
         }
-
         break;
+
     case 'd':
         p1->pos.x += p1->speed;
-        if (!checkCollision(p1))
+        if (!checkCollision(p1, bombs))
         {
             p1->pos.x -= p1->speed;
         }
@@ -175,14 +197,9 @@ void move(Player p1,int *lastMove, int *newMove, char key) {
             p1->currentFrame = 8;
             *lastMove = *newMove = 8;
             printf("%d Right\n", p1->pos.x);
-
         }
-
        break;
 
-    case SDLK_SPACE:
-        printf("Space\n");
-        break;
     default: break;
     }
 }

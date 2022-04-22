@@ -1,6 +1,7 @@
 #include "game.h"
 #include "box.h"
 #include "bomb.h"
+#include "gameLogic.h"
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -69,23 +70,24 @@ PUBLIC void updateGame(Game game) {
 
                 switch (game->event.key.keysym.sym)
                 {
-                case SDLK_w: move(game->p1, &newMove, &lastMove, KEYUP);
+                case SDLK_w:
+                        move(game->p1, &newMove, &lastMove, KEYUP, game->bombs);
                     break;
 
                 case SDLK_s:
-                        move(game->p1, &newMove, &lastMove, KEYDOWN);
+                        move(game->p1, &newMove, &lastMove, KEYDOWN, game->bombs);
                     break;
 
                 case SDLK_a:
-                        move(game->p1, &newMove, &lastMove, KEYLEFT);
+                        move(game->p1, &newMove, &lastMove, KEYLEFT, game->bombs);
                     break;
 
                 case SDLK_d:
-                        move(game->p1, &newMove, &lastMove, KEYRIGHT);
+                        move(game->p1, &newMove, &lastMove, KEYRIGHT, game->bombs);
                     break;
 
                 case SDLK_SPACE:
-                    bombPlacement(game->p1, game->bombs, game->renderer);
+                        bombPlacement(game->p1, game->bombs, game->renderer);
                     break;
                 }
 

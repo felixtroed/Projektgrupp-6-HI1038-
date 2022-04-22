@@ -1,6 +1,9 @@
 #ifndef BOMB_H
 #define BOMB_H
 
+#define BOMB_WIDTH 50
+#define BOMB_HEIGHT 50
+
 #include <SDL2/SDL.h>
 // #include <SDL.h>
 #include <stdbool.h>
@@ -10,7 +13,7 @@
 typedef struct GameSettings* Game;
 typedef struct PlayerSettings* Player;
 
-typedef struct Bomb {
+typedef struct BombSettings {
     SDL_Texture *textureBomb;
     SDL_Texture *textureBombRed;
     SDL_Texture* textureExplosionStart;
@@ -27,6 +30,7 @@ typedef struct Bomb {
     bool endExplosion;
     bool switchRedBomb;
     bool hasCollision;
+    bool spawnInside;
     int explosionRange;
 } *Bomb;
 

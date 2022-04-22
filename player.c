@@ -73,7 +73,7 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
     player->pos.y = y;
     player->pos.w = PLAYER_WIDTH;
     player->pos.h = PLAYER_HEIGHT;
-    player->speed = 20;
+    player->speed = 6;
     player->bombsAvailable = 4;
     initClips(player);
     return player;

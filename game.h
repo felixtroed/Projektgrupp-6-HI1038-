@@ -11,7 +11,7 @@
 #define BOMBS 4
 
 typedef struct PlayerSettings* Player;
-typedef struct Bomb* Bomb;
+typedef struct BombSettings* Bomb;
 
 typedef struct GameSettings {
     SDL_Window *window;

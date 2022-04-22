@@ -4,9 +4,6 @@
 #define PUBLIC /* empty */
 #define PRIVATE static
 
-#define BOMB_WIDTH 50
-#define BOMB_HEIGHT 50
-
 typedef struct BombTimerCallbackArgs {
     Bomb bomb;
     uint8_t *bombsAvailable;
@@ -30,8 +27,8 @@ PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer) {
         callbackArgs->bombsAvailable = &p->bombsAvailable;
 
         bombs[bombIdx]->redBombTime = SDL_AddTimer(2000, redBomb, callbackArgs);                      // Timer tills r�d bomb ska visas
-        bombs[bombIdx]->bombTime = SDL_AddTimer(3000, bombExploded, callbackArgs);                    // Timer tills explosion
-        bombs[bombIdx]->deleteBombTime = SDL_AddTimer(4000, explosionDone, callbackArgs);
+        bombs[bombIdx]->bombTime = SDL_AddTimer(6000, bombExploded, callbackArgs);                    // Timer tills explosion
+        bombs[bombIdx]->deleteBombTime = SDL_AddTimer(7000, explosionDone, callbackArgs);
     }
 }
 
@@ -132,7 +129,7 @@ PUBLIC void renderBombsAndExplosions(Game game) {
 }
 
 PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer) {
-    Bomb bomb = malloc(sizeof(struct Bomb));
+    Bomb bomb = malloc(sizeof(struct BombSettings));
 
     bomb->surface = IMG_Load("resources/bomb.png");                                     // Laddar in svart bomb
     if (bomb->surface == NULL) {
@@ -206,6 +203,7 @@ PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer) 
     bomb->switchRedBomb = false;                                                  // R�d bomb avaktiverad fr�n b�rjan
     bomb->startExplosion = false;
     bomb->endExplosion = false;
+    bomb->spawnInside = true;
     // bomb->hasCollision = false; // Maybe only use "exploded" boolean
     bomb->explosionRange = 2;
 
