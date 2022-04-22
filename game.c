@@ -48,38 +48,50 @@ PUBLIC Game createGame() {
 
 PUBLIC void updateGame(Game game) {
     bool running = true;
-    bool bombCreated = false;
+    char keyresseed; 
     int newMove = 1, lastMove = 0;
 
     while (running) {
-        while (SDL_PollEvent(&game->event) != 0) {
-            if (game->event.type == SDL_QUIT) {
-                running = false; // st�nger programmet ifall man trycker p� kryss 
+        bool keyUp=true;
+        while (SDL_PollEvent(&game->event) != 0) 
+        {
+            switch (game->event.type)
+            {
+              case SDL_QUIT: running = false; 
+                break; 
+              case SDL_KEYUP: keyUp = true; 
+                break; 
+              case SDL_KEYDOWN: keyUp = false;
+                  break; 
+
             }
-            else if (game->event.type == SDL_KEYDOWN) { // ifall en knapp �r netryckt 
-                switch (game->event.key.keysym.sym) {
-                case SDLK_w: 
-                    movement(game->p1, &newMove, &lastMove, KEYUP);     // "checkMovement" sker nu inne i "movement" i gameLogic.c
+            if (!keyUp) { // ifall en knapp �r netryckt
+
+                switch (game->event.key.keysym.sym)
+                {
+                case SDLK_w: move(game->p1, &newMove, &lastMove, KEYUP);
                     break;
 
                 case SDLK_s:
-                    movement(game->p1, &newMove, &lastMove, KEYDOWN);
+                        move(game->p1, &newMove, &lastMove, KEYDOWN);
                     break;
 
                 case SDLK_a:
-                    movement(game->p1, &newMove, &lastMove, KEYLEFT);
+                        move(game->p1, &newMove, &lastMove, KEYLEFT);
                     break;
 
-                case SDLK_d: 
-                    movement(game->p1, &newMove, &lastMove, KEYRIGHT);
+                case SDLK_d:
+                        move(game->p1, &newMove, &lastMove, KEYRIGHT);
                     break;
 
                 case SDLK_SPACE:
                     bombPlacement(game->p1, game->bombs, game->renderer);
                     break;
                 }
+
             }
         }
+          
         SDL_RenderClear(game->renderer);
         SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
         // SDL_RenderCopy(game->renderer, game->bombs[0]->texture, NULL, &game->bombs[0]->pos);    // Copies temporary bomb to renderer
@@ -179,7 +191,7 @@ PRIVATE void renderBoxes(Game game) {
      game->boxPos.h = 64;
      for (int row = 0; row < ROW_SIZE; row++) {
          for (int column = 0; column < COLUMN_SIZE; column++) {
-             if (activeBox[row][column] != 0) {
+             if (activeBox[row][column] == 1) {
                  game->boxPos.x = column * 64 + 64;
                  game->boxPos.y = row * 64 + 64;
                  SDL_RenderCopyEx(game->renderer, game->box, NULL, &game->boxPos, 0, NULL, SDL_FLIP_NONE);       // Renderar en l�da i taget
