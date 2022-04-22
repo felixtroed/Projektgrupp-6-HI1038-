@@ -86,8 +86,8 @@ PUBLIC void updateGame(Game game) {
           
         SDL_RenderClear(game->renderer);
         SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
+        renderBackground(game);
         SDL_RenderCopyEx(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos, 0, NULL, SDL_FLIP_NONE);
-        renderBackground(game);  
         SDL_RenderPresent(game->renderer);
     }
 }
