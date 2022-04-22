@@ -50,25 +50,36 @@ bool collisionMap(Player p1) {
 bool collisionBoxes(Player p1)
 {
     int posBoxX=0, posBoxY=0;
-    int sizeBox = 32, sizeBoxTop = 32;
-     int sizePlayer = 40;
+     int sizeBox = 48;
+     int sizePlayer = 48, sizePlayerGreyBox = 0;
      for (int row = 0; row < ROW_SIZE; row++) {
-         sizeBox = 64;
          for (int column = 0; column < COLUMN_SIZE; column++) {
              if (activeBox[row][column] >0)
              {
             
                  posBoxX = column * 64 + 64;
                  posBoxY = row * 64 + 64;
-
-                 if (!(p1->pos.x > posBoxX + sizeBoxTop || posBoxX > p1->pos.x + sizePlayer || p1->pos.y > posBoxY + sizeBoxTop || p1->pos.y + sizePlayer < posBoxY))
+                 if (activeBox[row][column] == 2)
                  {
+                     sizeBox = 32;
+                     sizePlayer = 32;
+                     sizePlayerGreyBox = 16;
+                  }
+
+                 if (!(p1->pos.x > posBoxX + sizeBox || posBoxX > p1->pos.x + sizePlayer || p1->pos.y > posBoxY + sizeBox || 
+                     p1->pos.y + sizePlayerGreyBox + sizePlayer < posBoxY))
+                 {
+                     printf("POS X: %d POS Y %d \n", p1->pos.x, p1->pos.y);
+                     printf("BOX: POS X: %d POS Y:%d ", posBoxX, posBoxY);
                      return false; 
 
                  }
                 
 
              }
+             sizeBox = 50;
+             sizePlayer = 50;
+             sizePlayerGreyBox = 0; 
            
          }
      }
@@ -146,7 +157,7 @@ void move(Player p1,int *lastMove, int *newMove, char key) {
         break;
     case 'd':
         p1->pos.x += p1->speed;
-        if (!checkCollision(p1))
+        if (!checkCollision(p1,key))
         {
             p1->pos.x -= p1->speed;
         }
