@@ -1,6 +1,5 @@
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "box.h"
+
 #define PUBLIC /* EMPTY */
 #define PRIVATE static
 

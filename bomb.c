@@ -1,8 +1,10 @@
 #include "bomb.h"
-#include "player.h"
 
 #define PUBLIC /* empty */
 #define PRIVATE static
+
+#define BOMB_WIDTH 50
+#define BOMB_HEIGHT 50
 
 typedef struct BombTimerCallbackArgs {
     Bomb bomb;
@@ -27,8 +29,8 @@ PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer) {
         callbackArgs->bombsAvailable = &p->bombsAvailable;
 
         bombs[bombIdx]->redBombTime = SDL_AddTimer(2000, redBomb, callbackArgs);                      // Timer tills r�d bomb ska visas
-        bombs[bombIdx]->bombTime = SDL_AddTimer(6000, bombExploded, callbackArgs);                    // Timer tills explosion
-        bombs[bombIdx]->deleteBombTime = SDL_AddTimer(7000, explosionDone, callbackArgs);
+        bombs[bombIdx]->bombTime = SDL_AddTimer(3000, bombExploded, callbackArgs);                    // Timer tills explosion
+        bombs[bombIdx]->deleteBombTime = SDL_AddTimer(4000, explosionDone, callbackArgs);
     }
 }
 

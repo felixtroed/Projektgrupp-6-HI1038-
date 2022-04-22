@@ -1,7 +1,4 @@
 #include "game.h"
-#include "box.h"
-#include "bomb.h"
-#include "gameLogic.h"
 #include <stdio.h>
 #include <stdbool.h>
 

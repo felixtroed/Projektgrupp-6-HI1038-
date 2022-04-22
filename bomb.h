@@ -1,9 +1,6 @@
 #ifndef BOMB_H
 #define BOMB_H
 
-#define BOMB_WIDTH 50
-#define BOMB_HEIGHT 50
-
 #include <SDL2/SDL.h>
 // #include <SDL.h>
 #include <stdbool.h>

@@ -1,6 +1,4 @@
 #include "gameLogic.h"
-#include "game.h"
-#include "bomb.h"
 
 #define SCREENMAX_X 970
 #define SCREENMIN_X 48
