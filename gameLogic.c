@@ -10,7 +10,29 @@
 
 #define BOMB_SIZE 34
 
+Uint32 disableInvincibility(Uint32 interval, void *args);
 
+void handleExplosionCollision(Game game) {
+    if (game->p1->isHurt == false) {
+        for (uint8_t i = 0; i < BOMBS; i++) {
+            if (game->bombs[i] != NULL) {
+                game->p1->hitboxPos.x = game->p1->pos.x + 16;       // Puts hitbox in the same position as character
+                game->p1->hitboxPos.y = game->p1->pos.y + 14;
+
+                if (SDL_HasIntersection(&game->p1->hitboxPos, &game->bombs[i]->explosionHor) || SDL_HasIntersection(&game->p1->hitboxPos, &game->bombs[i]->explosionVer)) {
+                    game->p1->isHurt = true;
+                    game->p1->invincibleTimer = SDL_AddTimer(2000, disableInvincibility, game->p1);
+                }
+            } 
+        }
+    }
+}
+
+Uint32 disableInvincibility(Uint32 interval, void *args) {
+    Player p = (Player) args;
+    p->isHurt = false;
+    return 0;
+}
 
 bool checkCollision(Player p1, Bomb bombs[]) {
     if (!collisionMap(p1))
@@ -70,8 +92,8 @@ bool collisionBoxes(Player p1)
                  if (!(p1->pos.x> posBoxX + sizeBox || posBoxX> p1->pos.x + sizePlayer  || p1->pos.y> posBoxY + sizeBox || 
                      p1->pos.y + sizePlayerGreyBox + sizePlayer < posBoxY))
                  {
-                     printf("POS X: %d POS Y %d \n", p1->pos.x, p1->pos.y);
-                     printf("BOX: POS X: %d POS Y:%d\n ", posBoxX, posBoxY);
+                    //  printf("POS X: %d POS Y %d \n", p1->pos.x, p1->pos.y);
+                    //  printf("BOX: POS X: %d POS Y:%d\n ", posBoxX, posBoxY);
                      return false; 
                  }  
              }
@@ -130,13 +152,13 @@ void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[]) {
         {
             p1->currentFrame++;
             *lastMove = *newMove;
-            printf("%d Down\n", p1->pos.y);
+            // printf("%d Down\n", p1->pos.y);
         }
         else
         {
             p1->currentFrame = 0;
             *lastMove = *newMove = 0;
-            printf("%d Down\n", p1->pos.y);
+            // printf("%d Down\n", p1->pos.y);
         }
         break;
 
@@ -150,12 +172,12 @@ void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[]) {
         {
             p1->currentFrame++;
             *lastMove = *newMove;
-            printf("%d Up\n", p1->pos.y);
+            // printf("%d Up\n", p1->pos.y);
         }
         else {
             p1->currentFrame = 4;
             *lastMove = *newMove = 4;
-            printf("%d Up\n", p1->pos.y);
+            // printf("%d Up\n", p1->pos.y);
         }
         break;
 
@@ -170,12 +192,12 @@ void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[]) {
         {
             p1->currentFrame++;
             *lastMove = *newMove;
-            printf("%d Left\n", p1->pos.x);
+            // printf("%d Left\n", p1->pos.x);
         }
         else {
             p1->currentFrame = 12;
             *lastMove = *newMove = 12;
-            printf("%d Left\n", p1->pos.x);
+            // printf("%d Left\n", p1->pos.x);
         }
         break;
 
@@ -189,12 +211,12 @@ void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[]) {
         {
             p1->currentFrame++;
             *lastMove = *newMove;
-            printf("%d Right\n", p1->pos.x);
+            // printf("%d Right\n", p1->pos.x);
         }
         else {
             p1->currentFrame = 8;
             *lastMove = *newMove = 8;
-            printf("%d Right\n", p1->pos.x);
+            // printf("%d Right\n", p1->pos.x);
         }
        break;
 

@@ -54,6 +54,11 @@ PRIVATE Uint32 bombExploded(Uint32 interval, void *args) {
     BombTimerCallbackArgs* bargs = (BombTimerCallbackArgs*) args;
     bargs->bomb->startExplosion = true;
 
+    bargs->bomb->explosionHor.w = 64 * bargs->bomb->explosionRange * 2 + 64;
+    bargs->bomb->explosionHor.h = 64;
+    bargs->bomb->explosionVer.w = 64;
+    bargs->bomb->explosionVer.h = bargs->bomb->explosionHor.w;
+
     return 0;
 }
 
@@ -62,7 +67,6 @@ PRIVATE Uint32 explosionDone(Uint32 interval, void *args) {
     bargs->bomb->endExplosion = true;
     (*(bargs->bombsAvailable))++;
 
-    printf("Callback function entered.\n");
     free(bargs);
     return 0;
 }
@@ -124,7 +128,7 @@ PUBLIC void renderBombsAndExplosions(Game game) {
             } 
             if (game->bombs[i]->endExplosion) {
                 game->bombs[i] = NULL;                                                                          // Raderar bomben
-                printf("Explosion timer done. Bomb deleted.\n");
+                // printf("Explosion timer done. Bomb deleted.\n");
             } 
         }
     }
@@ -201,13 +205,19 @@ PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer) 
     bomb->explosionPos.y = bomb->bombPos.y - 7;
     bomb->explosionPos.w = 64;
     bomb->explosionPos.h = 64;
-    bomb->currentFrame = 0;
+    bomb->explosionRange = 2;
+
+    bomb->explosionHor.x = bomb->bombPos.x - 7 - (64 * (bomb->explosionRange));   // Start horizontal explosion to the left of bomb
+    bomb->explosionHor.y = bomb->bombPos.y - 7;
+    bomb->explosionVer.x = bomb->bombPos.x - 7;
+    bomb->explosionVer.y = bomb->bombPos.y - 7 - (64 * (bomb->explosionRange));   // Start vertical explosion above bomb
+    bomb->explosionHor.w = bomb->explosionHor.h = bomb->explosionVer.w = bomb->explosionVer.h = 0;      // Width and height changes when bomb sets off
+
     bomb->switchRedBomb = false;                                                  // R�d bomb avaktiverad fr�n b�rjan
     bomb->startExplosion = false;
     bomb->endExplosion = false;
     bomb->spawnInside = true;
     // bomb->hasCollision = false; // Maybe only use "exploded" boolean
-    bomb->explosionRange = 2;
 
     return bomb;
 }

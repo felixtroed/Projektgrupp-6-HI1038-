@@ -18,15 +18,16 @@ typedef struct BombSettings {
     SDL_Texture* textureExplosionEnd;
     SDL_Rect bombPos;
     SDL_Rect explosionPos;
+    SDL_Rect explosionHor;
+    SDL_Rect explosionVer;
     SDL_Surface *surface;
     SDL_TimerID bombTime;
     SDL_TimerID redBombTime;
     SDL_TimerID deleteBombTime;
-    int currentFrame;
     bool startExplosion;
     bool endExplosion;
     bool switchRedBomb;
-    bool hasCollision;
+    bool hasCollision;          // Not currently used
     bool spawnInside;
     int explosionRange;
 } *Bomb;

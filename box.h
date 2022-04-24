@@ -3,6 +3,6 @@
 
 #include <stdbool.h>
 
-bool activeBox[11][15];
+int activeBox[11][15];
 
 #endif /* BOX_H */

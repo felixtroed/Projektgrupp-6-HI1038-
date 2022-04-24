@@ -39,7 +39,6 @@ PUBLIC Game createGame() {
     game->p3 = createPlayer(3, 64, 704, game);
     game->p4 = createPlayer(4, 960, 704, game);
     initBombs(game->bombs);                           // Sets all bombs to NULL
-    // game->bombs[0] = createBomb(64+12, 128+12, game); // Creates temporary bomb for testing
 
     return game;
 }
@@ -90,12 +89,20 @@ PUBLIC void updateGame(Game game) {
 
             }
         }
+        handleExplosionCollision(game);
           
         SDL_RenderClear(game->renderer);
         SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
-        // SDL_RenderCopy(game->renderer, game->bombs[0]->texture, NULL, &game->bombs[0]->pos);    // Copies temporary bomb to renderer
         renderBoxes(game);
         renderBombsAndExplosions(game);
+
+        if (game->p1->isHurt) {
+            SDL_SetTextureColorMod(game->p1->texture, 255, 0, 0);           // Character turns red if hurt
+        }
+        else {
+            SDL_SetTextureColorMod(game->p1->texture, 255, 255, 255);       // Restore color if not hurt
+        }
+
         SDL_RenderCopy(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos);
         SDL_RenderCopy(game->renderer, game->p2->texture, &game->p2->clip[game->p2->currentFrame], &game->p2->pos);
         SDL_RenderCopy(game->renderer, game->p3->texture, &game->p3->clip[game->p3->currentFrame], &game->p3->pos);
@@ -178,6 +185,10 @@ PUBLIC void exitGame(Game game) {
     SDL_DestroyTexture(game->p2->texture);
     SDL_DestroyTexture(game->p3->texture);
     SDL_DestroyTexture(game->p4->texture);
+    free(game->p1);
+    free(game->p2);
+    free(game->p3);
+    free(game->p4);
     SDL_DestroyRenderer(game->renderer);
     SDL_DestroyWindow(game->window);
     IMG_Quit();
