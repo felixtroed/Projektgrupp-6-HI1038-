@@ -8,36 +8,76 @@ PRIVATE int PLAYER_HEIGHT = 64;
 
 PRIVATE void initClips(Player player);
 
-PUBLIC Player createPlayer(int x, int y, Game game) {
+PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
     Player player = malloc(sizeof(struct PlayerSettings));
 
-    player->texture = NULL;
-    player->surface = IMG_Load("resources/old-man.png");
-    if(player->surface == NULL ) {
-            printf( "Unable to load image! SDL_image Error: %s\n", IMG_GetError());
-    }
-    else {
-        // Create texture from surface pixels
-        player->texture = SDL_CreateTextureFromSurface(game->renderer, player->surface);
-        if(player->texture == NULL ) {
-            printf( "Unable to create texture! SDL Error: %s\n", SDL_GetError());
-        }
+    switch (playerNumber) {                                                 // Laddar upp rätt bild för rätt player
+        case 1:
+            player->surface = IMG_Load("resources/old-man.png");
+            if (player->surface == NULL) {
+                printf("Unable to load player 1 image! SDL_image Error: %s\n", IMG_GetError());
+            }
+            else {                                                          // Create texture from surface pixels
+                player->texture = SDL_CreateTextureFromSurface(game->renderer, player->surface);
+                if (player->texture == NULL) {
+                    printf("Unable to create player 1 texture! SDL Error: %s\n", SDL_GetError());
+                }
+                SDL_FreeSurface(player->surface);                           // Get rid of old loaded surface
+                player->currentFrame = 8;                                   // Player is turned right from start
+            } break;
 
-        // Get rid of old loaded surface
-        SDL_FreeSurface(player->surface);
-        printf("Player surface freed.\n");
+        case 2:
+            player->surface = IMG_Load("resources/green-man.png");
+            if (player->surface == NULL) {
+                printf("Unable to load player 2 image! SDL_image Error: %s\n", IMG_GetError());
+            }
+            else {
+                player->texture = SDL_CreateTextureFromSurface(game->renderer, player->surface);
+                if (player->texture == NULL) {
+                    printf("Unable to create player 2 texture! SDL Error: %s\n", SDL_GetError());
+                }
+                SDL_FreeSurface(player->surface);
+                player->currentFrame = 12;                                  // Player is turned left from start
+            } break;
+
+        case 3:
+            player->surface = IMG_Load("resources/blue-man.png");
+            if (player->surface == NULL) {
+                printf("Unable to load player 3 image! SDL_image Error: %s\n", IMG_GetError());
+            }
+            else {
+                player->texture = SDL_CreateTextureFromSurface(game->renderer, player->surface);
+                if (player->texture == NULL) {
+                    printf("Unable to create player 3 texture! SDL Error: %s\n", SDL_GetError());
+                }
+                SDL_FreeSurface(player->surface);
+                player->currentFrame = 8;
+            } break;
+
+        case 4:
+            player->surface = IMG_Load("resources/red-man.png");
+            if (player->surface == NULL) {
+                printf("Unable to load player 4 image! SDL_image Error: %s\n", IMG_GetError());
+            }
+            else {
+                player->texture = SDL_CreateTextureFromSurface(game->renderer, player->surface);
+                if (player->texture == NULL) {
+                    printf("Unable to create player 4 texture! SDL Error: %s\n", SDL_GetError());
+                }
+                SDL_FreeSurface(player->surface);
+                player->currentFrame = 12;
+            } break;
     }
 
     player->pos.x = x;
     player->pos.y = y;
     player->pos.w = PLAYER_WIDTH;
     player->pos.h = PLAYER_HEIGHT;
-    player->currentFrame = 0;
     player->speed = 8;
+    player->bombsAvailable = 4;
     initClips(player);
     return player;
 }
-
 
 PRIVATE void initClips(Player player) {
     player->clip[0].x = 0;
@@ -119,5 +159,4 @@ PRIVATE void initClips(Player player) {
     player->clip[15].y = 64;
     player->clip[15].w = PLAYER_WIDTH;
     player->clip[15].h = PLAYER_HEIGHT; // gubben g�r v�nster
-
  }

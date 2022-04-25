@@ -9,15 +9,15 @@
 #define COLUMN_SIZE 15 
 
 
-
-bool checkCollision(Player p1) {
+bool checkCollision(Player p1,Boxes boxes) {
     if (!collisionMap(p1))
         return false; 
-    if (!collisionBoxes(p1))
+    if (!collisionBoxes(p1,boxes))
         return false; 
 
     return true; 
 }
+
 
 bool collisionMap(Player p1) {
     if (p1->pos.y < SCREENMIN_Y)
@@ -36,17 +36,15 @@ bool collisionMap(Player p1) {
         return false;
     }
 
-
     if (p1->pos.x > SCREENMAX_X)
     {
         return false;
     }
-
     return true;
 }
 
 
-bool collisionBoxes(Player p1)
+bool collisionBoxes(Player p1,Boxes boxes)
 {
     int posBoxX=0, posBoxY=0;
      int sizeBox = 50;
@@ -54,19 +52,19 @@ bool collisionBoxes(Player p1)
      int changeBoxs = 0;
      for (int row = 0; row < ROW_SIZE; row++) {
          for (int column = 0; column < COLUMN_SIZE; column++) {
-             if (activeBox[row][column] >0)
+             if (boxes->activeBox[row][column] >0)
              {
             
                  posBoxX = column * 64 + 64;
                  posBoxY = row * 64 + 64;
-                 if (activeBox[row][column] == 2)
+                 if (boxes->activeBox[row][column] == 3)
                  {
                      sizeBox = 32;
                      sizePlayer = 32;
                      sizePlayerGreyBox = 16;
                  }
 
-                 if (activeBox[row][column] == 1)
+                 if (boxes->activeBox[row][column] == 1)
                  {
                      changeBoxs = 15;
                  }
@@ -93,12 +91,52 @@ bool collisionBoxes(Player p1)
 }
 
 
+Boxes removeBox(Player p1,Boxes boxes) {
 
-void move(Player p1,int *lastMove, int *newMove, char key) {
+    int posBoxX = 0, posBoxY = 0;
+    float closest=1000, distance;
+    int indexOne, indexTwo;
+    bool boxeGone = false;
+ 
+    for (int row = 0; row < ROW_SIZE; row++) {
+        for (int column = 0; column < COLUMN_SIZE; column++) {
+            if (boxes->activeBox[row][column] == 1)
+            {
+              
+                posBoxX = column * 64 + 64;
+                posBoxY = row * 64 + 64;
+                distance = sqrt(pow(posBoxX - p1->pos.x, 2) + pow((posBoxY - p1->pos.y), 2));
+               
+                if ( distance <closest && distance < 200 )
+                {
+                        indexOne = row; 
+                        indexTwo = column;
+                        printf("Row %d, Column %d\n", row, column);
+                        closest = sqrt(pow(posBoxX - p1->pos.x, 2) + pow((posBoxY - p1->pos.y), 2));
+                        printf("Player pos X %d Y %d \n", p1->pos.x, p1->pos.y);
+                        printf("BOX pos X %d Y %d\n", posBoxX, posBoxY);
+                        printf("Closest: %f\n", closest);
+                        boxeGone = true;
+             
+                }
+            }
+      
+        }
+    }
+    if(boxeGone)
+    boxes->activeBox[indexOne][indexTwo] = 0;
+
+    return boxes;
+
+}
+
+
+
+void move(Player p1,int *lastMove, int *newMove, char key, Boxes boxes) {
     switch (key) {
     case 's':
         p1->pos.y += p1->speed;
-        if (!checkCollision(p1))
+        if (!checkCollision(p1,boxes))
         {
             p1->pos.y -= p1->speed; 
         }
@@ -121,7 +159,7 @@ void move(Player p1,int *lastMove, int *newMove, char key) {
 
     case 'w':
         p1->pos.y -= p1->speed;
-        if (!checkCollision(p1))
+        if (!checkCollision(p1,boxes))
         {
             p1->pos.y += p1->speed;
         }
@@ -142,7 +180,7 @@ void move(Player p1,int *lastMove, int *newMove, char key) {
 
     case 'a':
         p1->pos.x -= p1->speed;
-        if (!checkCollision(p1))
+        if (!checkCollision(p1,boxes))
         {
             p1->pos.x += p1->speed;
         }
@@ -163,7 +201,7 @@ void move(Player p1,int *lastMove, int *newMove, char key) {
         break;
     case 'd':
         p1->pos.x += p1->speed;
-        if (!checkCollision(p1))
+        if (!checkCollision(p1,boxes))
         {
             p1->pos.x -= p1->speed;
         }

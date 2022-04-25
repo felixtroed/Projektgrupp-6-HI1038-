@@ -1,5 +1,6 @@
 #include "game.h"
 #include "box.h"
+#include "bomb.h"
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -9,18 +10,17 @@
 #define WINDOW_WIDTH 1088
 #define WINDOW_HEIGHT 832
 #define ROW_SIZE 11
-#define COLUMN_SIZE 15 
+#define COLUMN_SIZE 15
 
 #define KEYDOWN 's'
 #define KEYUP 'w'
 #define KEYRIGHT 'd'
 #define KEYLEFT 'a'
 
-
-PRIVATE bool initWinRen(Game game); 
-PRIVATE bool createBackground(Game game); 
-PRIVATE bool createBoxes(Game game); 
-PRIVATE void renderBackground(Game game);
+PRIVATE bool initWinRen(Game game);
+PRIVATE bool createBackground(Game game);
+PRIVATE bool createBoxes(Game game);
+PRIVATE void renderBoxes(Game game);
 
 PUBLIC Game createGame() {
     Game game = malloc(sizeof(struct GameSettings));
@@ -36,7 +36,13 @@ PUBLIC Game createGame() {
             }
         }
     }
-    game->p1 = createPlayer(64, 64, game);
+    game->p1 = createPlayer(1, 64, 64, game);
+    game->p2 = createPlayer(2, 960, 64, game);
+    game->p3 = createPlayer(3, 64, 704, game);
+    game->p4 = createPlayer(4, 960, 704, game);
+    game->placeBoxes = setBoxes(game);
+    initBombs(game->bombs);                           // Sets all bombs to NULL
+    // game->bombs[0] = createBomb(64+12, 128+12, game); // Creates temporary bomb for testing
 
     return game;
 }
@@ -64,21 +70,25 @@ PUBLIC void updateGame(Game game) {
 
                 switch (game->event.key.keysym.sym)
                 {
-                case SDLK_w: move(game->p1, &newMove, &lastMove, KEYUP);
+                case SDLK_w: move(game->p1, &newMove, &lastMove, KEYUP,game->placeBoxes);
                     break;
 
                 case SDLK_s:
-                        move(game->p1, &newMove, &lastMove, KEYDOWN);
+                        move(game->p1, &newMove, &lastMove, KEYDOWN, game->placeBoxes);
                     break;
 
                 case SDLK_a:
-                        move(game->p1, &newMove, &lastMove, KEYLEFT);
+                        move(game->p1, &newMove, &lastMove, KEYLEFT, game->placeBoxes);
                     break;
 
                 case SDLK_d:
-                        move(game->p1, &newMove, &lastMove, KEYRIGHT);
+                        move(game->p1, &newMove, &lastMove, KEYRIGHT,game->placeBoxes);
                     break;
 
+                case SDLK_SPACE:
+                        bombPlacement(game->p1, game->bombs, game->renderer);
+                        game->placeBoxes = removeBox(game->p1, game->placeBoxes->activeBox);
+                    break;
                 }
 
             }
@@ -86,15 +96,20 @@ PUBLIC void updateGame(Game game) {
           
         SDL_RenderClear(game->renderer);
         SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
-        renderBackground(game);
-        SDL_RenderCopyEx(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos, 0, NULL, SDL_FLIP_NONE);
+        // SDL_RenderCopy(game->renderer, game->bombs[0]->texture, NULL, &game->bombs[0]->pos);    // Copies temporary bomb to renderer
+        renderBoxes(game);
+        renderBombsAndExplosions(game);
+        SDL_RenderCopy(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos);
+        SDL_RenderCopy(game->renderer, game->p2->texture, &game->p2->clip[game->p2->currentFrame], &game->p2->pos);
+        SDL_RenderCopy(game->renderer, game->p3->texture, &game->p3->clip[game->p3->currentFrame], &game->p3->pos);
+        SDL_RenderCopy(game->renderer, game->p4->texture, &game->p4->clip[game->p4->currentFrame], &game->p4->pos);
         SDL_RenderPresent(game->renderer);
     }
 }
 
 PRIVATE bool initWinRen(Game game) {
 
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
         printf("SDL failed to initialize. Error code: %s\n", SDL_GetError());
         return false;
     }
@@ -141,6 +156,8 @@ PRIVATE bool createBackground(Game game) {
 
 PRIVATE bool createBoxes(Game game) {
 
+
+    game->placeBoxes = setBoxes(game);
     game->bitmapSurface = SDL_LoadBMP("resources/Box.bmp");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske m�ste �ndra bildens position)
     if (!game->bitmapSurface) {
         printf("Could not load Box to bitmapSurface: %s\n", SDL_GetError());
@@ -162,19 +179,24 @@ PRIVATE bool createBoxes(Game game) {
 }
 
 PUBLIC void exitGame(Game game) {
-    IMG_Quit();
+    SDL_DestroyTexture(game->p1->texture);
+    SDL_DestroyTexture(game->p2->texture);
+    SDL_DestroyTexture(game->p3->texture);
+    SDL_DestroyTexture(game->p4->texture);
     SDL_DestroyRenderer(game->renderer);
     SDL_DestroyWindow(game->window);
+    IMG_Quit();
     SDL_Quit();
 }
 
-PRIVATE void renderBackground(Game game) {
+PRIVATE void renderBoxes(Game game) {
      //// RENDERAR L�DORNA, INTE OPTIMERAT ////
      game->boxPos.w = 64;                  //Utanf�r loopen, alltid samma v�rde (h�jd/bredd p� l�dan)
      game->boxPos.h = 64;
+
      for (int row = 0; row < ROW_SIZE; row++) {
          for (int column = 0; column < COLUMN_SIZE; column++) {
-             if (activeBox[row][column] == 1) {
+             if (game->placeBoxes->activeBox[row][column] == 1) {
                  game->boxPos.x = column * 64 + 64;
                  game->boxPos.y = row * 64 + 64;
                  SDL_RenderCopyEx(game->renderer, game->box, NULL, &game->boxPos, 0, NULL, SDL_FLIP_NONE);       // Renderar en l�da i taget
