@@ -46,10 +46,11 @@ bool collisionMap(Player p1) {
 
 bool collisionBoxes(Player p1,Boxes boxes)
 {
-    int posBoxX=0, posBoxY=0;
-     int sizeBox = 50;
-     int sizePlayer = 50, sizePlayerGreyBox = 0;
-     int changeBoxs = 0;
+     int posBoxX=0, posBoxY=0;
+     int sizeBox = 32;
+     int sizePlayer = 32;
+     const int botPlayerBigger = 16;
+
      for (int row = 0; row < ROW_SIZE; row++) {
          for (int column = 0; column < COLUMN_SIZE; column++) {
              if (boxes->activeBox[row][column] >0)
@@ -57,21 +58,9 @@ bool collisionBoxes(Player p1,Boxes boxes)
             
                  posBoxX = column * 64 + 64;
                  posBoxY = row * 64 + 64;
-                 if (boxes->activeBox[row][column] == 3)
-                 {
-                     sizeBox = 32;
-                     sizePlayer = 32;
-                     sizePlayerGreyBox = 16;
-                 }
 
-                 if (boxes->activeBox[row][column] == 1)
-                 {
-                     changeBoxs = 15;
-                 }
-
-
-                 if (!(p1->pos.x + changeBoxs> posBoxX + sizeBox || posBoxX + changeBoxs > p1->pos.x + sizePlayer  || p1->pos.y + changeBoxs> posBoxY + sizeBox || 
-                     p1->pos.y + sizePlayerGreyBox + sizePlayer < posBoxY))
+                 if (!(p1->pos.x > posBoxX + sizeBox || posBoxX  > p1->pos.x + sizePlayer  || p1->pos.y > posBoxY + sizeBox || 
+                     p1->pos.y + botPlayerBigger + sizePlayer < posBoxY))
                  {
                      printf("POS X: %d POS Y %d \n", p1->pos.x, p1->pos.y);
                      printf("BOX: POS X: %d POS Y:%d\n ", posBoxX, posBoxY);
@@ -80,10 +69,7 @@ bool collisionBoxes(Player p1,Boxes boxes)
                  }  
 
              }
-             sizeBox = 50;
-             sizePlayer = 50;
-             sizePlayerGreyBox = 0; 
-             changeBoxs = 0;
+           
            
          }
      }
@@ -91,7 +77,7 @@ bool collisionBoxes(Player p1,Boxes boxes)
 }
 
 
-Boxes removeBox(Player p1,Boxes boxes) {
+void removeBox(Player p1,Boxes boxes) {
 
     int posBoxX = 0, posBoxY = 0;
     float closest=1000, distance;
@@ -106,8 +92,8 @@ Boxes removeBox(Player p1,Boxes boxes) {
                 posBoxX = column * 64 + 64;
                 posBoxY = row * 64 + 64;
                 distance = sqrt(pow(posBoxX - p1->pos.x, 2) + pow((posBoxY - p1->pos.y), 2));
-               
-                if ( distance <closest && distance < 200 )
+            
+                if ( distance <closest && distance < 150 )
                 {
                         indexOne = row; 
                         indexTwo = column;
@@ -125,8 +111,6 @@ Boxes removeBox(Player p1,Boxes boxes) {
     }
     if(boxeGone)
     boxes->activeBox[indexOne][indexTwo] = 0;
-
-    return boxes;
 
 }
 
@@ -226,3 +210,4 @@ void move(Player p1,int *lastMove, int *newMove, char key, Boxes boxes) {
     default: break;
     }
 }
+

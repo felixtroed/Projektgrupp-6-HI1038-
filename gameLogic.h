@@ -23,6 +23,6 @@ bool collisionMap(Player p1);
 void move(Player p1, int* lastMove, int* newMove, char key,Boxes boxes);
 bool collisionBoxes(Player p1, Boxes boxes);
 bool checkCollision(Player p1,Boxes boxes);
-Boxes removeBox(Player p1,Boxes boxes);
+void removeBox(Player p1,Boxes boxes);
 
 #endif /* GAME_LOGIC_H */

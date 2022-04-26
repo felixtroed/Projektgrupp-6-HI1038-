@@ -86,8 +86,8 @@ PUBLIC void updateGame(Game game) {
                     break;
 
                 case SDLK_SPACE:
-                        bombPlacement(game->p1, game->bombs, game->renderer);
-                        game->placeBoxes = removeBox(game->p1, game->placeBoxes->activeBox);
+                    bombPlacement(game->p1, game->bombs, game->renderer);
+                        removeBox(game->p1, game->placeBoxes->activeBox);
                     break;
                 }
 
