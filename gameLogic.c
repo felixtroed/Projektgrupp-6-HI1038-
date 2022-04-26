@@ -3,26 +3,26 @@
 #define SCREENMAX_X 970
 #define SCREENMIN_X 48
 #define SCREENMAX_Y 700
-#define SCREENMIN_Y 48
-
-#define ROW_SIZE 11
-#define COLUMN_SIZE 15 
+#define SCREENMIN_Y 48 
 
 #define BOMB_SIZE 34
 
 Uint32 disableInvincibility(Uint32 interval, void *args);
 
 void handleExplosionCollision(Game game) {
-    if (game->p1->isHurt == false) {
+    if (game->p1->isHurt == false) { 
+
         for (uint8_t i = 0; i < BOMBS; i++) {
             if (game->bombs[i] != NULL) {
                 game->p1->hitboxPos.x = game->p1->pos.x + 16;       // Puts hitbox in the same position as character
                 game->p1->hitboxPos.y = game->p1->pos.y + 14;
 
-                if (SDL_HasIntersection(&game->p1->hitboxPos, &game->bombs[i]->explosionHor) || SDL_HasIntersection(&game->p1->hitboxPos, &game->bombs[i]->explosionVer)) {
-                    game->p1->isHurt = true;
-                    game->p1->invincibleTimer = SDL_AddTimer(2000, disableInvincibility, game->p1);
-                }
+                if (game->bombs[i]->startExplosion == true && game->bombs[i]->endExplosion == false) {
+                    if (SDL_HasIntersection(&game->p1->hitboxPos, &game->bombs[i]->explosionHor) || SDL_HasIntersection(&game->p1->hitboxPos, &game->bombs[i]->explosionVer)) {
+                        game->p1->isHurt = true;
+                        game->p1->invincibleTimer = SDL_AddTimer(2000, disableInvincibility, game->p1);
+                    }
+                }  
             } 
         }
     }
@@ -82,7 +82,7 @@ bool collisionBoxes(Player p1)
             
                  posBoxX = column * 64 + 64;
                  posBoxY = row * 64 + 64;
-                 if (activeBox[row][column] == 2)
+                 if (activeBox[row][column] == W)
                  {
                      sizeBox = 32;
                      sizePlayer = 32;

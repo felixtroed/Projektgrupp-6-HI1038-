@@ -16,6 +16,7 @@ PRIVATE Uint32 bombExploded(Uint32 interval, void *args);
 PRIVATE Uint32 explosionDone(Uint32 interval, void *deleteBomb);
 PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer);
 PRIVATE uint8_t getBombIdx(Bomb bombs[]);
+PRIVATE void modifyExplosionHitbox(Bomb bomb);
 PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer);
 PUBLIC void renderBombsAndExplosions(Game game);
 
@@ -53,11 +54,6 @@ PRIVATE Uint32 redBomb(Uint32 interval, void *args) {
 PRIVATE Uint32 bombExploded(Uint32 interval, void *args) {
     BombTimerCallbackArgs* bargs = (BombTimerCallbackArgs*) args;
     bargs->bomb->startExplosion = true;
-
-    bargs->bomb->explosionHor.w = 64 * bargs->bomb->explosionRange * 2 + 64;
-    bargs->bomb->explosionHor.h = 64;
-    bargs->bomb->explosionVer.w = 64;
-    bargs->bomb->explosionVer.h = bargs->bomb->explosionHor.w;
 
     return 0;
 }
@@ -209,17 +205,61 @@ PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer) 
 
     bomb->explosionHor.x = bomb->bombPos.x - 7 - (64 * (bomb->explosionRange));   // Start horizontal explosion to the left of bomb
     bomb->explosionHor.y = bomb->bombPos.y - 7;
+    bomb->explosionHor.w = 64 * bomb->explosionRange * 2 + 64;
+    bomb->explosionHor.h = 64;
     bomb->explosionVer.x = bomb->bombPos.x - 7;
     bomb->explosionVer.y = bomb->bombPos.y - 7 - (64 * (bomb->explosionRange));   // Start vertical explosion above bomb
-    bomb->explosionHor.w = bomb->explosionHor.h = bomb->explosionVer.w = bomb->explosionVer.h = 0;      // Width and height changes when bomb sets off
+    bomb->explosionVer.w = 64;
+    bomb->explosionVer.h = bomb->explosionHor.w;
 
     bomb->switchRedBomb = false;                                                  // R�d bomb avaktiverad fr�n b�rjan
     bomb->startExplosion = false;
     bomb->endExplosion = false;
     bomb->spawnInside = true;
-    // bomb->hasCollision = false; // Maybe only use "exploded" boolean
+
+    modifyExplosionHitbox(bomb);       // Changes explosion size based on collision with walls and boxes 
 
     return bomb;
+}
+
+PRIVATE void modifyExplosionHitbox(Bomb bomb) {
+    uint8_t col = bomb->explosionPos.x / 64 - 1;
+    uint8_t row = bomb->explosionPos.y / 64 - 1;
+    uint8_t i;
+
+    // Adjust explosion size if box or wall exists on the right part of the explosion
+    for (i = 0; i < bomb->explosionRange; i++) {
+        if (activeBox[row][col + i + 1] == W) {
+            // printf("Right wall: hor w before: %d\n", bomb->explosionHor.w);  // Sparar dessa printsatser för tillfället ifall ni vill testa
+            bomb->explosionHor.w -= 64 * (bomb->explosionRange - i);
+            // printf("Right wall: hor w after: %d\n", bomb->explosionHor.w);
+            break;
+        }
+        else if (activeBox[row][col + i + 1] == 1) {
+            // printf("Right box: hor w before: %d\n", bomb->explosionHor.w);
+            bomb->explosionHor.w -= 64 * (bomb->explosionRange - i) - 64;
+            activeBox[row][col + i + 1] = 0;
+            // printf("Right box: hor w after: %d\n", bomb->explosionHor.w);
+            break;
+        }
+    }
+
+    // Adjust explosion size if box or wall exists on the left part of the explosion
+    for (i = 0; i < bomb->explosionRange; i++) {
+        if (activeBox[row][col - i - 1] == W) {
+            printf("Left wall: hor x before: %d\n", bomb->explosionHor.x);
+            bomb->explosionHor.x += 64 * (bomb->explosionRange - i);
+            printf("Left wall: hor x after: %d\n", bomb->explosionHor.x);
+            break;
+        }
+        if (activeBox[row][col - i - 1] == 1) {
+            // printf("Left box: hor x before: %d\n", bomb->explosionHor.x);
+            bomb->explosionHor.x += 64 * (bomb->explosionRange - i) - 64;
+            // printf("Left box: hor x after: %d\n", bomb->explosionHor.x);
+        }
+    }
+
+    // Adjust explosion size if box or wall exists on the top part of the explosion
 }
 
 PUBLIC void initBombs(Bomb bombs[]) {
