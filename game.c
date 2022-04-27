@@ -1,16 +1,9 @@
 #include "game.h"
-#include "box.h"
-#include "bomb.h"
 #include <stdio.h>
 #include <stdbool.h>
 
 #define PUBLIC /* empty */
 #define PRIVATE static
-
-#define WINDOW_WIDTH 1088
-#define WINDOW_HEIGHT 832
-#define ROW_SIZE 11
-#define COLUMN_SIZE 15
 
 #define KEYDOWN 's'
 #define KEYUP 'w'
@@ -19,7 +12,7 @@
 
 PRIVATE bool initWinRen(Game game);
 PRIVATE bool createBackground(Game game);
-PRIVATE bool createBoxes(Game game);
+PRIVATE bool showBoxes(Game game);
 PRIVATE void renderBoxes(Game game);
 
 PUBLIC Game createGame() {
@@ -27,7 +20,7 @@ PUBLIC Game createGame() {
 
     if (initWinRen(game)) {
         if(createBackground(game)) {
-            if (createBoxes(game)) {
+            if (showBoxes(game)) {
                 int imgFlags = IMG_INIT_PNG;
                 if (!(IMG_Init(imgFlags) & imgFlags)) 
                 {
@@ -40,9 +33,8 @@ PUBLIC Game createGame() {
     game->p2 = createPlayer(2, 960, 64, game);
     game->p3 = createPlayer(3, 64, 704, game);
     game->p4 = createPlayer(4, 960, 704, game);
-    game->placeBoxes = setBoxes(game);
+    game->boxes = createBoxes(game);
     initBombs(game->bombs);                           // Sets all bombs to NULL
-    // game->bombs[0] = createBomb(64+12, 128+12, game); // Creates temporary bomb for testing
 
     return game;
 }
@@ -70,35 +62,44 @@ PUBLIC void updateGame(Game game) {
 
                 switch (game->event.key.keysym.sym)
                 {
-                case SDLK_w: move(game->p1, &newMove, &lastMove, KEYUP,game->placeBoxes);
+                case SDLK_w:
+                        move(game->p1, &newMove, &lastMove, KEYUP, game->bombs,game->boxes);
                     break;
 
                 case SDLK_s:
-                        move(game->p1, &newMove, &lastMove, KEYDOWN, game->placeBoxes);
+                        move(game->p1, &newMove, &lastMove, KEYDOWN, game->bombs,game->boxes);
                     break;
 
                 case SDLK_a:
-                        move(game->p1, &newMove, &lastMove, KEYLEFT, game->placeBoxes);
+                        move(game->p1, &newMove, &lastMove, KEYLEFT, game->bombs,game->boxes);
                     break;
 
                 case SDLK_d:
-                        move(game->p1, &newMove, &lastMove, KEYRIGHT,game->placeBoxes);
+                        move(game->p1, &newMove, &lastMove, KEYRIGHT, game->bombs,game->boxes);
                     break;
 
                 case SDLK_SPACE:
-                    bombPlacement(game->p1, game->bombs, game->renderer);
-                        removeBox(game->p1, game->placeBoxes->activeBox);
+                        bombPlacement(game->p1, game->bombs, game->renderer,game->boxes);
+                        removeBox(game->p1, game->boxes->activeBox);
                     break;
                 }
 
             }
         }
+        handlePlayerExplosionCollision(game);
           
         SDL_RenderClear(game->renderer);
         SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
-        // SDL_RenderCopy(game->renderer, game->bombs[0]->texture, NULL, &game->bombs[0]->pos);    // Copies temporary bomb to renderer
         renderBoxes(game);
         renderBombsAndExplosions(game);
+
+        if (game->p1->isHurt) {
+            SDL_SetTextureColorMod(game->p1->texture, 255, 0, 0);           // Character turns red if hurt
+        }
+        else {
+            SDL_SetTextureColorMod(game->p1->texture, 255, 255, 255);       // Restore color if not hurt
+        }
+
         SDL_RenderCopy(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos);
         SDL_RenderCopy(game->renderer, game->p2->texture, &game->p2->clip[game->p2->currentFrame], &game->p2->pos);
         SDL_RenderCopy(game->renderer, game->p3->texture, &game->p3->clip[game->p3->currentFrame], &game->p3->pos);
@@ -134,9 +135,9 @@ PRIVATE bool initWinRen(Game game) {
 
 PRIVATE bool createBackground(Game game) {
 
-    game->bitmapSurface = SDL_LoadBMP("resources/Background.bmp");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske m�ste �ndra bildens position)
+    game->bitmapSurface = IMG_Load("resources/Background.png");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske m�ste �ndra bildens position)
     if (!game->bitmapSurface) {
-        printf("Could not load Background to bitmapSurface: %s\n", SDL_GetError());
+        printf("Could not load Background to bitmapSurface: %s\n", IMG_GetError());
         return false;
     }
   
@@ -154,13 +155,11 @@ PRIVATE bool createBackground(Game game) {
     return true;
 }
 
-PRIVATE bool createBoxes(Game game) {
+PRIVATE bool showBoxes(Game game) {
 
-
-    game->placeBoxes = setBoxes(game);
-    game->bitmapSurface = SDL_LoadBMP("resources/Box.bmp");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske m�ste �ndra bildens position)
+    game->bitmapSurface = IMG_Load("resources/Box.png");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske m�ste �ndra bildens position)
     if (!game->bitmapSurface) {
-        printf("Could not load Box to bitmapSurface: %s\n", SDL_GetError());
+        printf("Could not load Box to bitmapSurface: %s\n", IMG_GetError());
         return false;
     }
    
@@ -183,6 +182,10 @@ PUBLIC void exitGame(Game game) {
     SDL_DestroyTexture(game->p2->texture);
     SDL_DestroyTexture(game->p3->texture);
     SDL_DestroyTexture(game->p4->texture);
+    free(game->p1);
+    free(game->p2);
+    free(game->p3);
+    free(game->p4);
     SDL_DestroyRenderer(game->renderer);
     SDL_DestroyWindow(game->window);
     IMG_Quit();
@@ -193,10 +196,9 @@ PRIVATE void renderBoxes(Game game) {
      //// RENDERAR L�DORNA, INTE OPTIMERAT ////
      game->boxPos.w = 64;                  //Utanf�r loopen, alltid samma v�rde (h�jd/bredd p� l�dan)
      game->boxPos.h = 64;
-
      for (int row = 0; row < ROW_SIZE; row++) {
          for (int column = 0; column < COLUMN_SIZE; column++) {
-             if (game->placeBoxes->activeBox[row][column] == 1) {
+             if (game->boxes->activeBox[row][column] == 1) {
                  game->boxPos.x = column * 64 + 64;
                  game->boxPos.y = row * 64 + 64;
                  SDL_RenderCopyEx(game->renderer, game->box, NULL, &game->boxPos, 0, NULL, SDL_FLIP_NONE);       // Renderar en l�da i taget

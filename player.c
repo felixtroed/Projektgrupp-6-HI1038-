@@ -73,8 +73,11 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
     player->pos.y = y;
     player->pos.w = PLAYER_WIDTH;
     player->pos.h = PLAYER_HEIGHT;
-    player->speed = 8;
+    player->hitboxPos.w = 34;            // The actual width of the character in each clip
+    player->hitboxPos.h = 46;            // The actual height of the character in each clip
+    player->speed = 10;
     player->bombsAvailable = 4;
+    player->isHurt = false;
     initClips(player);
     return player;
 }

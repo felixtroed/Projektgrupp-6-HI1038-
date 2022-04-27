@@ -1,18 +1,21 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <SDL.h>
+ #include <SDL.h>
 //#include <SDL2/SDL.h>
 #include "player.h"
 #include "box.h"
 #include "bomb.h"
 #include "gameLogic.h"
 
+#define WINDOW_WIDTH 1088
+#define WINDOW_HEIGHT 832
 #define BOMBS 4
 
 typedef struct PlayerSettings* Player;
-typedef struct Bomb* Bomb;
+typedef struct BombSettings* Bomb;
 typedef struct BoxInit* Boxes;
+
 
 typedef struct GameSettings {
     SDL_Window *window;
@@ -22,7 +25,7 @@ typedef struct GameSettings {
     SDL_Texture *box;                   //Anv�nds f�r att ladda in bilden av l�dan
     SDL_Rect boxPos;                  //Anv�nds f�r positionen av l�dorna
     SDL_Event event;
-    Boxes placeBoxes;
+    Boxes boxes;
     Player p1;
     Player p2;
     Player p3;
