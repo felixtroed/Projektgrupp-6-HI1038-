@@ -1,12 +1,22 @@
 #ifndef BOX_H
 #define BOX_H
 
-#include <stdbool.h>
-
 #define ROW_SIZE 11
 #define COLUMN_SIZE 15
-#define W 2			        // Walls, can't have boxes spawn on walls
+#define W 3
+#include "game.h"
+#include <stdlib.h>
+#include <stdio.h>
 
-int activeBox[ROW_SIZE][COLUMN_SIZE];
+//bool activeBox[11][15];
+
+typedef struct GameSettings* Game;
+
+typedef struct BoxInit {
+	int activeBox[ROW_SIZE][COLUMN_SIZE];
+} *Boxes;
+
+Boxes createBoxes(Game game);
+
 
 #endif /* BOX_H */

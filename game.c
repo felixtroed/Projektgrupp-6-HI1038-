@@ -12,7 +12,7 @@
 
 PRIVATE bool initWinRen(Game game);
 PRIVATE bool createBackground(Game game);
-PRIVATE bool createBoxes(Game game);
+PRIVATE bool showBoxes(Game game);
 PRIVATE void renderBoxes(Game game);
 
 PUBLIC Game createGame() {
@@ -20,7 +20,7 @@ PUBLIC Game createGame() {
 
     if (initWinRen(game)) {
         if(createBackground(game)) {
-            if (createBoxes(game)) {
+            if (showBoxes(game)) {
                 int imgFlags = IMG_INIT_PNG;
                 if (!(IMG_Init(imgFlags) & imgFlags)) 
                 {
@@ -33,6 +33,7 @@ PUBLIC Game createGame() {
     game->p2 = createPlayer(2, 960, 64, game);
     game->p3 = createPlayer(3, 64, 704, game);
     game->p4 = createPlayer(4, 960, 704, game);
+    game->boxes = createBoxes(game);
     initBombs(game->bombs);                           // Sets all bombs to NULL
 
     return game;
@@ -62,23 +63,24 @@ PUBLIC void updateGame(Game game) {
                 switch (game->event.key.keysym.sym)
                 {
                 case SDLK_w:
-                        move(game->p1, &newMove, &lastMove, KEYUP, game->bombs);
+                        move(game->p1, &newMove, &lastMove, KEYUP, game->bombs,game->boxes);
                     break;
 
                 case SDLK_s:
-                        move(game->p1, &newMove, &lastMove, KEYDOWN, game->bombs);
+                        move(game->p1, &newMove, &lastMove, KEYDOWN, game->bombs,game->boxes);
                     break;
 
                 case SDLK_a:
-                        move(game->p1, &newMove, &lastMove, KEYLEFT, game->bombs);
+                        move(game->p1, &newMove, &lastMove, KEYLEFT, game->bombs,game->boxes);
                     break;
 
                 case SDLK_d:
-                        move(game->p1, &newMove, &lastMove, KEYRIGHT, game->bombs);
+                        move(game->p1, &newMove, &lastMove, KEYRIGHT, game->bombs,game->boxes);
                     break;
 
                 case SDLK_SPACE:
-                        bombPlacement(game->p1, game->bombs, game->renderer);
+                        bombPlacement(game->p1, game->bombs, game->renderer,game->boxes);
+                        removeBox(game->p1, game->boxes->activeBox);
                     break;
                 }
 
@@ -153,7 +155,7 @@ PRIVATE bool createBackground(Game game) {
     return true;
 }
 
-PRIVATE bool createBoxes(Game game) {
+PRIVATE bool showBoxes(Game game) {
 
     game->bitmapSurface = IMG_Load("resources/Box.png");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske m�ste �ndra bildens position)
     if (!game->bitmapSurface) {
@@ -196,7 +198,7 @@ PRIVATE void renderBoxes(Game game) {
      game->boxPos.h = 64;
      for (int row = 0; row < ROW_SIZE; row++) {
          for (int column = 0; column < COLUMN_SIZE; column++) {
-             if (activeBox[row][column] == 1) {
+             if (game->boxes->activeBox[row][column] == 1) {
                  game->boxPos.x = column * 64 + 64;
                  game->boxPos.y = row * 64 + 64;
                  SDL_RenderCopyEx(game->renderer, game->box, NULL, &game->boxPos, 0, NULL, SDL_FLIP_NONE);       // Renderar en l�da i taget
