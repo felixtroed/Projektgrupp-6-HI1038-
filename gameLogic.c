@@ -138,41 +138,43 @@ bool collisionBomb(Player p1, Bomb bombs[]) {
 
 
 void removeBox(Player p1, Boxes boxes) {
+    int indexRow=0, indexCol=0;
+    
+    bool leftside = false;
+    bool rightside = false;
+    bool upp = false; 
+    bool down = false; 
 
-    int posBoxX = 0, posBoxY = 0;
-    float closest = 1000, distance;
-    int indexOne, indexTwo;
-    bool boxeGone = false;
+    indexCol=((((p1->pos.x + 32) / 64) * 64 + 7)/64)-1;
+    indexRow=((((p1->pos.y + 32) / 64) * 64 + 7) / 64)-1;
 
-    for (int row = 0; row < ROW_SIZE; row++) {
-        for (int column = 0; column < COLUMN_SIZE; column++) {
-            if (boxes->activeBox[row][column] == 1)
-            {
+    if (indexCol - 1 > 0)
+    {
+        boxes->activeBox[indexRow][indexCol - 1] = 0;
 
-                posBoxX = column * 64 + 64;
-                posBoxY = row * 64 + 64;
-                distance = sqrt(pow(posBoxX - p1->pos.x, 2) + pow((posBoxY - p1->pos.y), 2));
-
-                if (distance < closest && distance < 150)
-                {
-                    indexOne = row;
-                    indexTwo = column;
-                    printf("Row %d, Column %d\n", row, column);
-                    closest = sqrt(pow(posBoxX - p1->pos.x, 2) + pow((posBoxY - p1->pos.y), 2));
-                    printf("Player pos X %d Y %d \n", p1->pos.x, p1->pos.y);
-                    printf("BOX pos X %d Y %d\n", posBoxX, posBoxY);
-                    printf("Closest: %f\n", closest);
-                    boxeGone = true;
-
-                }
-            }
-
-        }
     }
-    if (boxeGone)
-        boxes->activeBox[indexOne][indexTwo] = 0;
 
-}
+    if (indexCol + 1 < 14)
+    {
+        boxes->activeBox[indexRow][indexCol + 1] = 0; 
+
+    }
+
+    if (indexRow - 1 > 0)
+    {
+        boxes->activeBox[indexRow-1][indexCol] = 0;
+    }
+
+    if (indexRow + 1 < 10)
+    {
+        boxes->activeBox[indexRow + 1][indexCol] = 0;
+
+    }
+
+
+    }  
+
+      
 
 
 void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[],Boxes boxes) {
