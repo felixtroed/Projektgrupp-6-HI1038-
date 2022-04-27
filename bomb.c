@@ -247,19 +247,49 @@ PRIVATE void modifyExplosionHitbox(Bomb bomb) {
     // Adjust explosion size if box or wall exists on the left part of the explosion
     for (i = 0; i < bomb->explosionRange; i++) {
         if (activeBox[row][col - i - 1] == W) {
-            printf("Left wall: hor x before: %d\n", bomb->explosionHor.x);
+            // printf("Left wall: hor x before: %d\n", bomb->explosionHor.x);
             bomb->explosionHor.x += 64 * (bomb->explosionRange - i);
-            printf("Left wall: hor x after: %d\n", bomb->explosionHor.x);
+            // printf("Left wall: hor x after: %d\n", bomb->explosionHor.x);
             break;
         }
-        if (activeBox[row][col - i - 1] == 1) {
+        else if (activeBox[row][col - i - 1] == 1) {
             // printf("Left box: hor x before: %d\n", bomb->explosionHor.x);
             bomb->explosionHor.x += 64 * (bomb->explosionRange - i) - 64;
             // printf("Left box: hor x after: %d\n", bomb->explosionHor.x);
+            break;
         }
     }
 
     // Adjust explosion size if box or wall exists on the top part of the explosion
+    for (i = 0; i < bomb->explosionRange; i++) {
+        if (activeBox[row - i - 1][col] == W) {
+            // printf("Top wall: ver y before: %d\n", bomb->explosionVer.y);
+            bomb->explosionVer.y += 64 * (bomb->explosionRange - i);
+            // printf("Top wall: ver y after: %d\n", bomb->explosionVer.y);
+            break;
+        }
+        else if (activeBox[row - i - 1][col] == 1) {
+            // printf("Top box: ver y before: %d\n", bomb->explosionVer.y);
+            bomb->explosionVer.y += 64 * (bomb->explosionRange - i) - 64;
+            // printf("Top box: ver y after: %d\n", bomb->explosionVer.y);
+            break;
+        }
+    }
+
+    // Adjust explosion size if box or wall exists on the bottom part of the explosion
+    for (i = 0; i < bomb->explosionRange; i++) {
+        if (activeBox[row + i + 1][col] == W) {
+            // printf("Bottom wall: ver h before: %d\n", bomb->explosionVer.h);
+            bomb->explosionVer.h -= 64 * (bomb->explosionRange - i);
+            // printf("Bottom wall: ver h after: %d\n", bomb->explosionVer.h);
+            break;
+        }
+        else if (activeBox[row + i + 1][col] == 1) {
+            // printf("Bottom box: ver h before: %d\n", bomb->explosionVer.h);
+            bomb->explosionVer.h -= 64 * (bomb->explosionRange - i) - 64;
+            // printf("Bottom box: ver h after: %d\n", bomb->explosionVer.h);
+        }
+    }
 }
 
 PUBLIC void initBombs(Bomb bombs[]) {
