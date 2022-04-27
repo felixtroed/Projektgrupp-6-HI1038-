@@ -19,7 +19,7 @@ typedef struct BoxInit* Boxes;
 
 
 bool collisionMap(Player p1);
-void move(Player p1, int* lastMove, int* newMove, char key, Bomb bombs[],Boxes boxes);
+void move(Player p1, int* lastMove, int* newMove, char key, Bomb bombs[], Boxes boxes, int *frames);
 bool collisionBoxes(Player p1,Boxes boxes);
 bool checkCollision(Player p1, Bomb bombs[], Boxes boxes);
 bool collisionBomb(Player p1, Bomb bombs[]);

@@ -41,51 +41,36 @@ PUBLIC Game createGame() {
 
 PUBLIC void updateGame(Game game) {
     bool running = true;
-    char keyresseed; 
     int newMove = 1, lastMove = 0;
+    int frames = 0;                 // Used for character refresh rate in gameLogic.c
 
     while (running) {
-        bool keyUp=true;
-        while (SDL_PollEvent(&game->event) != 0) 
-        {
-            switch (game->event.type)
-            {
-              case SDL_QUIT: running = false; 
-                break; 
-              case SDL_KEYUP: keyUp = true; 
-                break; 
-              case SDL_KEYDOWN: keyUp = false;
-                  break; 
-
+        while (SDL_PollEvent(&game->event) != 0) {
+            if (game->event.type == SDL_QUIT) {
+                running = false;
             }
-            if (!keyUp) { // ifall en knapp �r netryckt
-
-                switch (game->event.key.keysym.sym)
-                {
-                case SDLK_w:
-                        move(game->p1, &newMove, &lastMove, KEYUP, game->bombs,game->boxes);
-                    break;
-
-                case SDLK_s:
-                        move(game->p1, &newMove, &lastMove, KEYDOWN, game->bombs,game->boxes);
-                    break;
-
-                case SDLK_a:
-                        move(game->p1, &newMove, &lastMove, KEYLEFT, game->bombs,game->boxes);
-                    break;
-
-                case SDLK_d:
-                        move(game->p1, &newMove, &lastMove, KEYRIGHT, game->bombs,game->boxes);
-                    break;
-
-                case SDLK_SPACE:
-                        bombPlacement(game->p1, game->bombs, game->renderer,game->boxes);
-                        removeBox(game->p1, game->boxes->activeBox);
-                    break;
+            if (game->event.type == SDL_KEYDOWN) {
+                if (game->event.key.keysym.sym == SDLK_SPACE) {                     // Space intryckt (gamla sättet som pausar i 1 sek när man håller in knappen)
+                    bombPlacement(game->p1, game->bombs, game->renderer, game->boxes);
+                    removeBox(game->p1, game->boxes->activeBox);
                 }
-
             }
         }
+
+        const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
+        if (currentKeyStates[SDL_SCANCODE_W] || currentKeyStates[SDL_SCANCODE_UP]) {                // Funkar för både WASD och pilar
+            move(game->p1, &newMove, &lastMove, KEYUP, game->bombs, game->boxes, &frames);
+        }
+        else if (currentKeyStates[SDL_SCANCODE_S] || currentKeyStates[SDL_SCANCODE_DOWN]) {
+            move(game->p1, &newMove, &lastMove, KEYDOWN, game->bombs, game->boxes, &frames);
+        }
+        else if (currentKeyStates[SDL_SCANCODE_A] || currentKeyStates[SDL_SCANCODE_LEFT]) {
+            move(game->p1, &newMove, &lastMove, KEYLEFT, game->bombs, game->boxes, &frames);
+        }
+        else if (currentKeyStates[SDL_SCANCODE_D] || currentKeyStates[SDL_SCANCODE_RIGHT]) {
+            move(game->p1, &newMove, &lastMove, KEYRIGHT, game->bombs, game->boxes, &frames);
+        }
+
         handlePlayerExplosionCollision(game);
           
         SDL_RenderClear(game->renderer);

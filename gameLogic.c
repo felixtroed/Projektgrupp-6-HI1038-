@@ -5,6 +5,8 @@
 #define SCREENMAX_Y 700
 #define SCREENMIN_Y 48
 
+#define CHAR_REFRESH_RATE 20                // Higher value = Slower animation transition
+
 #define BOMB_SIZE 34
 
 
@@ -46,7 +48,7 @@ Uint32 disableInvincibility(Uint32 interval, void *args) {
 bool checkCollision(Player p1, Bomb bombs[], Boxes boxes) {
     if (!collisionMap(p1))
         return false; 
-    if (!collisionBoxes(p1,boxes))
+    if (!collisionBoxes(p1, boxes))
         return false; 
     if (!collisionBomb(p1, bombs))
         return false;
@@ -207,86 +209,99 @@ void removeBox(Player p1, Boxes boxes) {
       
 
 
-void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[],Boxes boxes) {
+void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[],Boxes boxes, int *frames) {
     switch (key) {
     case 's':
         p1->pos.y += p1->speed;
-        if (!checkCollision(p1, bombs,boxes))
-        {
-            p1->pos.y -= p1->speed; 
+        if (!checkCollision(p1, bombs, boxes)) {
+            p1->pos.y -= p1->speed;
         }
-
-        if (*newMove == *lastMove && p1->currentFrame < 3)
-        {
-            p1->currentFrame++;
-            *lastMove = *newMove;
-            // printf("%d Down\n", p1->pos.y);
+        if (*newMove == *lastMove && p1->currentFrame <= 3) {
+            *frames += 1;
+            if (*frames == CHAR_REFRESH_RATE / p1->speed) {
+                *frames = 0;
+                *lastMove = *newMove;
+                p1->currentFrame++;
+                if (p1->currentFrame > 3) {
+                    p1->currentFrame = 0;
+                }
+            }
         }
-        else
-        {
+        else {
+            *frames = 0;
             p1->currentFrame = 0;
             *lastMove = *newMove = 0;
-            // printf("%d Down\n", p1->pos.y);
         }
         break;
 
     case 'w':
         p1->pos.y -= p1->speed;
-        if (!checkCollision(p1, bombs,boxes))
-        {
+        if (!checkCollision(p1, bombs, boxes)) {
             p1->pos.y += p1->speed;
         }
-        if (*newMove == *lastMove && p1->currentFrame < 7 && p1->currentFrame >3)
-        {
-            p1->currentFrame++;
-            *lastMove = *newMove;
-            // printf("%d Up\n", p1->pos.y);
+        if (*newMove == *lastMove && p1->currentFrame <= 7 && p1->currentFrame > 3) {
+            *frames += 1;
+            if (*frames == CHAR_REFRESH_RATE / p1->speed) {
+                *frames = 0;
+                *lastMove = *newMove;
+                p1->currentFrame++;
+                if (p1->currentFrame > 7) {
+                    p1->currentFrame = 4;
+                }
+            }
         }
         else {
+            *frames = 0;
             p1->currentFrame = 4;
             *lastMove = *newMove = 4;
-            // printf("%d Up\n", p1->pos.y);
         }
         break;
 
     case 'a':
         p1->pos.x -= p1->speed;
-        if (!checkCollision(p1, bombs,boxes))
-        {
+        if (!checkCollision(p1, bombs, boxes)) {
             p1->pos.x += p1->speed;
         }
-        
-        if (*newMove == *lastMove && p1->currentFrame < 15 && p1->currentFrame >11)
-        {
-            p1->currentFrame++;
-            *lastMove = *newMove;
-            // printf("%d Left\n", p1->pos.x);
+        if (*newMove == *lastMove && p1->currentFrame <= 15 && p1->currentFrame > 11) {
+            *frames += 1;
+            if (*frames == CHAR_REFRESH_RATE / p1->speed) {
+                *frames = 0;
+                *lastMove = *newMove;
+                p1->currentFrame++;
+                if (p1->currentFrame > 15) {
+                    p1->currentFrame = 12;
+                }
+            }
         }
         else {
+            *frames = 0;
             p1->currentFrame = 12;
             *lastMove = *newMove = 12;
-            // printf("%d Left\n", p1->pos.x);
         }
         break;
 
     case 'd':
         p1->pos.x += p1->speed;
-        if (!checkCollision(p1, bombs,boxes))
-        {
+        if (!checkCollision(p1, bombs, boxes)) {
             p1->pos.x -= p1->speed;
         }
-        if (*newMove == *lastMove && p1->currentFrame < 11 && p1->currentFrame >7)
-        {
-            p1->currentFrame++;
-            *lastMove = *newMove;
-            // printf("%d Right\n", p1->pos.x);
+        if (*newMove == *lastMove && p1->currentFrame <= 11 && p1->currentFrame > 7) {
+            *frames += 1;
+            if (*frames == CHAR_REFRESH_RATE / p1->speed) {
+                *frames = 0;
+                *lastMove = *newMove;
+                p1->currentFrame++;
+                if (p1->currentFrame > 11) {
+                    p1->currentFrame = 8;
+                }
+            }
         }
         else {
+            *frames = 0;
             p1->currentFrame = 8;
             *lastMove = *newMove = 8;
-            // printf("%d Right\n", p1->pos.x);
         }
-       break;
+        break;
 
     default: break;
     }
