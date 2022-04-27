@@ -5,11 +5,6 @@
 #define PUBLIC /* empty */
 #define PRIVATE static
 
-#define WINDOW_WIDTH 1088
-#define WINDOW_HEIGHT 832
-#define ROW_SIZE 11
-#define COLUMN_SIZE 15
-
 #define KEYDOWN 's'
 #define KEYUP 'w'
 #define KEYRIGHT 'd'
@@ -89,7 +84,7 @@ PUBLIC void updateGame(Game game) {
 
             }
         }
-        handleExplosionCollision(game);
+        handlePlayerExplosionCollision(game);
           
         SDL_RenderClear(game->renderer);
         SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
@@ -138,9 +133,9 @@ PRIVATE bool initWinRen(Game game) {
 
 PRIVATE bool createBackground(Game game) {
 
-    game->bitmapSurface = SDL_LoadBMP("resources/Background.bmp");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske m�ste �ndra bildens position)
+    game->bitmapSurface = IMG_Load("resources/Background.png");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske m�ste �ndra bildens position)
     if (!game->bitmapSurface) {
-        printf("Could not load Background to bitmapSurface: %s\n", SDL_GetError());
+        printf("Could not load Background to bitmapSurface: %s\n", IMG_GetError());
         return false;
     }
   
@@ -160,9 +155,9 @@ PRIVATE bool createBackground(Game game) {
 
 PRIVATE bool createBoxes(Game game) {
 
-    game->bitmapSurface = SDL_LoadBMP("resources/Box.bmp");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske m�ste �ndra bildens position)
+    game->bitmapSurface = IMG_Load("resources/Box.png");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske m�ste �ndra bildens position)
     if (!game->bitmapSurface) {
-        printf("Could not load Box to bitmapSurface: %s\n", SDL_GetError());
+        printf("Could not load Box to bitmapSurface: %s\n", IMG_GetError());
         return false;
     }
    

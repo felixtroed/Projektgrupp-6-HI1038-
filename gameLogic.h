@@ -18,6 +18,6 @@ void move(Player p1, int* lastMove, int* newMove, char key, Bomb bombs[]);
 bool collisionBoxes(Player p1);
 bool checkCollision(Player p1, Bomb bombs[]);
 bool collisionBomb(Player p1, Bomb bombs[]);
-void handleExplosionCollision(Game game);
+void handlePlayerExplosionCollision(Game game);
 
 #endif /* GAME_LOGIC_H */

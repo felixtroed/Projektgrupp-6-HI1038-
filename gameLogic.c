@@ -3,13 +3,13 @@
 #define SCREENMAX_X 970
 #define SCREENMIN_X 48
 #define SCREENMAX_Y 700
-#define SCREENMIN_Y 48 
+#define SCREENMIN_Y 48
 
 #define BOMB_SIZE 34
 
 Uint32 disableInvincibility(Uint32 interval, void *args);
 
-void handleExplosionCollision(Game game) {
+void handlePlayerExplosionCollision(Game game) {
     if (game->p1->isHurt == false) { 
 
         for (uint8_t i = 0; i < BOMBS; i++) {
