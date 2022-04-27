@@ -21,6 +21,8 @@ typedef struct PlayerSettings {
     bool isHurt;
     int currentFrame;
     int speed;
+    int explosionRange;
+    int numOfBoxes;
     uint8_t bombsAvailable;
 } *Player;
 

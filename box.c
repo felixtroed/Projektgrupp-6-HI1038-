@@ -7,8 +7,8 @@
 Boxes createBoxes(Game game) {
 	Boxes boxes = malloc(sizeof(struct BoxInit));
 	int playField[ROW_SIZE][COLUMN_SIZE] = {
-	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{0, W, 1, W, 0, W, 1, W, 1, W, 1, W, 1, W, 0},
+	{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{1, W, 1, W, 0, W, 1, W, 1, W, 1, W, 1, W, 0},
 	{0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0},
 	{0, W, 1, W, 0, W, 1, W, 1, W, 1, W, 1, W, 1},
 	{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1},

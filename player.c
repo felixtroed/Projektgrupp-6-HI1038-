@@ -78,6 +78,8 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
     player->speed = 10;
     player->bombsAvailable = 4;
     player->isHurt = false;
+    player-> explosionRange = 3;
+    player->numOfBoxes = 1; 
     initClips(player);
     return player;
 }

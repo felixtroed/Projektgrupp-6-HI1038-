@@ -326,7 +326,7 @@ PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer,B
     bomb->explosionPos.y = bomb->bombPos.y - 7;
     bomb->explosionPos.w = 64;
     bomb->explosionPos.h = 64;
-    bomb->explosionRange = 4;
+    bomb->explosionRange = 2;
 
     bomb->explosionHor.x = bomb->bombPos.x - 7 - (64 * (bomb->explosionRange));   // Start horizontal explosion to the left of bomb
     bomb->explosionHor.y = bomb->bombPos.y - 7;
