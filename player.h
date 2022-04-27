@@ -3,10 +3,10 @@
 
 #include "game.h"
 #include <stdbool.h>
-#include <SDL.h>
-#include <SDL_image.h>
-//#include <SDL2/SDL.h>
-//#include <SDL2/SDL_image.h>
+// #include <SDL.h>
+// #include <SDL_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
 typedef struct GameSettings* Game;
 
@@ -19,11 +19,14 @@ typedef struct PlayerSettings {
     SDL_Surface *surface;
     SDL_TimerID invincibleTimer;
     bool isHurt;
+    bool isAlive;
     int currentFrame;
     int speed;
+    uint8_t lifes;
     uint8_t bombsAvailable;
 } *Player;
 
 Player createPlayer(int playerNumber, int x, int y, Game game);
+void renderPlayers(Game game);
 
 #endif /* PLAYER_H */

@@ -92,18 +92,7 @@ PUBLIC void updateGame(Game game) {
         SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
         renderBoxes(game);
         renderBombsAndExplosions(game);
-
-        if (game->p1->isHurt) {
-            SDL_SetTextureColorMod(game->p1->texture, 255, 0, 0);           // Character turns red if hurt
-        }
-        else {
-            SDL_SetTextureColorMod(game->p1->texture, 255, 255, 255);       // Restore color if not hurt
-        }
-
-        SDL_RenderCopy(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos);
-        SDL_RenderCopy(game->renderer, game->p2->texture, &game->p2->clip[game->p2->currentFrame], &game->p2->pos);
-        SDL_RenderCopy(game->renderer, game->p3->texture, &game->p3->clip[game->p3->currentFrame], &game->p3->pos);
-        SDL_RenderCopy(game->renderer, game->p4->texture, &game->p4->clip[game->p4->currentFrame], &game->p4->pos);
+        renderPlayers(game);
         SDL_RenderPresent(game->renderer);
     }
 }

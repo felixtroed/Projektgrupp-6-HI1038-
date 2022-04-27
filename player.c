@@ -7,6 +7,7 @@ PRIVATE int PLAYER_WIDTH = 64;
 PRIVATE int PLAYER_HEIGHT = 64;
 
 PRIVATE void initClips(Player player);
+PUBLIC void renderPlayers(Game game);
 
 PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
     Player player = malloc(sizeof(struct PlayerSettings));
@@ -78,6 +79,8 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
     player->speed = 10;
     player->bombsAvailable = 4;
     player->isHurt = false;
+    player->isAlive = true;
+    player->lifes = 3;
     initClips(player);
     return player;
 }
@@ -163,3 +166,45 @@ PRIVATE void initClips(Player player) {
     player->clip[15].w = PLAYER_WIDTH;
     player->clip[15].h = PLAYER_HEIGHT; // gubben g�r v�nster
  }
+
+PUBLIC void renderPlayers(Game game) {
+    if (game->p1->isAlive) {
+        if (game->p1->isHurt)
+            SDL_SetTextureColorMod(game->p1->texture, 255, 0, 0);           // Character turns red if hurt
+        else {
+            SDL_SetTextureColorMod(game->p1->texture, 255, 255, 255);       // Restore color if not hurt
+        }
+
+        SDL_RenderCopy(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos);
+    }
+
+    if (game->p2->isAlive) {
+        if (game->p2->isHurt)
+            SDL_SetTextureColorMod(game->p2->texture, 255, 0, 0);
+        else {
+            SDL_SetTextureColorMod(game->p2->texture, 255, 255, 255);
+        }
+
+        SDL_RenderCopy(game->renderer, game->p2->texture, &game->p2->clip[game->p2->currentFrame], &game->p2->pos);
+    }
+
+    if (game->p3->isAlive) {
+        if (game->p3->isHurt)
+            SDL_SetTextureColorMod(game->p3->texture, 255, 0, 0);
+        else {
+            SDL_SetTextureColorMod(game->p3->texture, 255, 255, 255);
+        }
+
+        SDL_RenderCopy(game->renderer, game->p3->texture, &game->p3->clip[game->p3->currentFrame], &game->p3->pos);
+    }
+
+    if (game->p4->isAlive) {
+        if (game->p4->isHurt)
+            SDL_SetTextureColorMod(game->p3->texture, 255, 0, 0);
+        else {
+            SDL_SetTextureColorMod(game->p3->texture, 255, 255, 255);
+        }
+
+        SDL_RenderCopy(game->renderer, game->p4->texture, &game->p4->clip[game->p4->currentFrame], &game->p4->pos);
+    }
+}

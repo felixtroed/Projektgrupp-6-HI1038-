@@ -1,8 +1,8 @@
 #ifndef BOMB_H
 #define BOMB_H
 
-//#include <SDL2/SDL.h>
-#include <SDL.h>
+#include <SDL2/SDL.h>
+// #include <SDL.h>
 #include <stdbool.h>
 #include "game.h"
 #include "player.h"
@@ -33,7 +33,7 @@ typedef struct BombSettings {
     int explosionRange;
 } *Bomb;
 
-void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer,Boxes boxes);
+void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer, Boxes boxes);
 void initBombs(Bomb bombs[]);
 void renderBombsAndExplosions(Game game);
 

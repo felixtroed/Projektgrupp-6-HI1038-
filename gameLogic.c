@@ -21,6 +21,14 @@ void handlePlayerExplosionCollision(Game game) {
                 if (game->bombs[i]->startExplosion == true && game->bombs[i]->endExplosion == false) {
                     if (SDL_HasIntersection(&game->p1->hitboxPos, &game->bombs[i]->explosionHor) || SDL_HasIntersection(&game->p1->hitboxPos, &game->bombs[i]->explosionVer)) {
                         game->p1->isHurt = true;
+                        
+                        (game->p1->lifes)--;
+                        if (game->p1->lifes <= 0) {
+                            game->p1->isAlive = false;
+                            printf("Player died.\n");
+                            return;
+                        }
+
                         game->p1->invincibleTimer = SDL_AddTimer(2000, disableInvincibility, game->p1);
                     }
                 }  
