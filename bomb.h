@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include "game.h"
 #include "player.h"
+#include "box.h"
 
 typedef struct GameSettings* Game;
 typedef struct PlayerSettings* Player;

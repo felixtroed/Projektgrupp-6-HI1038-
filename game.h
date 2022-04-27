@@ -8,6 +8,8 @@
 #include "bomb.h"
 #include "gameLogic.h"
 
+#define WINDOW_WIDTH 1088
+#define WINDOW_HEIGHT 832
 #define BOMBS 4
 
 typedef struct PlayerSettings* Player;

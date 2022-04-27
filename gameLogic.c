@@ -5,9 +5,6 @@
 #define SCREENMAX_Y 700
 #define SCREENMIN_Y 48
 
-#define ROW_SIZE 11
-#define COLUMN_SIZE 15 
-
 #define BOMB_SIZE 34
 
 Uint32 disableInvincibility(Uint32 interval, void *args);

@@ -83,49 +83,174 @@ PUBLIC void renderBombsAndExplosions(Game game) {
             if (game->bombs[i]->startExplosion) {
 
                 int range = game->bombs[i]->explosionRange;
+                bool stoneWall = false;
+                bool hitWall = false;
 
-                game->bombs[i]->explosionPos.y = game->bombs[i]->bombPos.y - 7;
                 SDL_RenderCopy(game->renderer, game->bombs[i]->textureExplosionStart, NULL, &game->bombs[i]->explosionPos);         // Renderar explosion-start
-
-                // skapa en if-sats. Om nästa ruta har kolission -> sluta rendera åt det hållet
 
                 // Renderar explosion åt höger
                 for (int j = 0; j < range - 1; j++) {
                     game->bombs[i]->explosionPos.x += 64;
-                    SDL_RenderCopy(game->renderer, game->bombs[i]->textureExplosionMiddle, NULL, &game->bombs[i]->explosionPos);
+
+                    for (int row = 0; row < ROW_SIZE; row++) {
+                        for (int column = 0; column < COLUMN_SIZE; column++) {
+                            if (activeBox[row][column] > 0) {
+
+                                int boxLeft = column * 64 + 64;
+                                int boxRight = boxLeft + 64;
+                                int boxUp = row * 64 + 64;
+                                int boxDown = boxUp + 64;
+
+                                if ((game->bombs[i]->explosionPos.x + 32) > boxLeft && (game->bombs[i]->explosionPos.x + 32) < boxRight && (game->bombs[i]->explosionPos.y + 32) > boxUp
+                                    && (game->bombs[i]->explosionPos.y) + 32 < boxDown) {
+
+                                    if (activeBox[row][column] == W) {
+                                        stoneWall = true;
+                                    }
+
+                                    row = ROW_SIZE;
+                                    column = COLUMN_SIZE;
+                                    j = range;
+                                    hitWall = true;
+                                    game->bombs[i]->explosionPos.x -= 64;
+                                }
+                            }
+                        }
+                    }
+                    if (!hitWall && game->bombs[i]->explosionPos.x < WINDOW_WIDTH - 92) {
+                        SDL_RenderCopy(game->renderer, game->bombs[i]->textureExplosionMiddle, NULL, &game->bombs[i]->explosionPos);
+                    }
                 }
                 game->bombs[i]->explosionPos.x += 64;
-                SDL_RenderCopy(game->renderer, game->bombs[i]->textureExplosionEnd, NULL, &game->bombs[i]->explosionPos);
-                game->bombs[i]->explosionPos.x = game->bombs[i]->bombPos.x - 7;                                                     // Återställer explosionPos.x
+                if (!stoneWall && game->bombs[i]->explosionPos.x < WINDOW_WIDTH - 92) {
+                    SDL_RenderCopy(game->renderer, game->bombs[i]->textureExplosionEnd, NULL, &game->bombs[i]->explosionPos);
+                }
+                game->bombs[i]->explosionPos.x = game->bombs[i]->bombPos.x - 7;                                                     // Återställer startvärden
+                stoneWall = false;
+                hitWall = false;
 
                 // Renderar explosion åt vänster
                 for (int j = 0; j < range - 1; j++) {
                     game->bombs[i]->explosionPos.x -= 64;
-                    SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionMiddle, NULL, &game->bombs[i]->explosionPos, 180, NULL, SDL_FLIP_NONE);
+
+                    for (int row = 0; row < ROW_SIZE; row++) {
+                        for (int column = 0; column < COLUMN_SIZE; column++) {
+                            if (activeBox[row][column] > 0) {
+
+                                int boxLeft = column * 64 + 64;
+                                int boxRight = boxLeft + 64;
+                                int boxUp = row * 64 + 64;
+                                int boxDown = boxUp + 64;
+
+                                if ((game->bombs[i]->explosionPos.x + 32) > boxLeft && (game->bombs[i]->explosionPos.x + 32) < boxRight && (game->bombs[i]->explosionPos.y + 32) > boxUp
+                                    && (game->bombs[i]->explosionPos.y) + 32 < boxDown) {
+
+                                    if (activeBox[row][column] == W) {
+                                        stoneWall = true;
+                                    }
+
+                                    row = ROW_SIZE;
+                                    column = COLUMN_SIZE;
+                                    j = range;
+                                    hitWall = true;
+                                    game->bombs[i]->explosionPos.x += 64;
+                                }
+                            }
+                        }
+                    }
+                    if (!hitWall && game->bombs[i]->explosionPos.x > 32) {
+                        SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionMiddle, NULL, &game->bombs[i]->explosionPos, 180, NULL, SDL_FLIP_NONE);
+                    }
                 }
                 game->bombs[i]->explosionPos.x -= 64;
-                SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionEnd, NULL, &game->bombs[i]->explosionPos, 180, NULL, SDL_FLIP_NONE);
-                game->bombs[i]->explosionPos.x = game->bombs[i]->bombPos.x - 7;                                                     // Återställer explosionPos.x
+                if (!stoneWall && game->bombs[i]->explosionPos.x > 32) {
+                    SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionEnd, NULL, &game->bombs[i]->explosionPos, 180, NULL, SDL_FLIP_NONE);
+                }
+                game->bombs[i]->explosionPos.x = game->bombs[i]->bombPos.x - 7;                                                     // Återställer startvärden
+                stoneWall = false;
+                hitWall = false;
 
                 // Renderar explosion uppåt
                 for (int j = 0; j < range - 1; j++) {
                     game->bombs[i]->explosionPos.y -= 64;
-                    SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionMiddle, NULL, &game->bombs[i]->explosionPos, 270, NULL, SDL_FLIP_NONE);
+
+                    for (int row = 0; row < ROW_SIZE; row++) {
+                        for (int column = 0; column < COLUMN_SIZE; column++) {
+                            if (activeBox[row][column] > 0) {
+
+                                int boxLeft = column * 64 + 64;
+                                int boxRight = boxLeft + 64;
+                                int boxUp = row * 64 + 64;
+                                int boxDown = boxUp + 64;
+
+                                if ((game->bombs[i]->explosionPos.x + 32) > boxLeft && (game->bombs[i]->explosionPos.x + 32) < boxRight && (game->bombs[i]->explosionPos.y + 32) > boxUp
+                                    && (game->bombs[i]->explosionPos.y) + 32 < boxDown) {
+
+                                    if (activeBox[row][column] == W) {
+                                        stoneWall = true;
+                                    }
+
+                                    row = ROW_SIZE;
+                                    column = COLUMN_SIZE;
+                                    j = range;
+                                    hitWall = true;
+                                    game->bombs[i]->explosionPos.y += 64;
+                                }
+                            }
+                        }
+                    }
+                    if (!hitWall && game->bombs[i]->explosionPos.y > 32) {
+                        SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionMiddle, NULL, &game->bombs[i]->explosionPos, 270, NULL, SDL_FLIP_NONE);
+                    }
                 }
                 game->bombs[i]->explosionPos.y -= 64;
-                SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionEnd, NULL, &game->bombs[i]->explosionPos, 270, NULL, SDL_FLIP_NONE);
-                game->bombs[i]->explosionPos.y = game->bombs[i]->bombPos.y - 7;                                                     // Återställer explosionPos.y
+                if (!stoneWall && game->bombs[i]->explosionPos.y > 32) {
+                    SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionEnd, NULL, &game->bombs[i]->explosionPos, 270, NULL, SDL_FLIP_NONE);
+                }
+                game->bombs[i]->explosionPos.y = game->bombs[i]->bombPos.y - 7;                                                     // Återställer startvärden
+                stoneWall = false;
+                hitWall = false;
 
                 // Renderar explosion nedåt
                 for (int j = 0; j < range - 1; j++) {
                     game->bombs[i]->explosionPos.y += 64;
-                    SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionMiddle, NULL, &game->bombs[i]->explosionPos, 90, NULL, SDL_FLIP_NONE);
+
+                    for (int row = 0; row < ROW_SIZE; row++) {
+                        for (int column = 0; column < COLUMN_SIZE; column++) {
+                            if (activeBox[row][column] > 0) {
+
+                                int boxLeft = column * 64 + 64;
+                                int boxRight = boxLeft + 64;
+                                int boxUp = row * 64 + 64;
+                                int boxDown = boxUp + 64;
+
+                                if ((game->bombs[i]->explosionPos.x + 32) > boxLeft && (game->bombs[i]->explosionPos.x + 32) < boxRight && (game->bombs[i]->explosionPos.y + 32) > boxUp
+                                    && (game->bombs[i]->explosionPos.y) + 32 < boxDown) {
+
+                                    if (activeBox[row][column] == W) {
+                                        stoneWall = true;
+                                    }
+                                    row = ROW_SIZE;
+                                    column = COLUMN_SIZE;
+                                    j = range;
+                                    hitWall = true;
+                                    game->bombs[i]->explosionPos.y -= 64;
+                                }
+                            }
+                        }
+                    }
+                    if (!hitWall && game->bombs[i]->explosionPos.y < WINDOW_HEIGHT - 92) {
+                        SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionMiddle, NULL, &game->bombs[i]->explosionPos, 90, NULL, SDL_FLIP_NONE);
+                    }
                 }
                 game->bombs[i]->explosionPos.y += 64;
-                SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionEnd, NULL, &game->bombs[i]->explosionPos, 90, NULL, SDL_FLIP_NONE);
-                game->bombs[i]->explosionPos.y = game->bombs[i]->bombPos.y - 7;                                                     // Återställer explosionPos.y
-
-            } 
+                if (!stoneWall && game->bombs[i]->explosionPos.y < WINDOW_HEIGHT - 92) {
+                    SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionEnd, NULL, &game->bombs[i]->explosionPos, 90, NULL, SDL_FLIP_NONE);
+                }
+                game->bombs[i]->explosionPos.y = game->bombs[i]->bombPos.y - 7;                                                     // Återställer startvärden
+                stoneWall = false;
+                hitWall = false;
+            }
             if (game->bombs[i]->endExplosion) {
                 game->bombs[i] = NULL;                                                                          // Raderar bomben
                 // printf("Explosion timer done. Bomb deleted.\n");
@@ -205,7 +330,7 @@ PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer) 
     bomb->explosionPos.y = bomb->bombPos.y - 7;
     bomb->explosionPos.w = 64;
     bomb->explosionPos.h = 64;
-    bomb->explosionRange = 2;
+    bomb->explosionRange = 4;
 
     bomb->explosionHor.x = bomb->bombPos.x - 7 - (64 * (bomb->explosionRange));   // Start horizontal explosion to the left of bomb
     bomb->explosionHor.y = bomb->bombPos.y - 7;
