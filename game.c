@@ -53,6 +53,7 @@ PUBLIC void updateGame(Game game) {
                 if (game->event.key.keysym.sym == SDLK_SPACE) {                     // Space intryckt (gamla sättet som pausar i 1 sek när man håller in knappen)
                     bombPlacement(game->p1, game->bombs, game->renderer, game->boxes);
                     removeBox(game->p1, game->boxes->activeBox);
+                    
                 }
             }
         }

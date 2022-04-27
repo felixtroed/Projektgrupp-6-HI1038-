@@ -32,6 +32,7 @@ PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer, Boxes 
         bombs[bombIdx]->redBombTime = SDL_AddTimer(2000, redBomb, callbackArgs);                      // Timer tills r�d bomb ska visas
         bombs[bombIdx]->bombTime = SDL_AddTimer(3000, bombExploded, callbackArgs);                    // Timer tills explosion
         bombs[bombIdx]->deleteBombTime = SDL_AddTimer(4000, explosionDone, callbackArgs);
+    
     }
 }
 

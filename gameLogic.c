@@ -148,63 +148,121 @@ bool collisionBomb(Player p1, Bomb bombs[]) {
 
 
 void removeBox(Player p1, Boxes boxes) {
+    int indexRow = 0, indexCol = 0;
+    int hitOne = 0, hitTwo = 0;
+    int i = 0;
+    int j = 0;
+    bool passedGrey = false;
+    bool illegalvalue = false;
+    indexCol = ((((p1->pos.x + 32) / 64) * 64 + 7) / 64) - 1;
+    indexRow = ((((p1->pos.y + 32) / 64) * 64 + 7) / 64) - 1;
+    i = indexRow;
+    j = indexCol;
 
-    int posBoxX = 0, posBoxY = 0, indexRow=0, indexCol=0;
-    bool boxeGone = false;
-    float sumX; 
-    sumX = p1->pos.x / 64;
-    
 
-    indexCol=((((p1->pos.x + 32) / 64) * 64 + 7)/64)-1;
-    indexRow=((((p1->pos.y + 32) / 64) * 64 + 7) / 64)-1;
+    for (indexRow; i < indexRow + p1->explosionRange; i++)
+    {
 
-    printf("ROW %d COL %d \n", indexRow, indexCol);
-    
+        if (boxes->activeBox[i][j] == 3)
+        {
+            passedGrey = true;
+        }
 
-            if (indexRow <10 && indexCol>0 && indexCol <14 && indexRow >0)
+        if (boxes->activeBox[i][j] == 1 && hitOne != p1->numOfBoxes && !passedGrey)
+        {
+            boxes->activeBox[i][j] = 0;
+            hitOne++;
+
+        }
+
+        if (!illegalvalue) // ifall passerar 14
+        {
+            for (indexCol; j < indexCol + p1->explosionRange; j++)
             {
-               
-                    boxes->activeBox[indexRow][indexCol + 1] = 0;
-                    boxes->activeBox[indexRow+1][indexCol] = 0;
-                    boxes->activeBox[indexRow - 1][indexCol] = 0;
-                    boxes->activeBox[indexRow][indexCol-1] = 0;
-                  
-            
-            }
-            if (indexRow == 0)
-            {
-                boxes->activeBox[indexRow][indexCol + 1] = 0;
-                boxes->activeBox[indexRow + 1][indexCol] = 0;
-                boxes->activeBox[indexRow][indexCol - 1] = 0;
-            }
 
-            if (indexRow == 10)
-            {
-                boxes->activeBox[indexRow][indexCol + 1] = 0;
-                boxes->activeBox[indexRow - 1][indexCol] = 0;
-                boxes->activeBox[indexRow][indexCol - 1] = 0;
+                if (boxes->activeBox[indexRow][j] == 3)
+                {
+                    break;
+                }
 
-            }
-
-
-            if (indexCol == 0)
-            {
-                boxes->activeBox[indexRow][indexCol + 1] = 0;
-                boxes->activeBox[indexRow - 1][indexCol] = 0;
-                boxes->activeBox[indexRow + 1][indexCol] = 0;
-
-            }
-
-            if (indexCol == 14)
-            {
-                boxes->activeBox[indexRow][indexCol -1 ] = 0;
-                boxes->activeBox[indexRow - 1][indexCol] = 0;
-                boxes->activeBox[indexRow + 1][indexCol] = 0;
+                if (boxes->activeBox[indexRow][j] == 1 && hitTwo != p1->numOfBoxes)
+                {
+                    boxes->activeBox[indexRow][j] = 0;
+                    hitTwo++;
+                }
+                if (j == 14)
+                {
+                    illegalvalue = true;
+                    break;
+                }
 
             }
+        }
+        j = indexCol;
+
+        if (i == 10)
+        {
+            break;
+        }
+     
+
+    } // kollar höger och neråt 
+
+    passedGrey = false;
+    hitOne = 0;
+    hitTwo = 0;
+    i = indexRow;
+    j = indexCol;
+    illegalvalue = false;
 
 
-    }  
+
+    for (indexRow; i > indexRow - p1->explosionRange; i--)
+    {
+        if (boxes->activeBox[i][j] == 3)
+        {
+            passedGrey = true;
+        }
+
+        if (boxes->activeBox[i][j] == 1 && hitOne != p1->numOfBoxes && !passedGrey)
+        {
+            boxes->activeBox[i][j] = 0;
+            hitOne++;
+
+        }
+        if (!illegalvalue) {
+            for (indexCol; j > indexCol - p1->explosionRange; j--)
+            {
+                printf("active box value %d\n", boxes->activeBox[i][j]);
+                if (boxes->activeBox[indexRow][j] == 3)
+                {
+                    break;
+                }
+
+                if (boxes->activeBox[indexRow][j] == 1 && hitTwo != p1->numOfBoxes)
+                {
+                    boxes->activeBox[indexRow][j] = 0;
+                    hitTwo++;
+                }
+                if (j == 0)
+                {
+                    illegalvalue = true;
+                    break;
+                }
+
+            }
+        }
+        j = indexCol;
+
+        if (i == 0)
+        {
+            break;
+        }
+
+    } // kolla vänster och uppåt
+
+}
+
 
       
 

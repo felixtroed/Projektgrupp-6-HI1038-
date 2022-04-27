@@ -78,6 +78,8 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
     player->hitboxPos.h = 46;            // The actual height of the character in each clip
     player->speed = 2;
     player->bombsAvailable = 4;
+    player->explosionRange = 3; 
+    player->numOfBoxes = 1; 
     player->isHurt = false;
     player->isAlive = true;
     player->lifes = 3;
