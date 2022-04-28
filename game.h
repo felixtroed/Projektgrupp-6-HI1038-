@@ -1,8 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <SDL.h>
-//#include <SDL2/SDL.h>
+// #include <SDL.h>
+#include <SDL2/SDL.h>
 #include "player.h"
 #include "box.h"
 #include "bomb.h"

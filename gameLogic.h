@@ -6,11 +6,9 @@
 #include "box.h"
 #include "bomb.h"
 #include <stdbool.h>
-#include <SDL.h>
-#include <SDL_image.h>
+// #include <SDL.h>
 #include <math.h>
-//#include <SDL2/SDL.h>
-//#include <SDL2/SDL_image.h>
+#include <SDL2/SDL.h>
 
 typedef struct PlayerSettings* Player;
 typedef struct GameSettings* Game;
