@@ -12,7 +12,7 @@ typedef struct BombTimerCallbackArgs {
 } BombTimerCallbackArgs;
 
 PRIVATE Uint32 redBomb(Uint32 interval, void *switchToRedBomb);
-PRIVATE Uint32 bombExploded(Uint32 interval, void *args);
+PRIVATE Uint32 explodeBomb(Uint32 interval, void *args);
 PRIVATE Uint32 explosionDone(Uint32 interval, void *deleteBomb);
 PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer);
 PRIVATE uint8_t getBombIdx(Bomb bombs[]);
@@ -29,10 +29,9 @@ PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer) {
         callbackArgs->bomb = bombs[bombIdx] = createBomb(p->pos.x, p->pos.y, renderer);
         callbackArgs->bombsAvailable = &p->bombsAvailable;
 
-        bombs[bombIdx]->redBombTime = SDL_AddTimer(2000, redBomb, callbackArgs);                      // Timer tills r�d bomb ska visas
-        bombs[bombIdx]->bombTime = SDL_AddTimer(3000, bombExploded, callbackArgs);                    // Timer tills explosion
+        bombs[bombIdx]->redBombTime = SDL_AddTimer(2000, redBomb, callbackArgs);                     // Timer tills r�d bomb ska visas
+        bombs[bombIdx]->bombTime = SDL_AddTimer(3000, explodeBomb, callbackArgs);                    // Timer tills explosion
         bombs[bombIdx]->deleteBombTime = SDL_AddTimer(4000, explosionDone, callbackArgs);
-    
     }
 }
 
@@ -52,9 +51,22 @@ PRIVATE Uint32 redBomb(Uint32 interval, void *args) {
     return 0;
 }
 
-PRIVATE Uint32 bombExploded(Uint32 interval, void *args) {
+PRIVATE Uint32 explodeBomb(Uint32 interval, void *args) {
     BombTimerCallbackArgs* bargs = (BombTimerCallbackArgs*) args;
     bargs->bomb->startExplosion = true;
+
+    if (bargs->bomb->boxIdxesLeft[0] >= 0) {
+        activeBox[bargs->bomb->boxIdxesLeft[0]][bargs->bomb->boxIdxesLeft[1]] = 0;
+    }
+    if (bargs->bomb->boxIdxesRight[0] >= 0) {
+        activeBox[bargs->bomb->boxIdxesRight[0]][bargs->bomb->boxIdxesRight[1]] = 0;
+    }
+    if (bargs->bomb->boxIdxesTop[0] >= 0) {
+        activeBox[bargs->bomb->boxIdxesTop[0]][bargs->bomb->boxIdxesTop[1]] = 0;
+    }
+    if (bargs->bomb->boxIdxesBottom[0] >= 0) {
+        activeBox[bargs->bomb->boxIdxesBottom[0]][bargs->bomb->boxIdxesBottom[1]] = 0;
+    }
 
     return 0;
 }
@@ -343,6 +355,8 @@ PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer) 
     bomb->endExplosion = false;
     bomb->spawnInside = true;
 
+    bomb->boxIdxesLeft[0] = bomb->boxIdxesRight[0] = bomb->boxIdxesTop[0] = bomb->boxIdxesBottom[0] = -1;
+
     modifyExplosionHitbox(bomb);       // Changes explosion size based on collision with walls and boxes 
 
     return bomb;
@@ -361,18 +375,15 @@ PRIVATE void modifyExplosionHitbox(Bomb bomb) {
     // Adjust explosion size if box or wall exists on the left part of the explosion
     for (i = 0; i < bomb->explosionRange && col - i - 1 >= 0; i++) {
         if (activeBox[row][col - i - 1] == W) {
-            printf("Left wall: hor x before: %d\n", bomb->explosionHor.x);
             bomb->explosionHor.x += 64 * (bomb->explosionRange - i);
             xOffset = bomb->explosionHor.x - xStart;            // Stores offset that is used if horizontal width is changed as well as horizontal x
-            printf("Left wall: hor x after: %d\n", bomb->explosionHor.x);
             break;
         }
         else if (activeBox[row][col - i - 1] == 1) {
-            printf("Left box: hor x before: %d\n", bomb->explosionHor.x);
             bomb->explosionHor.x += 64 * (bomb->explosionRange - i) - 64;
             xOffset = bomb->explosionHor.x - xStart;
-            activeBox[row][col - i - 1] = 0;
-            printf("Left box: hor x after: %d\n", bomb->explosionHor.x);
+            bomb->boxIdxesLeft[0] = row;
+            bomb->boxIdxesLeft[1] = col - i - 1;
             break;
         }
     }
@@ -380,16 +391,13 @@ PRIVATE void modifyExplosionHitbox(Bomb bomb) {
     // Adjust explosion size if box or wall exists on the right part of the explosion
     for (i = 0; i < bomb->explosionRange && col + i + 1 < COLUMN_SIZE; i++) {
         if (activeBox[row][col + i + 1] == W) {
-            printf("Right wall: hor w before: %d\n", bomb->explosionHor.w);
-            bomb->explosionHor.w -= 64 * (bomb->explosionRange - i) + xOffset;  // xOffset is used to modify the width in cases when
-            printf("Right wall: hor w after: %d\n", bomb->explosionHor.w);      // a wall or box exists on the left part of the explosion
-            break;
+            bomb->explosionHor.w -= 64 * (bomb->explosionRange - i) + xOffset;  // xOffset is used to modify the width in cases when      
+            break;                                                              // a wall or box exists on the left part of the explosion
         }
         else if (activeBox[row][col + i + 1] == 1) {
-            printf("Right box: hor w before: %d\n", bomb->explosionHor.w);
             bomb->explosionHor.w -= 64 * (bomb->explosionRange - i) - 64 + xOffset;
-            activeBox[row][col + i + 1] = 0;
-            printf("Right box: hor w after: %d\n", bomb->explosionHor.w);
+            bomb->boxIdxesRight[0] = row;
+            bomb->boxIdxesRight[1] = col + i + 1;
             break;
         }
     }
@@ -397,18 +405,15 @@ PRIVATE void modifyExplosionHitbox(Bomb bomb) {
     // Adjust explosion size if box or wall exists on the top part of the explosion
     for (i = 0; i < bomb->explosionRange && row - i - 1 >= 0; i++) {
         if (activeBox[row - i - 1][col] == W) {
-            printf("Top wall: ver y before: %d\n", bomb->explosionVer.y);
             bomb->explosionVer.y += 64 * (bomb->explosionRange - i);
             yOffset = bomb->explosionVer.y - yStart;
-            printf("Top wall: ver y after: %d\n", bomb->explosionVer.y);
             break;
         }
         else if (activeBox[row - i - 1][col] == 1) {
-            printf("Top box: ver y before: %d\n", bomb->explosionVer.y);
             bomb->explosionVer.y += 64 * (bomb->explosionRange - i) - 64;
             yOffset = bomb->explosionVer.y - yStart;
-            activeBox[row - i - 1][col] = 0;
-            printf("Top box: ver y after: %d\n", bomb->explosionVer.y);
+            bomb->boxIdxesTop[0] = row - i - 1;
+            bomb->boxIdxesTop[1] = col;
             break;
         }
     }
@@ -416,16 +421,13 @@ PRIVATE void modifyExplosionHitbox(Bomb bomb) {
     // Adjust explosion size if box or wall exists on the bottom part of the explosion
     for (i = 0; i < bomb->explosionRange && row + i + 1 < ROW_SIZE; i++) {
         if (activeBox[row + i + 1][col] == W) {
-            printf("Bottom wall: ver h before: %d\n", bomb->explosionVer.h);
             bomb->explosionVer.h -= 64 * (bomb->explosionRange - i) + yOffset;
-            printf("Bottom wall: ver h after: %d\n", bomb->explosionVer.h);
             break;
         }
         else if (activeBox[row + i + 1][col] == 1) {
-            printf("Bottom box: ver h before: %d\n", bomb->explosionVer.h);
             bomb->explosionVer.h -= 64 * (bomb->explosionRange - i) - 64 + yOffset;
-            activeBox[row + i + 1][col] = 0;
-            printf("Bottom box: ver h after: %d\n", bomb->explosionVer.h);
+            bomb->boxIdxesBottom[0] = row + i + 1;
+            bomb->boxIdxesBottom[1] = col;
             break;
         }
     }
