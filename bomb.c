@@ -12,26 +12,27 @@ typedef struct BombTimerCallbackArgs {
 } BombTimerCallbackArgs;
 
 PRIVATE Uint32 redBomb(Uint32 interval, void *switchToRedBomb);
-PRIVATE Uint32 explodeBomb(Uint32 interval, void *args);
+PRIVATE Uint32 bombExploded(Uint32 interval, void *args);
 PRIVATE Uint32 explosionDone(Uint32 interval, void *deleteBomb);
-PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer);
+PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer,Boxes boxes);
 PRIVATE uint8_t getBombIdx(Bomb bombs[]);
-PRIVATE void modifyExplosionHitbox(Bomb bomb);
-PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer);
+PRIVATE void modifyExplosionHitbox(Bomb bomb, Boxes boxes);
+PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer, Boxes boxes);
 PUBLIC void renderBombsAndExplosions(Game game);
 
-PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer) {
+PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer, Boxes boxes) {
     if (p->bombsAvailable) {
         uint8_t bombIdx = getBombIdx(bombs);             // Get first free index to store bomb
         (p->bombsAvailable)--;
 
         BombTimerCallbackArgs *callbackArgs = malloc(sizeof(BombTimerCallbackArgs));
-        callbackArgs->bomb = bombs[bombIdx] = createBomb(p->pos.x, p->pos.y, renderer);
+        callbackArgs->bomb = bombs[bombIdx] = createBomb(p->pos.x, p->pos.y, renderer,boxes);
         callbackArgs->bombsAvailable = &p->bombsAvailable;
 
-        bombs[bombIdx]->redBombTime = SDL_AddTimer(2000, redBomb, callbackArgs);                     // Timer tills r�d bomb ska visas
-        bombs[bombIdx]->bombTime = SDL_AddTimer(3000, explodeBomb, callbackArgs);                    // Timer tills explosion
+        bombs[bombIdx]->redBombTime = SDL_AddTimer(2000, redBomb, callbackArgs);                      // Timer tills r�d bomb ska visas
+        bombs[bombIdx]->bombTime = SDL_AddTimer(3000, bombExploded, callbackArgs);                    // Timer tills explosion
         bombs[bombIdx]->deleteBombTime = SDL_AddTimer(4000, explosionDone, callbackArgs);
+    
     }
 }
 
@@ -51,26 +52,9 @@ PRIVATE Uint32 redBomb(Uint32 interval, void *args) {
     return 0;
 }
 
-PRIVATE Uint32 explodeBomb(Uint32 interval, void *args) {
+PRIVATE Uint32 bombExploded(Uint32 interval, void *args) {
     BombTimerCallbackArgs* bargs = (BombTimerCallbackArgs*) args;
     bargs->bomb->startExplosion = true;
-
-    if (bargs->bomb->boxIdxesLeft[0] >= 0) {
-        // printf("Left box [0]: %d \nLeft box [1]: %d\n", bargs->bomb->boxIdxesLeft[0], bargs->bomb->boxIdxesLeft[1]);
-        activeBox[bargs->bomb->boxIdxesLeft[0]][bargs->bomb->boxIdxesLeft[1]] = 0;
-    }
-    if (bargs->bomb->boxIdxesRight[0] >= 0) {
-        // printf("Right box [0]: %d \nRight box [1]: %d\n", bargs->bomb->boxIdxesRight[0], bargs->bomb->boxIdxesRight[1]);
-        activeBox[bargs->bomb->boxIdxesRight[0]][bargs->bomb->boxIdxesRight[1]] = 0;
-    }
-    if (bargs->bomb->boxIdxesTop[0] >= 0) {
-        // printf("Top box [0]: %d \nTop box [1]: %d\n", bargs->bomb->boxIdxesTop[0], bargs->bomb->boxIdxesTop[1]);
-        activeBox[bargs->bomb->boxIdxesTop[0]][bargs->bomb->boxIdxesTop[1]] = 0;
-    }
-    if (bargs->bomb->boxIdxesBottom[0] >= 0) {
-        // printf("Bottom box [0]: %d \nBottom box [1]: %d\n", bargs->bomb->boxIdxesBottom[0], bargs->bomb->boxIdxesBottom[1]);
-        activeBox[bargs->bomb->boxIdxesBottom[0]][bargs->bomb->boxIdxesBottom[1]] = 0;
-    }
 
     return 0;
 }
@@ -107,7 +91,7 @@ PUBLIC void renderBombsAndExplosions(Game game) {
 
                     for (int row = 0; row < ROW_SIZE; row++) {
                         for (int column = 0; column < COLUMN_SIZE; column++) {
-                            if (activeBox[row][column] > 0) {
+                            if (game->boxes->activeBox[row][column] > 0) {
 
                                 int boxLeft = column * 64 + 64;
                                 int boxRight = boxLeft + 64;
@@ -117,7 +101,7 @@ PUBLIC void renderBombsAndExplosions(Game game) {
                                 if ((game->bombs[i]->explosionPos.x + 32) > boxLeft && (game->bombs[i]->explosionPos.x + 32) < boxRight && (game->bombs[i]->explosionPos.y + 32) > boxUp
                                     && (game->bombs[i]->explosionPos.y) + 32 < boxDown) {
 
-                                    if (activeBox[row][column] == 3) {
+                                    if (game->boxes->activeBox[row][column] == 3) {
                                         stoneWall = true;
                                     }
 
@@ -148,7 +132,7 @@ PUBLIC void renderBombsAndExplosions(Game game) {
 
                     for (int row = 0; row < ROW_SIZE; row++) {
                         for (int column = 0; column < COLUMN_SIZE; column++) {
-                            if (activeBox[row][column] > 0) {
+                            if (game->boxes->activeBox[row][column] > 0) {
 
                                 int boxLeft = column * 64 + 64;
                                 int boxRight = boxLeft + 64;
@@ -158,7 +142,7 @@ PUBLIC void renderBombsAndExplosions(Game game) {
                                 if ((game->bombs[i]->explosionPos.x + 32) > boxLeft && (game->bombs[i]->explosionPos.x + 32) < boxRight && (game->bombs[i]->explosionPos.y + 32) > boxUp
                                     && (game->bombs[i]->explosionPos.y) + 32 < boxDown) {
 
-                                    if (activeBox[row][column] == 3) {
+                                    if (game->boxes->activeBox[row][column] == 3) {
                                         stoneWall = true;
                                     }
 
@@ -189,7 +173,7 @@ PUBLIC void renderBombsAndExplosions(Game game) {
 
                     for (int row = 0; row < ROW_SIZE; row++) {
                         for (int column = 0; column < COLUMN_SIZE; column++) {
-                            if (activeBox[row][column] > 0) {
+                            if (game->boxes->activeBox[row][column] > 0) {
 
                                 int boxLeft = column * 64 + 64;
                                 int boxRight = boxLeft + 64;
@@ -199,7 +183,7 @@ PUBLIC void renderBombsAndExplosions(Game game) {
                                 if ((game->bombs[i]->explosionPos.x + 32) > boxLeft && (game->bombs[i]->explosionPos.x + 32) < boxRight && (game->bombs[i]->explosionPos.y + 32) > boxUp
                                     && (game->bombs[i]->explosionPos.y) + 32 < boxDown) {
 
-                                    if (activeBox[row][column] == 3) {
+                                    if (game->boxes->activeBox[row][column] == 3) {
                                         stoneWall = true;
                                     }
 
@@ -230,7 +214,7 @@ PUBLIC void renderBombsAndExplosions(Game game) {
 
                     for (int row = 0; row < ROW_SIZE; row++) {
                         for (int column = 0; column < COLUMN_SIZE; column++) {
-                            if (activeBox[row][column] > 0) {
+                            if (game->boxes->activeBox[row][column] > 0) {
 
                                 int boxLeft = column * 64 + 64;
                                 int boxRight = boxLeft + 64;
@@ -240,7 +224,7 @@ PUBLIC void renderBombsAndExplosions(Game game) {
                                 if ((game->bombs[i]->explosionPos.x + 32) > boxLeft && (game->bombs[i]->explosionPos.x + 32) < boxRight && (game->bombs[i]->explosionPos.y + 32) > boxUp
                                     && (game->bombs[i]->explosionPos.y) + 32 < boxDown) {
 
-                                    if (activeBox[row][column] == 3) {
+                                    if (game->boxes->activeBox[row][column] == 3) {
                                         stoneWall = true;
                                     }
                                     row = ROW_SIZE;
@@ -272,7 +256,7 @@ PUBLIC void renderBombsAndExplosions(Game game) {
     }
 }
 
-PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer) {
+PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer,Boxes boxes) {
     Bomb bomb = malloc(sizeof(struct BombSettings));
 
     bomb->surface = IMG_Load("resources/bomb.png");                                     // Laddar in svart bomb
@@ -359,14 +343,12 @@ PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer) 
     bomb->endExplosion = false;
     bomb->spawnInside = true;
 
-    bomb->boxIdxesLeft[0] = bomb->boxIdxesRight[0] = bomb->boxIdxesTop[0] = bomb->boxIdxesBottom[0] = -1;
-
-    modifyExplosionHitbox(bomb);       // Changes explosion size based on collision with walls and boxes 
+    modifyExplosionHitbox(bomb,boxes);       // Changes explosion size based on collision with walls and boxes 
 
     return bomb;
 }
 
-PRIVATE void modifyExplosionHitbox(Bomb bomb) {
+PRIVATE void modifyExplosionHitbox(Bomb bomb, Boxes boxes) {
     uint8_t col = bomb->explosionPos.x / 64 - 1;
     uint8_t row = bomb->explosionPos.y / 64 - 1;
     uint8_t i;
@@ -377,61 +359,53 @@ PRIVATE void modifyExplosionHitbox(Bomb bomb) {
     int yOffset = 0;
 
     // Adjust explosion size if box or wall exists on the left part of the explosion
-    for (i = 0; i < bomb->explosionRange && col - i - 1 >= 0; i++) {
-        if (activeBox[row][col - i - 1] == W) {
+    for (i = 0; i < bomb->explosionRange; i++) {
+        if (boxes->activeBox[row][col - i - 1] == 3) {
             bomb->explosionHor.x += 64 * (bomb->explosionRange - i);
             xOffset = bomb->explosionHor.x - xStart;            // Stores offset that is used if horizontal width is changed as well as horizontal x
             break;
         }
-        else if (activeBox[row][col - i - 1] == 1) {
+        else if (boxes->activeBox[row][col - i - 1] == 1) {
             bomb->explosionHor.x += 64 * (bomb->explosionRange - i) - 64;
             xOffset = bomb->explosionHor.x - xStart;
-            bomb->boxIdxesLeft[0] = row;
-            bomb->boxIdxesLeft[1] = col - i - 1;
             break;
         }
     }
 
     // Adjust explosion size if box or wall exists on the right part of the explosion
-    for (i = 0; i < bomb->explosionRange && col + i + 1 < COLUMN_SIZE; i++) {
-        if (activeBox[row][col + i + 1] == W) {
-            bomb->explosionHor.w -= 64 * (bomb->explosionRange - i) + xOffset;  // xOffset is used to modify the width in cases when      
+    for (i = 0; i < bomb->explosionRange; i++) {
+        if (boxes->activeBox[row][col + i + 1] == 3) {
+            bomb->explosionHor.w -= 64 * (bomb->explosionRange - i) + xOffset;  // xOffset is used to modify the width in cases when
             break;                                                              // a wall or box exists on the left part of the explosion
         }
-        else if (activeBox[row][col + i + 1] == 1) {
+        else if (boxes->activeBox[row][col + i + 1] == 1) {
             bomb->explosionHor.w -= 64 * (bomb->explosionRange - i) - 64 + xOffset;
-            bomb->boxIdxesRight[0] = row;
-            bomb->boxIdxesRight[1] = col + i + 1;
             break;
         }
     }
 
     // Adjust explosion size if box or wall exists on the top part of the explosion
-    for (i = 0; i < bomb->explosionRange && row - i - 1 >= 0; i++) {
-        if (activeBox[row - i - 1][col] == W) {
+    for (i = 0; i < bomb->explosionRange; i++) {
+        if (boxes->activeBox[row - i - 1][col] == 3) {
             bomb->explosionVer.y += 64 * (bomb->explosionRange - i);
             yOffset = bomb->explosionVer.y - yStart;
             break;
         }
-        else if (activeBox[row - i - 1][col] == 1) {
+        else if (boxes->activeBox[row - i - 1][col] == 1) {
             bomb->explosionVer.y += 64 * (bomb->explosionRange - i) - 64;
             yOffset = bomb->explosionVer.y - yStart;
-            bomb->boxIdxesTop[0] = row - i - 1;
-            bomb->boxIdxesTop[1] = col;
             break;
         }
     }
 
     // Adjust explosion size if box or wall exists on the bottom part of the explosion
-    for (i = 0; i < bomb->explosionRange && row + i + 1 < ROW_SIZE; i++) {
-        if (activeBox[row + i + 1][col] == W) {
+    for (i = 0; i < bomb->explosionRange; i++) {
+        if (boxes->activeBox[row + i + 1][col] == 3) {
             bomb->explosionVer.h -= 64 * (bomb->explosionRange - i) + yOffset;
             break;
         }
-        else if (activeBox[row + i + 1][col] == 1) {
+        else if (boxes->activeBox[row + i + 1][col] == 1) {
             bomb->explosionVer.h -= 64 * (bomb->explosionRange - i) - 64 + yOffset;
-            bomb->boxIdxesBottom[0] = row + i + 1;
-            bomb->boxIdxesBottom[1] = col;
             break;
         }
     }

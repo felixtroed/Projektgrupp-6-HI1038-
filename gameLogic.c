@@ -45,10 +45,10 @@ Uint32 disableInvincibility(Uint32 interval, void *args) {
     return 0;
 }
 
-bool checkCollision(Player p1, Bomb bombs[]) {
+bool checkCollision(Player p1, Bomb bombs[], Boxes boxes) {
     if (!collisionMap(p1))
         return false; 
-    if (!collisionBoxes(p1))
+    if (!collisionBoxes(p1, boxes))
         return false; 
     if (!collisionBomb(p1, bombs))
         return false;
@@ -80,7 +80,7 @@ bool collisionMap(Player p1) {
     return true;
 }
 
-bool collisionBoxes(Player p1)
+bool collisionBoxes(Player p1, Boxes boxes)
 {
     int posBoxX = 0, posBoxY = 0;
     int sizeBox = 32;
@@ -89,7 +89,7 @@ bool collisionBoxes(Player p1)
 
     for (int row = 0; row < ROW_SIZE; row++) {
         for (int column = 0; column < COLUMN_SIZE; column++) {
-            if (activeBox[row][column] > 0)
+            if (boxes->activeBox[row][column] > 0)
             {
 
                 posBoxX = column * 64 + 64;
@@ -98,9 +98,9 @@ bool collisionBoxes(Player p1)
                 if (!(p1->pos.x > posBoxX + sizeBox || posBoxX > p1->pos.x + sizePlayer || p1->pos.y > posBoxY + sizeBox ||
                     p1->pos.y + botPlayerBigger + sizePlayer < posBoxY))
                 {
-                    // printf("ROW %d COL %d \n", row, column);
-                    // printf("POS X: %d POS Y %d \n", p1->pos.x, p1->pos.y);
-                    // printf("BOX: POS X: %d POS Y:%d\n ", posBoxX, posBoxY);
+                    printf("ROW %d COL %d \n", row, column);
+                    printf("POS X: %d POS Y %d \n", p1->pos.x, p1->pos.y);
+                    printf("BOX: POS X: %d POS Y:%d\n ", posBoxX, posBoxY);
                     return false;
 
                 }
@@ -137,8 +137,8 @@ bool collisionBomb(Player p1, Bomb bombs[]) {
 
             if (!(p1->pos.x > right || left > p1->pos.x + BOMB_SIZE || p1->pos.y > down || p1->pos.y + BOMB_SIZE < up))
             {
-            //   printf("Char Pos: x: %d\ty: %d\n", p1->pos.x, p1->pos.y);
-            //    printf("BOMB: Left: %d\tRight: %d\tUp: %d\tDown: %d\n ", left, right, up, down);
+              printf("Char Pos: x: %d\ty: %d\n", p1->pos.x, p1->pos.y);
+               printf("BOMB: Left: %d\tRight: %d\tUp: %d\tDown: %d\n ", left, right, up, down);
                 return false;
             }
         }
@@ -146,7 +146,7 @@ bool collisionBomb(Player p1, Bomb bombs[]) {
     return true;
 }
 
-/*
+
 void removeBox(Player p1, Boxes boxes) {
     int indexRow = 0, indexCol = 0;
     int hitOne = 0, hitTwo = 0;
@@ -206,7 +206,7 @@ void removeBox(Player p1, Boxes boxes) {
         }
      
 
-    } // kollar hï¿½ger och nerï¿½t 
+    } // kollar höger och neråt 
 
     passedGrey = false;
     hitOne = 0;
@@ -259,19 +259,21 @@ void removeBox(Player p1, Boxes boxes) {
             break;
         }
 
-    } // kolla vï¿½nster och uppï¿½t
+    } // kolla vänster och uppåt
 
-} */
+
+
+}
 
 
       
 
 
-void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *frames) {
+void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[],Boxes boxes, int *frames) {
     switch (key) {
     case 's':
         p1->pos.y += p1->speed;
-        if (!checkCollision(p1, bombs)) {
+        if (!checkCollision(p1, bombs, boxes)) {
             p1->pos.y -= p1->speed;
         }
         if (*newMove == *lastMove && p1->currentFrame <= 3) {
@@ -294,7 +296,7 @@ void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *fr
 
     case 'w':
         p1->pos.y -= p1->speed;
-        if (!checkCollision(p1, bombs)) {
+        if (!checkCollision(p1, bombs, boxes)) {
             p1->pos.y += p1->speed;
         }
         if (*newMove == *lastMove && p1->currentFrame <= 7 && p1->currentFrame > 3) {
@@ -317,7 +319,7 @@ void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *fr
 
     case 'a':
         p1->pos.x -= p1->speed;
-        if (!checkCollision(p1, bombs)) {
+        if (!checkCollision(p1, bombs, boxes)) {
             p1->pos.x += p1->speed;
         }
         if (*newMove == *lastMove && p1->currentFrame <= 15 && p1->currentFrame > 11) {
@@ -340,7 +342,7 @@ void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *fr
 
     case 'd':
         p1->pos.x += p1->speed;
-        if (!checkCollision(p1, bombs)) {
+        if (!checkCollision(p1, bombs, boxes)) {
             p1->pos.x -= p1->speed;
         }
         if (*newMove == *lastMove && p1->currentFrame <= 11 && p1->currentFrame > 7) {

@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int activeBox[ROW_SIZE][COLUMN_SIZE];
+//bool activeBox[11][15];
 
 typedef struct GameSettings* Game;
 
