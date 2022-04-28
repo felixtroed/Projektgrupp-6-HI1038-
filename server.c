@@ -1,10 +1,13 @@
 #include "server.h"
-
 #define MAX_SOCKETS 4
+
+bool socketPlace(int socketIndex, Server s);
+
 
 Server createTCPServer (Game game) {
     Server s = malloc(sizeof(struct ServerSettings));
-    IPaddress ip;
+    
+    s->socketIndex = 0;
     if (SDLNet_Init() == -1) // initierar nätverk
     {
         printf("SDLNet_Init could not initialize: %s\n", SDLNet_GetError());
@@ -38,14 +41,35 @@ Server createTCPServer (Game game) {
     return s;
 }
 
+bool socketPlace(int socketIndex,Server s) {
+    if (s->sockets[socketIndex])
+    {
+        printf("Overriding socket at index %d", socketIndex);
+    }
+    s->sockets[socketIndex] = SDLNet_TCP_Accept(s->serverSocket);
+    if (s->sockets[socketIndex] == NULL) return false;
+
+    s->sockets[socketIndex] = 1;
+    if (SDLNet_TCP_AddSocket(s->numberOfSockets, s->sockets[socketIndex]) == -1) {
+        printf("SDLNet_TCP_AddSocket: %sn", SDLNet_GetError());
+    }
+}
 
 int checkSockets(Server s) {
     int num_rdy = SDLNet_CheckSockets(s->numberOfSockets, 1000);
+ 
+    if (SDLNet_SocketReady(s->serverSocket)) {
+        printf("hej");
+       //int got_socket = socketPlace(s->socketIndex,s);
+       // if (!got_socket) {
+            num_rdy--;
+        //}
+    }
     return num_rdy; 
 }
 
 
-void serverShutDown(Server server) {
+void serverShutDown(Server server){
 
     SDLNet_FreeSocketSet(server->numberOfSockets); // frigör sockets
 
@@ -54,5 +78,4 @@ void serverShutDown(Server server) {
     } SDLNet_TCP_Close(server->serverSocket);
     
     SDLNet_Quit();
-
 }

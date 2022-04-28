@@ -11,6 +11,12 @@ typedef struct ServerSettings {
 	TCPsocket serverSocket; 
 	IPaddress ip;
 	TCPsocket sockets[MAXSOCKETS];
+	uint8_t amt_wood;
+	uint32_t timer_wood;
+	int socketIndex;
+	int in_use;
+	int questing;
+	
 } *Server; 
 
 Server createTCPServer(Game game);

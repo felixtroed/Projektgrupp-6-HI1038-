@@ -46,9 +46,11 @@ PUBLIC Game createGame() {
 PUBLIC void updateGame(Game game) {
     bool running = true;
     int newMove = 1, lastMove = 0;
-    int frames = 0;                 // Used for character refresh rate in gameLogic.c
-    TCPsocket client; //test
-    const char* text = "test123"; // test
+    int frames = 0;    
+    
+    // Used for character refresh rate in gameLogic.c
+    //TCPsocket client; //test
+    //const char* text = "test123"; // test
 
     while (running) {
         while (SDL_PollEvent(&game->event) != 0) {
@@ -80,13 +82,13 @@ PUBLIC void updateGame(Game game) {
         
         handlePlayerExplosionCollision(game);
         printf("%d", checkSockets(game->server)); 
-        client = SDLNet_TCP_Accept(game->server);
-        if (client)
-        {
+        //client = SDLNet_TCP_Accept(game->server);
+        //if (client)
+        //{
             // communicate 
-            SDLNet_TCP_Send(client, text, strlen(text) + 1);
-            SDLNet_TCP_Close(client);
-        }
+        //  SDLNet_TCP_Send(client, text, strlen(text) + 1);
+        //    SDLNet_TCP_Close(client);
+        //}
 
         SDL_RenderClear(game->renderer);
         SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
