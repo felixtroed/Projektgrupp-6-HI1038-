@@ -55,18 +55,20 @@ PRIVATE Uint32 explodeBomb(Uint32 interval, void *args) {
     BombTimerCallbackArgs* bargs = (BombTimerCallbackArgs*) args;
     bargs->bomb->startExplosion = true;
 
-    if (!bargs->bomb->boxIdxesLeft[0]) {
-        printf("Left box [0]: %d \nLeft box [1]: %d\n", bargs->bomb->boxIdxesLeft[0], bargs->bomb->boxIdxesLeft[1]);
+    if (bargs->bomb->boxIdxesLeft[0] >= 0) {
+        // printf("Left box [0]: %d \nLeft box [1]: %d\n", bargs->bomb->boxIdxesLeft[0], bargs->bomb->boxIdxesLeft[1]);
         activeBox[bargs->bomb->boxIdxesLeft[0]][bargs->bomb->boxIdxesLeft[1]] = 0;
     }
-    if (!bargs->bomb->boxIdxesRight[0]) {
-        printf("Right box [0]: %d \nRight box [1]: %d\n", bargs->bomb->boxIdxesRight[0], bargs->bomb->boxIdxesRight[1]);
+    if (bargs->bomb->boxIdxesRight[0] >= 0) {
+        // printf("Right box [0]: %d \nRight box [1]: %d\n", bargs->bomb->boxIdxesRight[0], bargs->bomb->boxIdxesRight[1]);
         activeBox[bargs->bomb->boxIdxesRight[0]][bargs->bomb->boxIdxesRight[1]] = 0;
     }
-    if (!bargs->bomb->boxIdxesTop[0]) {
+    if (bargs->bomb->boxIdxesTop[0] >= 0) {
+        // printf("Top box [0]: %d \nTop box [1]: %d\n", bargs->bomb->boxIdxesTop[0], bargs->bomb->boxIdxesTop[1]);
         activeBox[bargs->bomb->boxIdxesTop[0]][bargs->bomb->boxIdxesTop[1]] = 0;
     }
-    if (!bargs->bomb->boxIdxesBottom[0]) {
+    if (bargs->bomb->boxIdxesBottom[0] >= 0) {
+        // printf("Bottom box [0]: %d \nBottom box [1]: %d\n", bargs->bomb->boxIdxesBottom[0], bargs->bomb->boxIdxesBottom[1]);
         activeBox[bargs->bomb->boxIdxesBottom[0]][bargs->bomb->boxIdxesBottom[1]] = 0;
     }
 
