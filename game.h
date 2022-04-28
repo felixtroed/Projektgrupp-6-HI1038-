@@ -11,6 +11,7 @@
 #define WINDOW_WIDTH 1088
 #define WINDOW_HEIGHT 832
 #define BOMBS 4
+#define MENUOPTIONS 4
 
 typedef struct PlayerSettings* Player;
 typedef struct BombSettings* Bomb;
@@ -23,6 +24,13 @@ typedef struct GameSettings {
     SDL_Surface *bitmapSurface;         //Anv�nds f�r ladda upp bilder
     SDL_Texture *background;             //Anv�nds f�r att ladda in bilden av bakgrunden
     SDL_Texture *box;                   //Anv�nds f�r att ladda in bilden av l�dan
+    SDL_Texture *startMenu;
+    SDL_Texture *controlsMenu;
+    SDL_Texture *redPlay;
+    SDL_Texture *redControls;
+    SDL_Texture *redQuit;
+    SDL_Texture *redBack;
+    SDL_Rect menuOptionPos[MENUOPTIONS];
     SDL_Rect boxPos;                  //Anv�nds f�r positionen av l�dorna
     SDL_Event event;
     Boxes boxes;

@@ -11,6 +11,7 @@
 #define KEYLEFT 'a'
 
 PRIVATE bool initWinRen(Game game);
+PRIVATE bool createStartMenu(Game game);
 PRIVATE bool createBackground(Game game);
 PRIVATE bool showBoxes(Game game);
 PRIVATE void renderBoxes(Game game);
@@ -19,16 +20,39 @@ PUBLIC Game createGame() {
     Game game = malloc(sizeof(struct GameSettings));
 
     if (initWinRen(game)) {
-        if(createBackground(game)) {
-            if (showBoxes(game)) {
-                int imgFlags = IMG_INIT_PNG;
-                if (!(IMG_Init(imgFlags) & imgFlags)) 
-                {
-                    printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
+        if (createStartMenu(game)) {
+            if (createBackground(game)) {
+                if (showBoxes(game)) {
+                    int imgFlags = IMG_INIT_PNG;
+                    if (!(IMG_Init(imgFlags) & imgFlags))
+                    {
+                        printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
+                    }
                 }
-            }
+
+        }
         }
     }
+    game->menuOptionPos[0].x = 441;             // 'PLAY' button in menu
+    game->menuOptionPos[0].y = 429;
+    game->menuOptionPos[0].w = 212;
+    game->menuOptionPos[0].h = 71;
+
+    game->menuOptionPos[1].x = 336;             // 'CONTROLS' button in menu
+    game->menuOptionPos[1].y = 521;
+    game->menuOptionPos[1].w = 419;
+    game->menuOptionPos[1].h = 71;
+
+    game->menuOptionPos[2].x = 470;             // 'QUIT' button in menu
+    game->menuOptionPos[2].y = 613;
+    game->menuOptionPos[2].w = 151;
+    game->menuOptionPos[2].h = 71;
+
+    game->menuOptionPos[3].x = 39;             // 'BACK' button in menu
+    game->menuOptionPos[3].y = 725;
+    game->menuOptionPos[3].w = 212;
+    game->menuOptionPos[3].h = 71;
+
     game->p1 = createPlayer(1, 64, 64, game);
     game->p2 = createPlayer(2, 960, 64, game);
     game->p3 = createPlayer(3, 64, 704, game);
@@ -43,6 +67,10 @@ PUBLIC void updateGame(Game game) {
     bool running = true;
     int newMove = 1, lastMove = 0;
     int frames = 0;                 // Used for character refresh rate in gameLogic.c
+    bool inMenu = true;
+    bool inControls = false;
+    int mousePos_x, mousePos_y;
+    bool menuOptionSelected[MENUOPTIONS] = { 0,0,0,0 };
     const Uint8* currentKeyStates;
 
     while (running) {
@@ -50,41 +78,131 @@ PUBLIC void updateGame(Game game) {
             if (game->event.type == SDL_QUIT) {
                 running = false;
             }
-            if (game->p1->isAlive) {
-                if (game->event.type == SDL_KEYDOWN) {
-                    if (game->event.key.keysym.sym == SDLK_SPACE) {                     // Space intryckt (gamla sättet som pausar i 1 sek när man håller in knappen)
-                        bombPlacement(game->p1, game->bombs, game->renderer);
-                        // removeBox(game->p1, game->boxes->activeBox);
-                        
+            if (!inMenu) {
+                if (game->p1->isAlive) {
+                    if (game->event.type == SDL_KEYDOWN) {
+                        if (game->event.key.keysym.sym == SDLK_SPACE) {                     // Space intryckt (gamla sättet som pausar i 1 sek när man håller in knappen)
+                            bombPlacement(game->p1, game->bombs, game->renderer);
+                            // removeBox(game->p1, game->boxes->activeBox);
+                        }
                     }
                 }
             }
+            else {
+                mousePos_x = game->event.motion.x;
+                mousePos_y = game->event.motion.y;
+                if (!inControls) {
+                    for (int i = 0; i < MENUOPTIONS; i++) {
+                        if (mousePos_x >= 440 && mousePos_x <= 650 && mousePos_y >= 430 && mousePos_y <= 505) {         // Om musen är på "PLAY"
+                            if (!menuOptionSelected[0]) {
+                                menuOptionSelected[0] = true;
+                            }
+                            if (game->event.type == SDL_MOUSEBUTTONDOWN) {
+                                inMenu = false;
+                            }
+                        }
+                        else {
+                            if (menuOptionSelected[0]) {
+                                menuOptionSelected[0] = false;
+                            }
+                        }
+
+                        if (mousePos_x >= 336 && mousePos_x <= 750 && mousePos_y >= 525 && mousePos_y <= 596) {         // Om musen är på "CONTROLS"
+                            if (!menuOptionSelected[1]) {
+                                menuOptionSelected[1] = true;
+                            }
+                            if (game->event.type == SDL_MOUSEBUTTONDOWN) {
+                                inControls = true;
+                                menuOptionSelected[1] = false;
+                            }
+                        }
+                        else {
+                            if (menuOptionSelected[1]) {
+                                menuOptionSelected[1] = false;
+                            }
+                        }
+
+                        if (mousePos_x >= 470 && mousePos_x <= 615 && mousePos_y >= 615 && mousePos_y <= 690) {         // Om musen är på "QUIT"
+                            if (!menuOptionSelected[2]) {
+                                menuOptionSelected[2] = true;
+                            }
+                            if (game->event.type == SDL_MOUSEBUTTONDOWN) {
+                                running = false;
+                            }
+                        }
+                        else {
+                            if (menuOptionSelected[2]) {
+                                menuOptionSelected[2] = false;
+                            }
+                        }
+                    }
+                }
+                else {
+                    if (mousePos_x >= 40 && mousePos_x <= 242 && mousePos_y >= 726 && mousePos_y <= 800) {              // Om musen är på "BACK"
+                        if (!menuOptionSelected[3]) {
+                            menuOptionSelected[3] = true;
+                        }
+                        if (game->event.type == SDL_MOUSEBUTTONDOWN) {
+                            inControls = false;
+                        }
+                    }
+                    else {
+                        if (menuOptionSelected[3]) {
+                            menuOptionSelected[3] = false;
+                        }
+                    }
+                }
+            }
+            
         }
 
-        currentKeyStates = SDL_GetKeyboardState(NULL);
-        if (game->p1->isAlive) {
-            if (currentKeyStates[SDL_SCANCODE_W] || currentKeyStates[SDL_SCANCODE_UP]) {                // Funkar för både WASD och pilar
-                move(game->p1, &newMove, &lastMove, KEYUP, game->bombs, &frames);
+        if (!inMenu) {
+            currentKeyStates = SDL_GetKeyboardState(NULL);
+            if (game->p1->isAlive) {
+                if (currentKeyStates[SDL_SCANCODE_W] || currentKeyStates[SDL_SCANCODE_UP]) {                // Funkar för både WASD och pilar
+                    move(game->p1, &newMove, &lastMove, KEYUP, game->bombs, &frames);
+                }
+                else if (currentKeyStates[SDL_SCANCODE_S] || currentKeyStates[SDL_SCANCODE_DOWN]) {
+                    move(game->p1, &newMove, &lastMove, KEYDOWN, game->bombs, &frames);
+                }
+                else if (currentKeyStates[SDL_SCANCODE_A] || currentKeyStates[SDL_SCANCODE_LEFT]) {
+                    move(game->p1, &newMove, &lastMove, KEYLEFT, game->bombs, &frames);
+                }
+                else if (currentKeyStates[SDL_SCANCODE_D] || currentKeyStates[SDL_SCANCODE_RIGHT]) {
+                    move(game->p1, &newMove, &lastMove, KEYRIGHT, game->bombs, &frames);
+                }
             }
-            else if (currentKeyStates[SDL_SCANCODE_S] || currentKeyStates[SDL_SCANCODE_DOWN]) {
-                move(game->p1, &newMove, &lastMove, KEYDOWN, game->bombs, &frames);
-            }
-            else if (currentKeyStates[SDL_SCANCODE_A] || currentKeyStates[SDL_SCANCODE_LEFT]) {
-                move(game->p1, &newMove, &lastMove, KEYLEFT, game->bombs, &frames);
-            }
-            else if (currentKeyStates[SDL_SCANCODE_D] || currentKeyStates[SDL_SCANCODE_RIGHT]) {
-                move(game->p1, &newMove, &lastMove, KEYRIGHT, game->bombs, &frames);
-            }
-        }
 
-        handlePlayerExplosionCollision(game);
-          
-        SDL_RenderClear(game->renderer);
-        SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
-        renderBoxes(game);
-        renderBombsAndExplosions(game);
-        renderPlayers(game);
-        SDL_RenderPresent(game->renderer);
+            handlePlayerExplosionCollision(game);
+
+            SDL_RenderClear(game->renderer);
+            SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
+            renderBoxes(game);
+            renderBombsAndExplosions(game);
+            renderPlayers(game);
+            SDL_RenderPresent(game->renderer);
+        }
+        else {
+            SDL_RenderClear(game->renderer);
+            SDL_RenderCopy(game->renderer, game->startMenu, NULL, NULL);
+            if (inControls) {
+                SDL_RenderCopy(game->renderer, game->controlsMenu, NULL, NULL);
+                if (menuOptionSelected[3]) {
+                    SDL_RenderCopy(game->renderer, game->redBack, NULL, &game->menuOptionPos[3]);
+                }
+            }
+            if (menuOptionSelected[0]) {
+                SDL_RenderCopy(game->renderer, game->redPlay, NULL, &game->menuOptionPos[0]);
+            }
+            else if (menuOptionSelected[1]) {
+                SDL_RenderCopy(game->renderer, game->redControls, NULL, &game->menuOptionPos[1]);
+            }
+            else if (menuOptionSelected[2]) {
+                SDL_RenderCopy(game->renderer, game->redQuit, NULL, &game->menuOptionPos[2]);
+            }
+            SDL_RenderPresent(game->renderer);
+        }
+        
     }
 }
 
@@ -132,6 +250,119 @@ PRIVATE bool createBackground(Game game) {
         return false; 
     }
     
+    return true;
+}
+
+PRIVATE bool createStartMenu(Game game) {
+
+    game->bitmapSurface = IMG_Load("resources/Menu.png");
+    if (!game->bitmapSurface) {
+        printf("Could not load Background to bitmapSurface: %s\n", IMG_GetError());
+        return false;
+    }
+
+    game->startMenu = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);
+    if (!game->startMenu) {
+        printf("Could not create texture 'startMenu' from bitmapSurface: %s\n", SDL_GetError());
+        return false;
+    }
+
+    SDL_FreeSurface(game->bitmapSurface);
+    if (!game->bitmapSurface) {
+        printf("Could not free bitmapSurface: %s\n", SDL_GetError());
+        return false;
+    }
+    game->bitmapSurface = IMG_Load("resources/Controls-Menu.png");
+    if (!game->bitmapSurface) {
+        printf("Could not load 'Controls-Menu' to bitmapSurface: %s\n", IMG_GetError());
+        return false;
+    }
+
+    game->controlsMenu = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);
+    if (!game->controlsMenu) {
+        printf("Could not create texture 'Controls-Menu' from bitmapSurface: %s\n", SDL_GetError());
+        return false;
+    }
+
+    SDL_FreeSurface(game->bitmapSurface);
+    if (!game->bitmapSurface) {
+        printf("Could not free bitmapSurface: %s\n", SDL_GetError());
+        return false;
+    }
+
+
+    game->bitmapSurface = IMG_Load("resources/Play.png");
+    if (!game->bitmapSurface) {
+        printf("Could not load 'Play' to bitmapSurface: %s\n", IMG_GetError());
+        return false;
+    }
+
+    game->redPlay = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);
+    if (!game->redPlay) {
+        printf("Could not create texture 'Play' from bitmapSurface: %s\n", SDL_GetError());
+        return false;
+    }
+
+    SDL_FreeSurface(game->bitmapSurface);
+    if (!game->bitmapSurface) {
+        printf("Could not free bitmapSurface: %s\n", SDL_GetError());
+        return false;
+    }
+
+    game->bitmapSurface = IMG_Load("resources/Controls.png");
+    if (!game->bitmapSurface) {
+        printf("Could not load 'Controls' to bitmapSurface: %s\n", IMG_GetError());
+        return false;
+    }
+
+    game->redControls = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);
+    if (!game->redControls) {
+        printf("Could not create texture 'Controls' from bitmapSurface: %s\n", SDL_GetError());
+        return false;
+    }
+
+    SDL_FreeSurface(game->bitmapSurface);
+    if (!game->bitmapSurface) {
+        printf("Could not free bitmapSurface: %s\n", SDL_GetError());
+        return false;
+    }
+
+    game->bitmapSurface = IMG_Load("resources/Quit.png");
+    if (!game->bitmapSurface) {
+        printf("Could not load 'Quit' to bitmapSurface: %s\n", IMG_GetError());
+        return false;
+    }
+
+    game->redQuit = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);
+    if (!game->redQuit) {
+        printf("Could not create texture 'Quit' from bitmapSurface: %s\n", SDL_GetError());
+        return false;
+    }
+
+    SDL_FreeSurface(game->bitmapSurface);
+    if (!game->bitmapSurface) {
+        printf("Could not free bitmapSurface: %s\n", SDL_GetError());
+        return false;
+    }
+
+    game->bitmapSurface = IMG_Load("resources/Back.png");
+    if (!game->bitmapSurface) {
+        printf("Could not load 'Back' to bitmapSurface: %s\n", IMG_GetError());
+        return false;
+    }
+
+    game->redBack = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);
+    if (!game->redBack) {
+        printf("Could not create texture 'Back' from bitmapSurface: %s\n", SDL_GetError());
+        return false;
+    }
+
+    SDL_FreeSurface(game->bitmapSurface);
+    if (!game->bitmapSurface) {
+        printf("Could not free bitmapSurface: %s\n", SDL_GetError());
+        return false;
+    }
+
     return true;
 }
 
