@@ -33,7 +33,7 @@ PUBLIC Game createGame() {
     game->p2 = createPlayer(2, 960, 64, game);
     game->p3 = createPlayer(3, 64, 704, game);
     game->p4 = createPlayer(4, 960, 704, game);
-    game->boxes = createBoxes(game);
+    // game->boxes = createBoxes(game);
     initBombs(game->bombs);                           // Sets all bombs to NULL
 
     return game;
@@ -53,8 +53,8 @@ PUBLIC void updateGame(Game game) {
             if (game->p1->isAlive) {
                 if (game->event.type == SDL_KEYDOWN) {
                     if (game->event.key.keysym.sym == SDLK_SPACE) {                     // Space intryckt (gamla sättet som pausar i 1 sek när man håller in knappen)
-                        bombPlacement(game->p1, game->bombs, game->renderer, game->boxes);
-                        removeBox(game->p1, game->boxes->activeBox);
+                        bombPlacement(game->p1, game->bombs, game->renderer);
+                        // removeBox(game->p1, game->boxes->activeBox);
                         
                     }
                 }
@@ -64,16 +64,16 @@ PUBLIC void updateGame(Game game) {
         currentKeyStates = SDL_GetKeyboardState(NULL);
         if (game->p1->isAlive) {
             if (currentKeyStates[SDL_SCANCODE_W] || currentKeyStates[SDL_SCANCODE_UP]) {                // Funkar för både WASD och pilar
-                move(game->p1, &newMove, &lastMove, KEYUP, game->bombs, game->boxes, &frames);
+                move(game->p1, &newMove, &lastMove, KEYUP, game->bombs, &frames);
             }
             else if (currentKeyStates[SDL_SCANCODE_S] || currentKeyStates[SDL_SCANCODE_DOWN]) {
-                move(game->p1, &newMove, &lastMove, KEYDOWN, game->bombs, game->boxes, &frames);
+                move(game->p1, &newMove, &lastMove, KEYDOWN, game->bombs, &frames);
             }
             else if (currentKeyStates[SDL_SCANCODE_A] || currentKeyStates[SDL_SCANCODE_LEFT]) {
-                move(game->p1, &newMove, &lastMove, KEYLEFT, game->bombs, game->boxes, &frames);
+                move(game->p1, &newMove, &lastMove, KEYLEFT, game->bombs, &frames);
             }
             else if (currentKeyStates[SDL_SCANCODE_D] || currentKeyStates[SDL_SCANCODE_RIGHT]) {
-                move(game->p1, &newMove, &lastMove, KEYRIGHT, game->bombs, game->boxes, &frames);
+                move(game->p1, &newMove, &lastMove, KEYRIGHT, game->bombs, &frames);
             }
         }
 
@@ -178,7 +178,7 @@ PRIVATE void renderBoxes(Game game) {
      game->boxPos.h = 64;
      for (int row = 0; row < ROW_SIZE; row++) {
          for (int column = 0; column < COLUMN_SIZE; column++) {
-             if (game->boxes->activeBox[row][column] == 1) {
+             if (activeBox[row][column] == 1) {
                  game->boxPos.x = column * 64 + 64;
                  game->boxPos.y = row * 64 + 64;
                  SDL_RenderCopyEx(game->renderer, game->box, NULL, &game->boxPos, 0, NULL, SDL_FLIP_NONE);       // Renderar en l�da i taget

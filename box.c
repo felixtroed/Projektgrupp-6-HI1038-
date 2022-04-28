@@ -3,7 +3,7 @@
 #define PUBLIC /* EMPTY */
 #define PRIVATE static
 
-
+/*
 Boxes createBoxes(Game game) {
 	Boxes boxes = malloc(sizeof(struct BoxInit));
 	int playField[ROW_SIZE][COLUMN_SIZE] = {
@@ -31,11 +31,11 @@ Boxes createBoxes(Game game) {
 
 	return boxes;
 
-}
+} */
 
-/*PUBLIC bool activeBox[ROW_SIZE][COLUMN_SIZE] = {
-	{0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0},
-	{0, W, 0, W, 1, W, 0, W, 0, W, 1, W, 1, W, 0},
+PUBLIC int activeBox[ROW_SIZE][COLUMN_SIZE] = {
+	{0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0},
+	{0, 0, 0, 0, 1, W, 0, W, 0, W, 1, W, 1, W, 0},
 	{1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0},
 	{1, W, 0, W, 0, W, 1, W, 1, W, 1, W, 1, W, 1},
 	{1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1},
@@ -44,8 +44,8 @@ Boxes createBoxes(Game game) {
 	{1, W, 1, W, 1, W, 1, W, 0, W, 1, W, 1, W, 1},
 	{0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0},
 	{0, W, 1, W, 1, W, 1, W, 1, W, 1, W, 1, W, 0},
-	{0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0}
-}; */
+	{1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0}
+};
 
 
 

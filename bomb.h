@@ -33,7 +33,7 @@ typedef struct BombSettings {
     int explosionRange;
 } *Bomb;
 
-void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer, Boxes boxes);
+void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer);
 void initBombs(Bomb bombs[]);
 void renderBombsAndExplosions(Game game);
 
