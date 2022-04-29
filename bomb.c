@@ -16,7 +16,7 @@ PRIVATE Uint32 explodeBomb(Uint32 interval, void *args);
 PRIVATE Uint32 explosionDone(Uint32 interval, void *deleteBomb);
 PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer);
 PRIVATE uint8_t getBombIdx(Bomb bombs[]);
-PRIVATE void modifyExplosionHitbox(Bomb bomb);
+PRIVATE void handleExplosions(Bomb bomb);
 PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer);
 PUBLIC void renderBombsAndExplosions(Game game);
 
@@ -55,22 +55,7 @@ PRIVATE Uint32 explodeBomb(Uint32 interval, void *args) {
     BombTimerCallbackArgs* bargs = (BombTimerCallbackArgs*) args;
     bargs->bomb->startExplosion = true;
 
-    if (bargs->bomb->boxIdxesLeft[0] >= 0) {
-        // printf("Left box [0]: %d \nLeft box [1]: %d\n", bargs->bomb->boxIdxesLeft[0], bargs->bomb->boxIdxesLeft[1]);
-        activeBox[bargs->bomb->boxIdxesLeft[0]][bargs->bomb->boxIdxesLeft[1]] = 0;
-    }
-    if (bargs->bomb->boxIdxesRight[0] >= 0) {
-        // printf("Right box [0]: %d \nRight box [1]: %d\n", bargs->bomb->boxIdxesRight[0], bargs->bomb->boxIdxesRight[1]);
-        activeBox[bargs->bomb->boxIdxesRight[0]][bargs->bomb->boxIdxesRight[1]] = 0;
-    }
-    if (bargs->bomb->boxIdxesTop[0] >= 0) {
-        // printf("Top box [0]: %d \nTop box [1]: %d\n", bargs->bomb->boxIdxesTop[0], bargs->bomb->boxIdxesTop[1]);
-        activeBox[bargs->bomb->boxIdxesTop[0]][bargs->bomb->boxIdxesTop[1]] = 0;
-    }
-    if (bargs->bomb->boxIdxesBottom[0] >= 0) {
-        // printf("Bottom box [0]: %d \nBottom box [1]: %d\n", bargs->bomb->boxIdxesBottom[0], bargs->bomb->boxIdxesBottom[1]);
-        activeBox[bargs->bomb->boxIdxesBottom[0]][bargs->bomb->boxIdxesBottom[1]] = 0;
-    }
+    handleExplosions(bargs->bomb);    // Modifies explosion hitbox based on collision with walls and boxes as well as deletes boxes
 
     return 0;
 }
@@ -359,14 +344,10 @@ PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer) 
     bomb->endExplosion = false;
     bomb->spawnInside = true;
 
-    bomb->boxIdxesLeft[0] = bomb->boxIdxesRight[0] = bomb->boxIdxesTop[0] = bomb->boxIdxesBottom[0] = -1;
-
-    modifyExplosionHitbox(bomb);       // Changes explosion size based on collision with walls and boxes 
-
     return bomb;
 }
 
-PRIVATE void modifyExplosionHitbox(Bomb bomb) {
+PRIVATE void handleExplosions(Bomb bomb) {
     uint8_t col = bomb->explosionPos.x / 64 - 1;
     uint8_t row = bomb->explosionPos.y / 64 - 1;
     uint8_t i;
@@ -380,14 +361,13 @@ PRIVATE void modifyExplosionHitbox(Bomb bomb) {
     for (i = 0; i < bomb->explosionRange && col - i - 1 >= 0; i++) {
         if (activeBox[row][col - i - 1] == W) {
             bomb->explosionHor.x += 64 * (bomb->explosionRange - i);
-            xOffset = bomb->explosionHor.x - xStart;            // Stores offset that is used if horizontal width is changed as well as horizontal x
+            xOffset = bomb->explosionHor.x - xStart;          // Stores offset that is used if horizontal width is changed as well as horizontal x
             break;
         }
         else if (activeBox[row][col - i - 1] == 1) {
             bomb->explosionHor.x += 64 * (bomb->explosionRange - i) - 64;
             xOffset = bomb->explosionHor.x - xStart;
-            bomb->boxIdxesLeft[0] = row;
-            bomb->boxIdxesLeft[1] = col - i - 1;
+            activeBox[row][col - i - 1] = 0;                  // Deletes box
             break;
         }
     }
@@ -400,8 +380,7 @@ PRIVATE void modifyExplosionHitbox(Bomb bomb) {
         }
         else if (activeBox[row][col + i + 1] == 1) {
             bomb->explosionHor.w -= 64 * (bomb->explosionRange - i) - 64 + xOffset;
-            bomb->boxIdxesRight[0] = row;
-            bomb->boxIdxesRight[1] = col + i + 1;
+            activeBox[row][col + i + 1] = 0;
             break;
         }
     }
@@ -416,8 +395,7 @@ PRIVATE void modifyExplosionHitbox(Bomb bomb) {
         else if (activeBox[row - i - 1][col] == 1) {
             bomb->explosionVer.y += 64 * (bomb->explosionRange - i) - 64;
             yOffset = bomb->explosionVer.y - yStart;
-            bomb->boxIdxesTop[0] = row - i - 1;
-            bomb->boxIdxesTop[1] = col;
+            activeBox[row - i - 1][col] = 0;
             break;
         }
     }
@@ -430,8 +408,7 @@ PRIVATE void modifyExplosionHitbox(Bomb bomb) {
         }
         else if (activeBox[row + i + 1][col] == 1) {
             bomb->explosionVer.h -= 64 * (bomb->explosionRange - i) - 64 + yOffset;
-            bomb->boxIdxesBottom[0] = row + i + 1;
-            bomb->boxIdxesBottom[1] = col;
+            activeBox[row + i + 1][col] = 0;
             break;
         }
     }
