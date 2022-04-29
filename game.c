@@ -15,6 +15,7 @@ PRIVATE bool createStartMenu(Game game);
 PRIVATE bool createBackground(Game game);
 PRIVATE bool showBoxes(Game game);
 PRIVATE void renderBoxes(Game game);
+PUBLIC bool loadTextures(Game* renderer, Game* bitmapSurface, Game* texture, char pictureDestination[64]);
 
 PUBLIC Game createGame() {
     Game game = malloc(sizeof(struct GameSettings));
@@ -29,8 +30,7 @@ PUBLIC Game createGame() {
                         printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
                     }
                 }
-
-        }
+            }
         }
     }
     game->menuOptionPos[0].x = 441;             // 'PLAY' button in menu
@@ -233,159 +233,70 @@ PRIVATE bool initWinRen(Game game) {
 
 PRIVATE bool createBackground(Game game) {
 
-    game->bitmapSurface = IMG_Load("resources/Background.png");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske m�ste �ndra bildens position)
-    if (!game->bitmapSurface) {
-        printf("Could not load Background to bitmapSurface: %s\n", IMG_GetError());
-        return false;
-    }
-  
-    game->background = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);    //Skapar en Texture fr�n bitmapSurface
-    if (!game->background) {
-        return false;
-    }
+    char backgroundMenuDestination[64] = "resources/Background.png";
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->background, backgroundMenuDestination);
+    //    memset(backgroundDestination, NULL, strlen(backgroundMenuDestination));
 
-    SDL_FreeSurface(game->bitmapSurface);                                           //Raderar bitmapSurface (frig�r minnet) (Background finns fortfarande kvar)
-    if (!game->background) {
-        printf("Could not free bitmapSurface: %s\n", SDL_GetError());
-        return false; 
-    }
-    
     return true;
 }
 
 PRIVATE bool createStartMenu(Game game) {
 
-    game->bitmapSurface = IMG_Load("resources/Menu.png");
-    if (!game->bitmapSurface) {
-        printf("Could not load Background to bitmapSurface: %s\n", IMG_GetError());
-        return false;
-    }
+    char menuDestination[64] = "resources/Menu.png";
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->startMenu, menuDestination);
+    //    memset(menuDestination, NULL, strlen(menuDestination));                       //Tömmer strängen (för att kunna återanvändas till de andra funktionerna?
+                                                                                       //Men lyckas ej få det att fungera. Skapar istället nya strängar för varje funktion.
+    char controlsMenuDestination[64] = "resources/Controls-Menu.png";
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->controlsMenu, controlsMenuDestination);
+    //    memset(controlsMenuDestination, NULL, strlen(controlsMenuDestination));
 
-    game->startMenu = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);
-    if (!game->startMenu) {
-        printf("Could not create texture 'startMenu' from bitmapSurface: %s\n", SDL_GetError());
-        return false;
-    }
+    char playDestination[64] = "resources/Play.png";
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->redPlay, playDestination);
+    //    memset(playDestination, NULL, strlen(playDestination));
 
-    SDL_FreeSurface(game->bitmapSurface);
-    if (!game->bitmapSurface) {
-        printf("Could not free bitmapSurface: %s\n", SDL_GetError());
-        return false;
-    }
-    game->bitmapSurface = IMG_Load("resources/Controls-Menu.png");
-    if (!game->bitmapSurface) {
-        printf("Could not load 'Controls-Menu' to bitmapSurface: %s\n", IMG_GetError());
-        return false;
-    }
+    char controlsDestination[64] = "resources/Controls.png";
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->redControls, controlsDestination);
+    //    memset(controlsDestination, NULL, strlen(controlsDestination));
 
-    game->controlsMenu = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);
-    if (!game->controlsMenu) {
-        printf("Could not create texture 'Controls-Menu' from bitmapSurface: %s\n", SDL_GetError());
-        return false;
-    }
+    char quitDestination[64] = "resources/Quit.png";
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->redQuit, quitDestination);
+    //    memset(quitDestination, NULL, strlen(quitDestination));
 
-    SDL_FreeSurface(game->bitmapSurface);
-    if (!game->bitmapSurface) {
-        printf("Could not free bitmapSurface: %s\n", SDL_GetError());
-        return false;
-    }
-
-
-    game->bitmapSurface = IMG_Load("resources/Play.png");
-    if (!game->bitmapSurface) {
-        printf("Could not load 'Play' to bitmapSurface: %s\n", IMG_GetError());
-        return false;
-    }
-
-    game->redPlay = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);
-    if (!game->redPlay) {
-        printf("Could not create texture 'Play' from bitmapSurface: %s\n", SDL_GetError());
-        return false;
-    }
-
-    SDL_FreeSurface(game->bitmapSurface);
-    if (!game->bitmapSurface) {
-        printf("Could not free bitmapSurface: %s\n", SDL_GetError());
-        return false;
-    }
-
-    game->bitmapSurface = IMG_Load("resources/Controls.png");
-    if (!game->bitmapSurface) {
-        printf("Could not load 'Controls' to bitmapSurface: %s\n", IMG_GetError());
-        return false;
-    }
-
-    game->redControls = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);
-    if (!game->redControls) {
-        printf("Could not create texture 'Controls' from bitmapSurface: %s\n", SDL_GetError());
-        return false;
-    }
-
-    SDL_FreeSurface(game->bitmapSurface);
-    if (!game->bitmapSurface) {
-        printf("Could not free bitmapSurface: %s\n", SDL_GetError());
-        return false;
-    }
-
-    game->bitmapSurface = IMG_Load("resources/Quit.png");
-    if (!game->bitmapSurface) {
-        printf("Could not load 'Quit' to bitmapSurface: %s\n", IMG_GetError());
-        return false;
-    }
-
-    game->redQuit = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);
-    if (!game->redQuit) {
-        printf("Could not create texture 'Quit' from bitmapSurface: %s\n", SDL_GetError());
-        return false;
-    }
-
-    SDL_FreeSurface(game->bitmapSurface);
-    if (!game->bitmapSurface) {
-        printf("Could not free bitmapSurface: %s\n", SDL_GetError());
-        return false;
-    }
-
-    game->bitmapSurface = IMG_Load("resources/Back.png");
-    if (!game->bitmapSurface) {
-        printf("Could not load 'Back' to bitmapSurface: %s\n", IMG_GetError());
-        return false;
-    }
-
-    game->redBack = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);
-    if (!game->redBack) {
-        printf("Could not create texture 'Back' from bitmapSurface: %s\n", SDL_GetError());
-        return false;
-    }
-
-    SDL_FreeSurface(game->bitmapSurface);
-    if (!game->bitmapSurface) {
-        printf("Could not free bitmapSurface: %s\n", SDL_GetError());
-        return false;
-    }
+    char backDestination[64] = "resources/Back.png";
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->redBack, backDestination);
+    //    memset(backDestination, NULL, strlen(backDestination));
 
     return true;
 }
 
 PRIVATE bool showBoxes(Game game) {
 
-    game->bitmapSurface = IMG_Load("resources/Box.png");                      //Laddar upp bakgrundsbilden till bitmapSurface (kanske m�ste �ndra bildens position)
-    if (!game->bitmapSurface) {
-        printf("Could not load Box to bitmapSurface: %s\n", IMG_GetError());
+    char boxDestination[64] = "resources/Box.png";
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->box, boxDestination);
+    //    memset(boxDestination, NULL, strlen(boxDestination));
+
+    return true;
+}
+
+PUBLIC bool loadTextures(Game* renderer, Game* bitmapSurface, Game* texture, char pictureDestination[64]) {
+    *bitmapSurface = IMG_Load(pictureDestination);
+    if (!bitmapSurface) {
+        printf("Could not load %s to bitmapSurface: %s\n", pictureDestination, IMG_GetError());
         return false;
     }
-   
-    game->box = SDL_CreateTextureFromSurface(game->renderer, game->bitmapSurface);    //Skapar en Texture fr�n bitmapSurface
-    if (!game->box) {
+
+    *texture = SDL_CreateTextureFromSurface(*renderer, *bitmapSurface);
+    if (!texture) {
         printf("Could not create texture from bitmapSurface: %s\n", SDL_GetError());
         return false;
     }
-  
-    SDL_FreeSurface(game->bitmapSurface);                                           //Raderar bitmapSurface (frig�r minnet) (Background finns fortfarande kvar)
-    if (!game->box) {
+
+    SDL_FreeSurface(*bitmapSurface);                                           //Raderar bitmapSurface (frig�r minnet) (Background finns fortfarande kvar)
+    if (!bitmapSurface) {
         printf("Could not free bitmapSurface: %s\n", SDL_GetError());
         return false;
     }
-    return true; 
+    return true;
 }
 
 PUBLIC void exitGame(Game game) {
