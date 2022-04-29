@@ -3,6 +3,7 @@
 
 // #include <SDL.h>
 #include <SDL2/SDL.h>
+#include <string.h>
 #include "player.h"
 #include "box.h"
 #include "bomb.h"

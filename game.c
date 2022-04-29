@@ -202,7 +202,6 @@ PUBLIC void updateGame(Game game) {
             }
             SDL_RenderPresent(game->renderer);
         }
-        
     }
 }
 
@@ -233,38 +232,33 @@ PRIVATE bool initWinRen(Game game) {
 
 PRIVATE bool createBackground(Game game) {
 
-    char backgroundMenuDestination[64] = "resources/Background.png";
-    loadTextures(&game->renderer, &game->bitmapSurface, &game->background, backgroundMenuDestination);
-    //    memset(backgroundDestination, NULL, strlen(backgroundMenuDestination));
+    char pictureDestination[64] = "resources/Background.png";
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->background, pictureDestination);
 
     return true;
 }
 
 PRIVATE bool createStartMenu(Game game) {
 
-    char menuDestination[64] = "resources/Menu.png";
-    loadTextures(&game->renderer, &game->bitmapSurface, &game->startMenu, menuDestination);
-    //    memset(menuDestination, NULL, strlen(menuDestination));                       //Tömmer strängen (för att kunna återanvändas till de andra funktionerna?
-                                                                                       //Men lyckas ej få det att fungera. Skapar istället nya strängar för varje funktion.
-    char controlsMenuDestination[64] = "resources/Controls-Menu.png";
-    loadTextures(&game->renderer, &game->bitmapSurface, &game->controlsMenu, controlsMenuDestination);
-    //    memset(controlsMenuDestination, NULL, strlen(controlsMenuDestination));
+    char pictureDestination[64];
 
-    char playDestination[64] = "resources/Play.png";
-    loadTextures(&game->renderer, &game->bitmapSurface, &game->redPlay, playDestination);
-    //    memset(playDestination, NULL, strlen(playDestination));
+    strcpy_s(pictureDestination, sizeof pictureDestination, "resources/Menu.png");
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->startMenu, pictureDestination);
 
-    char controlsDestination[64] = "resources/Controls.png";
-    loadTextures(&game->renderer, &game->bitmapSurface, &game->redControls, controlsDestination);
-    //    memset(controlsDestination, NULL, strlen(controlsDestination));
+    strcpy_s(pictureDestination, sizeof pictureDestination, "resources/Controls-Menu.png");
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->controlsMenu, pictureDestination);
 
-    char quitDestination[64] = "resources/Quit.png";
-    loadTextures(&game->renderer, &game->bitmapSurface, &game->redQuit, quitDestination);
-    //    memset(quitDestination, NULL, strlen(quitDestination));
+    strcpy_s(pictureDestination, sizeof pictureDestination, "resources/Play.png");
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->redPlay, pictureDestination);
 
-    char backDestination[64] = "resources/Back.png";
-    loadTextures(&game->renderer, &game->bitmapSurface, &game->redBack, backDestination);
-    //    memset(backDestination, NULL, strlen(backDestination));
+    strcpy_s(pictureDestination, sizeof pictureDestination, "resources/Controls.png");
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->redControls, pictureDestination);
+
+    strcpy_s(pictureDestination, sizeof pictureDestination, "resources/Quit.png");
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->redQuit, pictureDestination);
+
+    strcpy_s(pictureDestination, sizeof pictureDestination, "resources/Back.png");
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->redBack, pictureDestination);
 
     return true;
 }
@@ -273,7 +267,6 @@ PRIVATE bool showBoxes(Game game) {
 
     char boxDestination[64] = "resources/Box.png";
     loadTextures(&game->renderer, &game->bitmapSurface, &game->box, boxDestination);
-    //    memset(boxDestination, NULL, strlen(boxDestination));
 
     return true;
 }
