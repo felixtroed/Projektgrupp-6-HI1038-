@@ -31,10 +31,6 @@ typedef struct BombSettings {
     bool switchRedBomb;
     bool spawnInside;
     int explosionRange;
-    int boxIdxesLeft[2];
-    int boxIdxesRight[2];
-    int boxIdxesTop[2];
-    int boxIdxesBottom[2];
 } *Bomb;
 
 void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer);
