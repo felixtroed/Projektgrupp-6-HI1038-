@@ -26,9 +26,9 @@ typedef struct GameSettings {
     SDL_Texture *background;             //Anv�nds f�r att ladda in bilden av bakgrunden
     SDL_Texture *box;                   //Anv�nds f�r att ladda in bilden av l�dan
     SDL_Texture *startMenu;
-    SDL_Texture *controlsMenu;
+    SDL_Texture *instructionsMenu;
     SDL_Texture *redPlay;
-    SDL_Texture *redControls;
+    SDL_Texture *redInstructions;
     SDL_Texture *redQuit;
     SDL_Texture *redBack;
     SDL_Rect menuOptionPos[MENUOPTIONS];

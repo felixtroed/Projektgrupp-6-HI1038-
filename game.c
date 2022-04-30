@@ -38,9 +38,9 @@ PUBLIC Game createGame() {
     game->menuOptionPos[0].w = 212;
     game->menuOptionPos[0].h = 71;
 
-    game->menuOptionPos[1].x = 336;             // 'CONTROLS' button in menu
+    game->menuOptionPos[1].x = 258;             // 'INSTRUCTIONS' button in menu
     game->menuOptionPos[1].y = 521;
-    game->menuOptionPos[1].w = 419;
+    game->menuOptionPos[1].w = 578;
     game->menuOptionPos[1].h = 71;
 
     game->menuOptionPos[2].x = 470;             // 'QUIT' button in menu
@@ -68,7 +68,7 @@ PUBLIC void updateGame(Game game) {
     int newMove = 1, lastMove = 0;
     int frames = 0;                 // Used for character refresh rate in gameLogic.c
     bool inMenu = true;
-    bool inControls = false;
+    bool inInstructions = false;
     int mousePos_x, mousePos_y;
     bool menuOptionSelected[MENUOPTIONS] = { 0,0,0,0 };
     const Uint8* currentKeyStates;
@@ -91,7 +91,7 @@ PUBLIC void updateGame(Game game) {
             else {
                 mousePos_x = game->event.motion.x;
                 mousePos_y = game->event.motion.y;
-                if (!inControls) {
+                if (!inInstructions) {
                     for (int i = 0; i < MENUOPTIONS; i++) {
                         if (mousePos_x >= 440 && mousePos_x <= 650 && mousePos_y >= 430 && mousePos_y <= 505) {         // Om musen är på "PLAY"
                             if (!menuOptionSelected[0]) {
@@ -107,12 +107,12 @@ PUBLIC void updateGame(Game game) {
                             }
                         }
 
-                        if (mousePos_x >= 336 && mousePos_x <= 750 && mousePos_y >= 525 && mousePos_y <= 596) {         // Om musen är på "CONTROLS"
+                        if (mousePos_x >= 259 && mousePos_x <= 828 && mousePos_y >= 525 && mousePos_y <= 595) {         // Om musen är på "INSTRUCTIONS"
                             if (!menuOptionSelected[1]) {
                                 menuOptionSelected[1] = true;
                             }
                             if (game->event.type == SDL_MOUSEBUTTONDOWN) {
-                                inControls = true;
+                                inInstructions = true;
                                 menuOptionSelected[1] = false;
                             }
                         }
@@ -143,7 +143,7 @@ PUBLIC void updateGame(Game game) {
                             menuOptionSelected[3] = true;
                         }
                         if (game->event.type == SDL_MOUSEBUTTONDOWN) {
-                            inControls = false;
+                            inInstructions = false;
                         }
                     }
                     else {
@@ -185,8 +185,8 @@ PUBLIC void updateGame(Game game) {
         else {
             SDL_RenderClear(game->renderer);
             SDL_RenderCopy(game->renderer, game->startMenu, NULL, NULL);
-            if (inControls) {
-                SDL_RenderCopy(game->renderer, game->controlsMenu, NULL, NULL);
+            if (inInstructions) {
+                SDL_RenderCopy(game->renderer, game->instructionsMenu, NULL, NULL);
                 if (menuOptionSelected[3]) {
                     SDL_RenderCopy(game->renderer, game->redBack, NULL, &game->menuOptionPos[3]);
                 }
@@ -195,7 +195,7 @@ PUBLIC void updateGame(Game game) {
                 SDL_RenderCopy(game->renderer, game->redPlay, NULL, &game->menuOptionPos[0]);
             }
             else if (menuOptionSelected[1]) {
-                SDL_RenderCopy(game->renderer, game->redControls, NULL, &game->menuOptionPos[1]);
+                SDL_RenderCopy(game->renderer, game->redInstructions, NULL, &game->menuOptionPos[1]);
             }
             else if (menuOptionSelected[2]) {
                 SDL_RenderCopy(game->renderer, game->redQuit, NULL, &game->menuOptionPos[2]);
@@ -245,14 +245,14 @@ PRIVATE bool createStartMenu(Game game) {
     SDL_strlcpy(pictureDestination, "resources/Menu.png", sizeof pictureDestination);
     loadTextures(&game->renderer, &game->bitmapSurface, &game->startMenu, pictureDestination);
 
-    SDL_strlcpy(pictureDestination, "resources/Controls-Menu.png", sizeof pictureDestination);
-    loadTextures(&game->renderer, &game->bitmapSurface, &game->controlsMenu, pictureDestination);
+    SDL_strlcpy(pictureDestination, "resources/Instructions-Menu.png", sizeof pictureDestination);
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->instructionsMenu, pictureDestination);
 
     SDL_strlcpy(pictureDestination, "resources/Play.png", sizeof pictureDestination);
     loadTextures(&game->renderer, &game->bitmapSurface, &game->redPlay, pictureDestination);
 
-    SDL_strlcpy(pictureDestination, "resources/Controls.png", sizeof pictureDestination);
-    loadTextures(&game->renderer, &game->bitmapSurface, &game->redControls, pictureDestination);
+    SDL_strlcpy(pictureDestination, "resources/Instructions.png", sizeof pictureDestination);
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->redInstructions, pictureDestination);
 
     SDL_strlcpy(pictureDestination, "resources/Quit.png", sizeof pictureDestination);
     loadTextures(&game->renderer, &game->bitmapSurface, &game->redQuit, pictureDestination);
