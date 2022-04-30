@@ -15,7 +15,7 @@ PRIVATE bool createStartMenu(Game game);
 PRIVATE bool createBackground(Game game);
 PRIVATE bool showBoxes(Game game);
 PRIVATE void renderBoxes(Game game);
-PUBLIC bool loadTextures(Game* renderer, Game* bitmapSurface, Game* texture, char pictureDestination[64]);
+PUBLIC bool loadTextures(SDL_Renderer** renderer, SDL_Surface** bitmapSurface, SDL_Texture** texture, char pictureDestination[64]);
 
 PUBLIC Game createGame() {
     Game game = malloc(sizeof(struct GameSettings));
@@ -271,21 +271,21 @@ PRIVATE bool showBoxes(Game game) {
     return true;
 }
 
-PUBLIC bool loadTextures(Game* renderer, Game* bitmapSurface, Game* texture, char pictureDestination[64]) {
+PUBLIC bool loadTextures(SDL_Renderer** renderer, SDL_Surface** bitmapSurface, SDL_Texture** texture, char pictureDestination[64]) {
     *bitmapSurface = IMG_Load(pictureDestination);
-    if (!bitmapSurface) {
+    if (!(*bitmapSurface)) {
         printf("Could not load %s to bitmapSurface: %s\n", pictureDestination, IMG_GetError());
         return false;
     }
 
     *texture = SDL_CreateTextureFromSurface(*renderer, *bitmapSurface);
-    if (!texture) {
+    if (!(*texture)) {
         printf("Could not create texture from bitmapSurface: %s\n", SDL_GetError());
         return false;
     }
 
     SDL_FreeSurface(*bitmapSurface);                                           //Raderar bitmapSurface (frig�r minnet) (Background finns fortfarande kvar)
-    if (!bitmapSurface) {
+    if (!(*bitmapSurface)) {
         printf("Could not free bitmapSurface: %s\n", SDL_GetError());
         return false;
     }
