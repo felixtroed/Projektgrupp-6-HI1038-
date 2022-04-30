@@ -242,22 +242,22 @@ PRIVATE bool createStartMenu(Game game) {
 
     char pictureDestination[64];
 
-    strcpy_s(pictureDestination, sizeof pictureDestination, "resources/Menu.png");
+    SDL_strlcpy(pictureDestination, "resources/Menu.png", sizeof pictureDestination);
     loadTextures(&game->renderer, &game->bitmapSurface, &game->startMenu, pictureDestination);
 
-    strcpy_s(pictureDestination, sizeof pictureDestination, "resources/Controls-Menu.png");
+    SDL_strlcpy(pictureDestination, "resources/Controls-Menu.png", sizeof pictureDestination);
     loadTextures(&game->renderer, &game->bitmapSurface, &game->controlsMenu, pictureDestination);
 
-    strcpy_s(pictureDestination, sizeof pictureDestination, "resources/Play.png");
+    SDL_strlcpy(pictureDestination, "resources/Play.png", sizeof pictureDestination);
     loadTextures(&game->renderer, &game->bitmapSurface, &game->redPlay, pictureDestination);
 
-    strcpy_s(pictureDestination, sizeof pictureDestination, "resources/Controls.png");
+    SDL_strlcpy(pictureDestination, "resources/Controls.png", sizeof pictureDestination);
     loadTextures(&game->renderer, &game->bitmapSurface, &game->redControls, pictureDestination);
 
-    strcpy_s(pictureDestination, sizeof pictureDestination, "resources/Quit.png");
+    SDL_strlcpy(pictureDestination, "resources/Quit.png", sizeof pictureDestination);
     loadTextures(&game->renderer, &game->bitmapSurface, &game->redQuit, pictureDestination);
 
-    strcpy_s(pictureDestination, sizeof pictureDestination, "resources/Back.png");
+    SDL_strlcpy(pictureDestination, "resources/Back.png", sizeof pictureDestination);
     loadTextures(&game->renderer, &game->bitmapSurface, &game->redBack, pictureDestination);
 
     return true;
