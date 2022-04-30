@@ -1,5 +1,5 @@
-#ifndef UDPS_H
-#define UDPS_H
+#ifndef SERVER_H
+#define SERVER_H
 
 #include <SDL2/SDL_net.h>
 #include <stdio.h>
@@ -7,4 +7,4 @@
 #include <stdbool.h>
 #include <string.h>
 
-#endif /* UDPS_H */
+#endif /* SERVER_H */
