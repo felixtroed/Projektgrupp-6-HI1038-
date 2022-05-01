@@ -4,7 +4,8 @@
 
 int main(int argc, char* argv[]) {
     Game game = createGame();
-    updateGame(game);
-    exitGame(game);
+    Network net = createNet();
+    updateGame(game, net);
+    exitGame(game, net);
     return 0;
 }

@@ -16,6 +16,14 @@ PRIVATE bool createBackground(Game game);
 PRIVATE bool showBoxes(Game game);
 PRIVATE void renderBoxes(Game game);
 PUBLIC bool loadTextures(SDL_Renderer** renderer, SDL_Surface** bitmapSurface, SDL_Texture** texture, char pictureDestination[64]);
+PRIVATE void initNetwork(Network net);
+PRIVATE void receiveUDPData(Game game, Network net);
+
+PUBLIC Network createNet() {
+    Network net = malloc(sizeof(struct NetworkData));
+    initNetwork(net);
+    return net;
+}
 
 PUBLIC Game createGame() {
     Game game = malloc(sizeof(struct GameSettings));
@@ -63,7 +71,7 @@ PUBLIC Game createGame() {
     return game;
 }
 
-PUBLIC void updateGame(Game game) {
+PUBLIC void updateGame(Game game, Network net) {
     bool running = true;
     int newMove = 1, lastMove = 0;
     int frames = 0;                 // Used for character refresh rate in gameLogic.c
@@ -160,19 +168,20 @@ PUBLIC void updateGame(Game game) {
             currentKeyStates = SDL_GetKeyboardState(NULL);
             if (game->p1->isAlive) {
                 if (currentKeyStates[SDL_SCANCODE_W] || currentKeyStates[SDL_SCANCODE_UP]) {                // Funkar för både WASD och pilar
-                    move(game->p1, &newMove, &lastMove, KEYUP, game->bombs, &frames);
+                    move(game->p1, &newMove, &lastMove, KEYUP, game->bombs, &frames, net);
                 }
                 else if (currentKeyStates[SDL_SCANCODE_S] || currentKeyStates[SDL_SCANCODE_DOWN]) {
-                    move(game->p1, &newMove, &lastMove, KEYDOWN, game->bombs, &frames);
+                    move(game->p1, &newMove, &lastMove, KEYDOWN, game->bombs, &frames, net);
                 }
                 else if (currentKeyStates[SDL_SCANCODE_A] || currentKeyStates[SDL_SCANCODE_LEFT]) {
-                    move(game->p1, &newMove, &lastMove, KEYLEFT, game->bombs, &frames);
+                    move(game->p1, &newMove, &lastMove, KEYLEFT, game->bombs, &frames, net);
                 }
                 else if (currentKeyStates[SDL_SCANCODE_D] || currentKeyStates[SDL_SCANCODE_RIGHT]) {
-                    move(game->p1, &newMove, &lastMove, KEYRIGHT, game->bombs, &frames);
+                    move(game->p1, &newMove, &lastMove, KEYRIGHT, game->bombs, &frames, net);
                 }
             }
 
+            receiveUDPData(game, net);
             handlePlayerExplosionCollision(game);
 
             SDL_RenderClear(game->renderer);
@@ -203,6 +212,43 @@ PUBLIC void updateGame(Game game) {
             SDL_RenderPresent(game->renderer);
         }
     }
+}
+
+PRIVATE void receiveUDPData(Game game, Network net) {
+    if (SDLNet_UDP_Recv(net->sd, net->packet2)){
+        int x, y; 
+        sscanf((char * )net->packet2->data, "%d %d\n", &x, &y);
+        game->p1->pos.x = x;
+        game->p1->pos.y = y;
+        printf("UDP Packet incoming %d %d\n", game->p1->pos.x, game->p1->pos.y);
+    }
+}
+
+PRIVATE void initNetwork(Network net) {
+    if (SDLNet_Init() < 0)
+	{
+		fprintf(stderr, "SDLNet_Init Error: %s\n", SDLNet_GetError());
+		exit(EXIT_FAILURE);
+	}
+
+    if (!(net->sd = SDLNet_UDP_Open(0)))
+	{
+		fprintf(stderr, "SDLNet_UDP_Open Error: %s\n", SDLNet_GetError());
+		exit(EXIT_FAILURE);
+	}
+
+    /* Resolve server name  */
+	if (SDLNet_ResolveHost(&net->srvAddr, "127.0.0.1", 2000) == -1)
+	{
+		fprintf(stderr, "SDLNet_ResolveHost(192.0.0.1 2000) Error: %s\n", SDLNet_GetError());
+		exit(EXIT_FAILURE);
+	}
+
+    if (!((net->packet1 = SDLNet_AllocPacket(512)) && (net->packet2 = SDLNet_AllocPacket(512))))
+	{
+		fprintf(stderr, "SDLNet_AllocPacket Error: %s\n", SDLNet_GetError());
+		exit(EXIT_FAILURE);
+	}
 }
 
 PRIVATE bool initWinRen(Game game) {
@@ -292,7 +338,11 @@ PUBLIC bool loadTextures(SDL_Renderer** renderer, SDL_Surface** bitmapSurface, S
     return true;
 }
 
-PUBLIC void exitGame(Game game) {
+PUBLIC void exitGame(Game game, Network net) {
+    SDLNet_FreePacket(net->packet1);
+    SDLNet_FreePacket(net->packet2);
+    free(net);
+	SDLNet_Quit();
     SDL_DestroyTexture(game->p1->texture);
     SDL_DestroyTexture(game->p2->texture);
     SDL_DestroyTexture(game->p3->texture);

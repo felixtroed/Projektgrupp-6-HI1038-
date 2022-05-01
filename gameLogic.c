@@ -264,10 +264,10 @@ void removeBox(Player p1, Boxes boxes) {
 } */
 
 
-      
-
-
-void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *frames) {
+void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *frames, Network net) {
+    int prevXPos = p1->pos.x;
+    int prevYPos = p1->pos.y;
+    
     switch (key) {
     case 's':
         p1->pos.y += p1->speed;
@@ -362,5 +362,17 @@ void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *fr
         break;
 
     default: break;
+    }
+
+    // Send and retrieve positions
+    if(prevXPos != p1->pos.x || prevYPos != p1->pos.y) {
+        // printf("%d %d\n", p1->pos.x, p1->pos.y);
+        sprintf((char *)net->packet1->data, "%d %d\n", p1->pos.x, p1->pos.y);    
+        net->packet1->address.host = net->srvAddr.host;	                    /* Set the destination host */
+        net->packet1->address.port = net->srvAddr.port;	                    /* And destination port */
+        net->packet1->len = strlen((char *)net->packet1->data) + 1;
+        SDLNet_UDP_Send(net->sd, -1, net->packet1);
+        prevXPos = p1->pos.x;
+        prevYPos = p1->pos.y;
     }
 }

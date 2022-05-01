@@ -3,6 +3,7 @@
 
 // #include <SDL.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
 #include <string.h>
 #include "player.h"
 #include "box.h"
@@ -17,7 +18,6 @@
 typedef struct PlayerSettings* Player;
 typedef struct BombSettings* Bomb;
 typedef struct BoxInit* Boxes;
-
 
 typedef struct GameSettings {
     SDL_Window *window;
@@ -34,7 +34,7 @@ typedef struct GameSettings {
     SDL_Rect menuOptionPos[MENUOPTIONS];
     SDL_Rect boxPos;                  //Anv�nds f�r positionen av l�dorna
     SDL_Event event;
-    Boxes boxes;
+    //Boxes boxes;
     Player p1;
     Player p2;
     Player p3;
@@ -42,8 +42,16 @@ typedef struct GameSettings {
     Bomb bombs[BOMBS];                // Contains all simultaneously allowed bombs
 } *Game;
 
+typedef struct NetworkData {
+    UDPsocket sd;
+    IPaddress srvAddr;
+	UDPpacket *packet1;
+    UDPpacket *packet2;
+} *Network;
+
 Game createGame();
-void updateGame(Game game);
-void exitGame(Game game);
+void updateGame(Game game, Network net);
+void exitGame(Game game, Network net);
+Network createNet();
 
 #endif /* GAME_H */

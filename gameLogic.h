@@ -14,10 +14,10 @@ typedef struct PlayerSettings* Player;
 typedef struct GameSettings* Game;
 typedef struct BombSettings* Bomb;
 typedef struct BoxInit* Boxes;
-
+typedef struct NetworkData* Network;
 
 bool collisionMap(Player p1);
-void move(Player p1, int* lastMove, int* newMove, char key, Bomb bombs[], int *frames);
+void move(Player p1, int* lastMove, int* newMove, char key, Bomb bombs[], int *frames, Network net);
 bool collisionBoxes(Player p1);
 bool checkCollision(Player p1, Bomb bombs[]);
 bool collisionBomb(Player p1, Bomb bombs[]);
