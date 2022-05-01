@@ -9,7 +9,6 @@
 
 #define BOMB_SIZE 34
 
-
 Uint32 disableInvincibility(Uint32 interval, void *args);
 
 void handlePlayerExplosionCollision(Game game) {
@@ -364,10 +363,10 @@ void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *fr
     default: break;
     }
 
-    // Send and retrieve positions
+    // Send position
     if(prevXPos != p1->pos.x || prevYPos != p1->pos.y) {
         // printf("%d %d\n", p1->pos.x, p1->pos.y);
-        sprintf((char *)net->packet1->data, "%d %d\n", p1->pos.x, p1->pos.y);    
+        sprintf((char *)net->packet1->data, "%d %d %d\n", p1->pos.x, p1->pos.y, p1->currentFrame);    
         net->packet1->address.host = net->srvAddr.host;	                    /* Set the destination host */
         net->packet1->address.port = net->srvAddr.port;	                    /* And destination port */
         net->packet1->len = strlen((char *)net->packet1->data) + 1;

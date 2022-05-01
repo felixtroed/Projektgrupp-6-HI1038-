@@ -1,5 +1,9 @@
 #include "server.h"
 
+typedef struct udpData {
+	int x, y, frame;
+} udpData;
+    
 int main(int argc, char **argv) {
 	
 	UDPsocket sd;       /* Socket descriptor */
@@ -10,7 +14,9 @@ int main(int argc, char **argv) {
     Uint32 client1Port = 0; 
     Uint32 client2Port = 0;
 	bool isRunning = 1;
-    int x, y;
+
+	udpData data = {0, 0, 0};
+
 
 	/* Initialize SDL_net */
 	if (SDLNet_Init() < 0)
@@ -57,9 +63,9 @@ int main(int argc, char **argv) {
                         printf("Send to Client 2\n");
                         pSent->address.host = client2IP;	/* Set the destination host */
 		                pSent->address.port = client2Port;
-                        sscanf((char * )pReceive->data, "%d %d\n", &x, &y);
-                        printf("%d %d\n", x, y);
-                        sprintf((char *)pSent->data, "%d %d\n", x,  y);
+                        sscanf((char * )pReceive->data, "%d %d %d\n", &data.x, &data.y, &data.frame);
+                        printf("%d %d %d\n", data.x, data.y, data.frame);
+                        sprintf((char *)pSent->data, "%d %d %d\n", data.x, data.y, data.frame);
                         pSent->len = strlen((char *)pSent->data) + 1;
                         SDLNet_UDP_Send(sd, -1, pSent);
                     }
@@ -67,9 +73,9 @@ int main(int argc, char **argv) {
                     printf("Send to Client 1\n");    
                     pSent->address.host = client1IP;	/* Set the destination host */
 		            pSent->address.port = client1Port;
-                    sscanf((char * )pReceive->data, "%d %d\n", &x, &y);
-                    printf("%d %d\n", x, y);
-                    sprintf((char *)pSent->data, "%d %d\n", x, y);
+                    sscanf((char * )pReceive->data, "%d %d %d\n", &data.x, &data.y, &data.frame);
+					printf("%d %d %d\n", data.x, data.y, data.frame);
+                    sprintf((char *)pSent->data, "%d %d %d\n", data.x, data.y, data.frame);
                     pSent->len = strlen((char *)pSent->data) + 1;
                     SDLNet_UDP_Send(sd, -1, pSent);
                 }

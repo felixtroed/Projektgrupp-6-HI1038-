@@ -216,10 +216,11 @@ PUBLIC void updateGame(Game game, Network net) {
 
 PRIVATE void receiveUDPData(Game game, Network net) {
     if (SDLNet_UDP_Recv(net->sd, net->packet2)){
-        int x, y; 
-        sscanf((char * )net->packet2->data, "%d %d\n", &x, &y);
+        int x, y, currentFrame; 
+        sscanf((char * )net->packet2->data, "%d %d %d\n", &x, &y, &currentFrame);
         game->p1->pos.x = x;
         game->p1->pos.y = y;
+        game->p1->currentFrame = currentFrame;
         printf("UDP Packet incoming %d %d\n", game->p1->pos.x, game->p1->pos.y);
     }
 }
