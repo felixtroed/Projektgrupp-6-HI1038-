@@ -40,6 +40,7 @@ typedef struct GameSettings {
     Player p3;
     Player p4;
     Bomb bombs[BOMBS];                // Contains all simultaneously allowed bombs
+    uint8_t currentPlayer;
 } *Game;
 
 typedef struct NetworkData {

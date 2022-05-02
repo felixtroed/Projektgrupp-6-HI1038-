@@ -96,21 +96,23 @@ int main(int argc, char **argv) {
 }
 
 void initClient(UDPsocket sd, UDPpacket *pReceive, UDPpacket *pSend, Uint32 *clientIP, Uint32 *clientPort, uint8_t *nrOfClients) {
-		*clientIP = pReceive->address.host;
-		*clientPort = pReceive->address.port;
+	*clientIP = pReceive->address.host;
+	*clientPort = pReceive->address.port;
 
-		pSend->address.host = *clientIP;
-		pSend->address.port = *clientPort;
-		if (*nrOfClients == 0) {
-			printf("Client 1\n");
-			sprintf((char *)pSend->data, "%d %d %d\n", 1, 192, 64);  // Sets player 1:s starting position to 64x, 64y
-		}
-		else if (*nrOfClients == 1) {
-			printf("Client 2\n");
-			sprintf((char *)pSend->data, "%d %d %d\n", 2, 832, 64);  // Sets player 2:s starting position to 832x, 64y
-		}
-		pSend->len = strlen((char *)pSend->data) + 1;
-		SDLNet_UDP_Send(sd, -1, pSend);
+	pSend->address.host = *clientIP;
+	pSend->address.port = *clientPort;
 
-		*nrOfClients += 1;
+	if (*nrOfClients == 0) {
+		printf("Client 1\n");
+		sprintf((char *)pSend->data, "%d\n", 1);  // Sets client to player 1
+	}
+	else if (*nrOfClients == 1) {
+		printf("Client 2\n");
+		sprintf((char *)pSend->data, "%d\n", 2);  // Sets client to player 2
+	}
+
+	pSend->len = strlen((char *)pSend->data) + 1;
+	SDLNet_UDP_Send(sd, -1, pSend);
+
+	*nrOfClients += 1;
 }
