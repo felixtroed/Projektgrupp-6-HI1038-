@@ -18,8 +18,6 @@ PRIVATE void renderBoxes(Game game);
 PUBLIC bool loadTextures(SDL_Renderer** renderer, SDL_Surface** bitmapSurface, SDL_Texture** texture, char pictureDestination[64]);
 PRIVATE void initNetwork(Network net);
 PRIVATE void receiveUDPData(Game game, Network net);
-PRIVATE void handleSpacebarEvent(Uint32 type, SDL_Keycode sym, Player player, Bomb bombs[], SDL_Renderer *renderer);
-PRIVATE void handleMovement(const Uint8 *currentKeyStates, Player player, int *lastMove, int *newMove, Bomb bombs[], int *frames, Network net);
 
 PUBLIC Network createNet() {
     Network net = malloc(sizeof(struct NetworkData));
@@ -76,27 +74,28 @@ PUBLIC Game createGame(Network net) {
     if (SDLNet_UDP_Recv(net->sd, net->packet1)) {
         printf("Packet received from server.\n");
 
-        int playerNumber;
-        sscanf((char * )net->packet1->data, "%d\n", &playerNumber);
-        game->currentPlayer = playerNumber;
+        int playerIdx;
+        sscanf((char * )net->packet1->data, "%d\n", &playerIdx);
+        game->pIdx = playerIdx;
 
-        if (game->currentPlayer == 1) {
-            game->p1 = createPlayer(1, 128, 64, game);
-            game->p2 = createPlayer(2, 960, 64, game);
+        if (game->pIdx == 0) {
+            game->player[0] = createPlayer(1, 128, 64, game);
+            game->player[1] = createPlayer(2, 960, 64, game);
         }
-        else if (game->currentPlayer == 2) {
-            game->p1 = createPlayer(1, 64, 64, game);
-            game->p2 = createPlayer(2, 832, 64, game);
+        else if (game->pIdx == 1) {
+            game->player[0] = createPlayer(1, 64, 64, game);
+            game->player[1] = createPlayer(2, 832, 64, game);
         }
     }
     else {                                                              // Start single player if no server response
-        game->currentPlayer = 1;
-        game->p1 = createPlayer(1, 64, 64, game);
-        game->p2 = createPlayer(2, 960, 64, game);
+        game->pIdx = 0;
+        game->player[0] = createPlayer(1, 64, 64, game);
+        game->player[1] = createPlayer(2, 960, 64, game);
+        game->nrOfPlayers = 4;
     }
 
-    game->p3 = createPlayer(3, 64, 704, game);
-    game->p4 = createPlayer(4, 960, 704, game);
+    game->player[2] = createPlayer(3, 64, 704, game);
+    game->player[3] = createPlayer(4, 960, 704, game);
     // game->boxes = createBoxes(game);
     initBombs(game->bombs);                           // Sets all bombs to NULL
 
@@ -119,11 +118,13 @@ PUBLIC void updateGame(Game game, Network net) {
                 running = false;
             }
             if (!inMenu) {
-                if (game->currentPlayer == 1) {
-                    handleSpacebarEvent(game->event.type, game->event.key.keysym.sym, game->p1, game->bombs, game->renderer);
-                }
-                else if (game->currentPlayer == 2) {
-                    handleSpacebarEvent(game->event.type, game->event.key.keysym.sym, game->p2, game->bombs, game->renderer);
+                if (game->player[game->pIdx]->isAlive) {
+                    if (game->event.type == SDL_KEYDOWN) {
+                        if (game->event.key.keysym.sym == SDLK_SPACE) {                     // Space intryckt (gamla sättet som pausar i 1 sek när man håller in knappen)
+                            bombPlacement(game->player[game->pIdx], game->bombs, game->renderer);
+                            // removeBox(game->p1, game->boxes->activeBox);
+                        }
+                    }
                 }
             }
             else {
@@ -196,12 +197,19 @@ PUBLIC void updateGame(Game game, Network net) {
 
         if (!inMenu) {
             currentKeyStates = SDL_GetKeyboardState(NULL);
-
-            if (game->currentPlayer == 1) {
-                handleMovement(currentKeyStates, game->p1, &newMove, &lastMove, game->bombs, &frames, net); 
-            }
-            else if (game->currentPlayer == 2) {
-                handleMovement(currentKeyStates, game->p2, &newMove, &lastMove, game->bombs, &frames, net);  
+            if (game->player[game->pIdx]->isAlive) {
+                if (currentKeyStates[SDL_SCANCODE_W] || currentKeyStates[SDL_SCANCODE_UP]) {                // Funkar för både WASD och pilar
+                    move(game->player[game->pIdx], &newMove, &lastMove, KEYUP, game->bombs, &frames, net, game->pIdx);
+                }
+                else if (currentKeyStates[SDL_SCANCODE_S] || currentKeyStates[SDL_SCANCODE_DOWN]) {
+                    move(game->player[game->pIdx], &newMove, &lastMove, KEYDOWN, game->bombs, &frames, net, game->pIdx);
+                }
+                else if (currentKeyStates[SDL_SCANCODE_A] || currentKeyStates[SDL_SCANCODE_LEFT]) {
+                    move(game->player[game->pIdx], &newMove, &lastMove, KEYLEFT, game->bombs, &frames, net, game->pIdx);
+                }
+                else if (currentKeyStates[SDL_SCANCODE_D] || currentKeyStates[SDL_SCANCODE_RIGHT]) {
+                    move(game->player[game->pIdx], &newMove, &lastMove, KEYRIGHT, game->bombs, &frames, net, game->pIdx);
+                }
             }
 
             receiveUDPData(game, net);
@@ -237,51 +245,14 @@ PUBLIC void updateGame(Game game, Network net) {
     }
 }
 
-PRIVATE void handleSpacebarEvent(Uint32 type, SDL_Keycode sym, Player player, Bomb bombs[], SDL_Renderer *renderer) {
-    if (player->isAlive) {
-        if (type == SDL_KEYDOWN) {
-            if (sym == SDLK_SPACE) {                     // Space intryckt (gamla sättet som pausar i 1 sek när man håller in knappen)
-                bombPlacement(player, bombs, renderer);
-                // removeBox(game->p1, game->boxes->activeBox);
-            }
-        }
-    }
-}
-
-PRIVATE void handleMovement(const Uint8 *currentKeyStates, Player player, int *lastMove, int *newMove, Bomb bombs[], int *frames, Network net) {
-    if (player->isAlive) {
-        if (currentKeyStates[SDL_SCANCODE_W] || currentKeyStates[SDL_SCANCODE_UP]) {                // Funkar för både WASD och pilar
-            move(player, newMove, lastMove, KEYUP, bombs, frames, net);
-        }
-        else if (currentKeyStates[SDL_SCANCODE_S] || currentKeyStates[SDL_SCANCODE_DOWN]) {
-            move(player, newMove, lastMove, KEYDOWN, bombs, frames, net);
-        }
-        else if (currentKeyStates[SDL_SCANCODE_A] || currentKeyStates[SDL_SCANCODE_LEFT]) {
-            move(player, newMove, lastMove, KEYLEFT, bombs, frames, net);
-        }
-        else if (currentKeyStates[SDL_SCANCODE_D] || currentKeyStates[SDL_SCANCODE_RIGHT]) {
-            move(player, newMove, lastMove, KEYRIGHT, bombs, frames, net);
-        }
-    }
-}
-
 PRIVATE void receiveUDPData(Game game, Network net) {
     if (SDLNet_UDP_Recv(net->sd, net->packet2)){
-        int x, y, currentFrame;
-        sscanf((char * )net->packet2->data, "%d %d %d\n", &x, &y, &currentFrame);
+        int idx, x, y, currentFrame;
+        sscanf((char * )net->packet2->data, "%d %d %d %d\n", &idx, &x, &y, &currentFrame);
 
-        if (game->currentPlayer == 1) {
-            game->p2->pos.x = x;
-            game->p2->pos.y = y;
-            game->p2->currentFrame = currentFrame;
-        }
-        else if (game->currentPlayer == 2) {
-            game->p1->pos.x = x;
-            game->p1->pos.y = y;
-            game->p1->currentFrame = currentFrame; 
-        }
-        
-        // printf("UDP Packet incoming %d %d %d\n", game->p1->pos.x, game->p1->pos.y, game->p1->currentFrame);
+        game->player[idx]->pos.x = x;
+        game->player[idx]->pos.y = y;
+        game->player[idx]->currentFrame = currentFrame;
     }
 }
 
@@ -404,14 +375,14 @@ PUBLIC void exitGame(Game game, Network net) {
     SDLNet_FreePacket(net->packet2);
     free(net);
 	SDLNet_Quit();
-    SDL_DestroyTexture(game->p1->texture);
-    SDL_DestroyTexture(game->p2->texture);
-    SDL_DestroyTexture(game->p3->texture);
-    SDL_DestroyTexture(game->p4->texture);
-    free(game->p1);
-    free(game->p2);
-    free(game->p3);
-    free(game->p4);
+    SDL_DestroyTexture(game->player[0]->texture);
+    SDL_DestroyTexture(game->player[1]->texture);
+    SDL_DestroyTexture(game->player[2]->texture);
+    SDL_DestroyTexture(game->player[3]->texture);
+    free(game->player[0]);
+    free(game->player[1]);
+    free(game->player[2]);
+    free(game->player[3]);
     SDL_DestroyRenderer(game->renderer);
     SDL_DestroyWindow(game->window);
     IMG_Quit();

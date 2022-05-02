@@ -12,25 +12,25 @@
 Uint32 disableInvincibility(Uint32 interval, void *args);
 
 void handlePlayerExplosionCollision(Game game) {
-    if (game->p1->isHurt == false) { 
+    if (game->player[game->pIdx]->isHurt == false) { 
 
         for (uint8_t i = 0; i < BOMBS; i++) {
             if (game->bombs[i] != NULL) {
-                game->p1->hitboxPos.x = game->p1->pos.x + 16;       // Puts hitbox in the same position as character
-                game->p1->hitboxPos.y = game->p1->pos.y + 14;
+                game->player[game->pIdx]->hitboxPos.x = game->player[game->pIdx]->pos.x + 16;       // Puts hitbox in the same position as character
+                game->player[game->pIdx]->hitboxPos.y = game->player[game->pIdx]->pos.y + 14;
 
                 if (game->bombs[i]->startExplosion == true && game->bombs[i]->endExplosion == false) {
-                    if (SDL_HasIntersection(&game->p1->hitboxPos, &game->bombs[i]->explosionHor) || SDL_HasIntersection(&game->p1->hitboxPos, &game->bombs[i]->explosionVer)) {
-                        game->p1->isHurt = true;
+                    if (SDL_HasIntersection(&game->player[game->pIdx]->hitboxPos, &game->bombs[i]->explosionHor) || SDL_HasIntersection(&game->player[game->pIdx]->hitboxPos, &game->bombs[i]->explosionVer)) {
+                        game->player[game->pIdx]->isHurt = true;
                         
-                        (game->p1->lifes)--;
-                        if (game->p1->lifes <= 0) {
-                            game->p1->isAlive = false;
+                        (game->player[game->pIdx]->lifes)--;
+                        if (game->player[game->pIdx]->lifes <= 0) {
+                            game->player[game->pIdx]->isAlive = false;
                             printf("Player died.\n");
                             return;
                         }
 
-                        game->p1->invincibleTimer = SDL_AddTimer(2000, disableInvincibility, game->p1);
+                        game->player[game->pIdx]->invincibleTimer = SDL_AddTimer(2000, disableInvincibility, game->player[game->pIdx]);
                     }
                 }  
             } 
@@ -263,7 +263,7 @@ void removeBox(Player p1, Boxes boxes) {
 } */
 
 
-void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *frames, Network net) {
+void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *frames, Network net, uint8_t pIdx) {
     int prevXPos = p1->pos.x;
     int prevYPos = p1->pos.y;
     
@@ -366,7 +366,7 @@ void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *fr
     // Send position
     if(prevXPos != p1->pos.x || prevYPos != p1->pos.y) {
         // printf("%d %d\n", p1->pos.x, p1->pos.y);
-        sprintf((char *)net->packet1->data, "%d %d %d\n", p1->pos.x, p1->pos.y, p1->currentFrame);    
+        sprintf((char *)net->packet1->data, "%d %d %d %d\n", pIdx, p1->pos.x, p1->pos.y, p1->currentFrame);    
         net->packet1->address.host = net->srvAddr.host;	                    /* Set the destination host */
         net->packet1->address.port = net->srvAddr.port;	                    /* And destination port */
         net->packet1->len = strlen((char *)net->packet1->data) + 1;

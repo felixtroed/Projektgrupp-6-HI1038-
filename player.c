@@ -170,43 +170,43 @@ PRIVATE void initClips(Player player) {
  }
 
 PUBLIC void renderPlayers(Game game) {
-    if (game->p1->isAlive) {
-        if (game->p1->isHurt)
-            SDL_SetTextureColorMod(game->p1->texture, 255, 0, 0);           // Character turns red if hurt
+    if (game->player[0]->isAlive) {
+        if (game->player[0]->isHurt)
+            SDL_SetTextureColorMod(game->player[0]->texture, 255, 0, 0);           // Character turns red if hurt
         else {
-            SDL_SetTextureColorMod(game->p1->texture, 255, 255, 255);       // Restore color if not hurt
+            SDL_SetTextureColorMod(game->player[0]->texture, 255, 255, 255);       // Restore color if not hurt
         }
 
-        SDL_RenderCopy(game->renderer, game->p1->texture, &game->p1->clip[game->p1->currentFrame], &game->p1->pos);
+        SDL_RenderCopy(game->renderer, game->player[0]->texture, &game->player[0]->clip[game->player[0]->currentFrame], &game->player[0]->pos);
     }
 
-    if (game->p2->isAlive) {
-        if (game->p2->isHurt)
-            SDL_SetTextureColorMod(game->p2->texture, 255, 0, 0);
+    if (game->player[1]->isAlive) {
+        if (game->player[1]->isHurt)
+            SDL_SetTextureColorMod(game->player[1]->texture, 255, 0, 0);
         else {
-            SDL_SetTextureColorMod(game->p2->texture, 255, 255, 255);
+            SDL_SetTextureColorMod(game->player[1]->texture, 255, 255, 255);
         }
 
-        SDL_RenderCopy(game->renderer, game->p2->texture, &game->p2->clip[game->p2->currentFrame], &game->p2->pos);
+        SDL_RenderCopy(game->renderer, game->player[1]->texture, &game->player[1]->clip[game->player[1]->currentFrame], &game->player[1]->pos);
     }
 
-    if (game->p3->isAlive) {
-        if (game->p3->isHurt)
-            SDL_SetTextureColorMod(game->p3->texture, 255, 0, 0);
+    if (game->player[2]->isAlive) {
+        if (game->player[2]->isHurt)
+            SDL_SetTextureColorMod(game->player[2]->texture, 255, 0, 0);
         else {
-            SDL_SetTextureColorMod(game->p3->texture, 255, 255, 255);
+            SDL_SetTextureColorMod(game->player[2]->texture, 255, 255, 255);
         }
 
-        SDL_RenderCopy(game->renderer, game->p3->texture, &game->p3->clip[game->p3->currentFrame], &game->p3->pos);
+        SDL_RenderCopy(game->renderer, game->player[2]->texture, &game->player[2]->clip[game->player[2]->currentFrame], &game->player[2]->pos);
     }
 
-    if (game->p4->isAlive) {
-        if (game->p4->isHurt)
-            SDL_SetTextureColorMod(game->p3->texture, 255, 0, 0);
+    if (game->player[3]->isAlive) {
+        if (game->player[3]->isHurt)
+            SDL_SetTextureColorMod(game->player[3]->texture, 255, 0, 0);
         else {
-            SDL_SetTextureColorMod(game->p3->texture, 255, 255, 255);
+            SDL_SetTextureColorMod(game->player[3]->texture, 255, 255, 255);
         }
 
-        SDL_RenderCopy(game->renderer, game->p4->texture, &game->p4->clip[game->p4->currentFrame], &game->p4->pos);
+        SDL_RenderCopy(game->renderer, game->player[3]->texture, &game->player[3]->clip[game->player[3]->currentFrame], &game->player[3]->pos);
     }
 }
