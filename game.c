@@ -79,23 +79,24 @@ PUBLIC Game createGame(Network net) {
         game->pIdx = playerIdx;
 
         if (game->pIdx == 0) {
-            game->player[0] = createPlayer(1, 128, 64, game);
-            game->player[1] = createPlayer(2, 960, 64, game);
+            game->player[0] = createPlayer(1, 64, 64, game);
+            game->activePlayers = 1;
         }
         else if (game->pIdx == 1) {
             game->player[0] = createPlayer(1, 64, 64, game);
-            game->player[1] = createPlayer(2, 832, 64, game);
+            game->player[1] = createPlayer(2, 960, 64, game);
+            game->activePlayers = 2;
         }
     }
     else {                                                              // Start single player if no server response
         game->pIdx = 0;
         game->player[0] = createPlayer(1, 64, 64, game);
         game->player[1] = createPlayer(2, 960, 64, game);
-        game->nrOfPlayers = 4;
+        game->player[2] = createPlayer(3, 64, 704, game);
+        game->player[3] = createPlayer(4, 960, 704, game);
+        game->activePlayers = 4;
     }
 
-    game->player[2] = createPlayer(3, 64, 704, game);
-    game->player[3] = createPlayer(4, 960, 704, game);
     // game->boxes = createBoxes(game);
     initBombs(game->bombs);                           // Sets all bombs to NULL
 
@@ -247,12 +248,21 @@ PUBLIC void updateGame(Game game, Network net) {
 
 PRIVATE void receiveUDPData(Game game, Network net) {
     if (SDLNet_UDP_Recv(net->sd, net->packet2)){
-        int idx, x, y, currentFrame;
-        sscanf((char * )net->packet2->data, "%d %d %d %d\n", &idx, &x, &y, &currentFrame);
+        int idx, x, y, currentFrame, activePlayers;
+        sscanf((char * )net->packet2->data, "%d %d %d %d %d\n", &idx, &x, &y, &currentFrame, &activePlayers);
 
-        game->player[idx]->pos.x = x;
-        game->player[idx]->pos.y = y;
-        game->player[idx]->currentFrame = currentFrame;
+        // printf("Active players: %d\n", activePlayers);
+        // printf("Game->activePlayers: %d\n", game->activePlayers);
+
+        if (activePlayers > game->activePlayers) {
+            game->player[game->activePlayers] = createPlayer(activePlayers, x, y, game);
+        }
+        else {
+            game->player[idx]->pos.x = x;
+            game->player[idx]->pos.y = y;
+            game->player[idx]->currentFrame = currentFrame;
+        }
+        game->activePlayers = activePlayers;
     }
 }
 
@@ -375,14 +385,12 @@ PUBLIC void exitGame(Game game, Network net) {
     SDLNet_FreePacket(net->packet2);
     free(net);
 	SDLNet_Quit();
-    SDL_DestroyTexture(game->player[0]->texture);
-    SDL_DestroyTexture(game->player[1]->texture);
-    SDL_DestroyTexture(game->player[2]->texture);
-    SDL_DestroyTexture(game->player[3]->texture);
-    free(game->player[0]);
-    free(game->player[1]);
-    free(game->player[2]);
-    free(game->player[3]);
+
+    for (uint8_t i = 0; i < game->activePlayers; i++) {
+        SDL_DestroyTexture(game->player[i]->texture);
+        free(game->player[i]);
+    }
+
     SDL_DestroyRenderer(game->renderer);
     SDL_DestroyWindow(game->window);
     IMG_Quit();

@@ -38,7 +38,7 @@ typedef struct GameSettings {
     //Boxes boxes;
     Player player[NUMPLAYERS];
     Bomb bombs[BOMBS];                // Contains all simultaneously allowed bombs
-    uint8_t nrOfPlayers;
+    uint8_t activePlayers;
     uint8_t pIdx;
 } *Game;
 

@@ -64,8 +64,8 @@ int main(int argc, char **argv) {
                         pSend->address.host = client2IP;	/* Set the destination host */
 		                pSend->address.port = client2Port;
                         sscanf((char * )pReceive->data, "%d %d %d %d\n", &data.idx, &data.x, &data.y, &data.frame);
-                        printf("%d %d %d\n", data.x, data.y, data.frame);
-                        sprintf((char *)pSend->data, "%d %d %d %d\n", data.idx, data.x, data.y, data.frame);
+                        printf("x: %d y: %d frame: %d clients %d\n", data.x, data.y, data.frame, nrOfClients);
+                        sprintf((char *)pSend->data, "%d %d %d %d %d\n", data.idx, data.x, data.y, data.frame, nrOfClients);
                         pSend->len = strlen((char *)pSend->data) + 1;
                         SDLNet_UDP_Send(sd, -1, pSend);
                     }
@@ -74,8 +74,8 @@ int main(int argc, char **argv) {
                     pSend->address.host = client1IP;	/* Set the destination host */
 		            pSend->address.port = client1Port;
                     sscanf((char * )pReceive->data, "%d %d %d %d\n", &data.idx, &data.x, &data.y, &data.frame);
-					printf("%d %d %d\n", data.x, data.y, data.frame);
-                    sprintf((char *)pSend->data, "%d %d %d %d\n", data.idx, data.x, data.y, data.frame);
+					printf("x: %d y: %d frame: %d clients %d\n", data.x, data.y, data.frame, nrOfClients);
+                    sprintf((char *)pSend->data, "%d %d %d %d %d\n", data.idx, data.x, data.y, data.frame, nrOfClients);
                     pSend->len = strlen((char *)pSend->data) + 1;
                     SDLNet_UDP_Send(sd, -1, pSend);
                 }
