@@ -12,7 +12,7 @@
 
 #define WINDOW_WIDTH 1088
 #define WINDOW_HEIGHT 832
-#define BOMBS 4
+#define BOMBS 12
 #define MENUOPTIONS 4
 
 typedef struct PlayerSettings* Player;
@@ -49,7 +49,7 @@ typedef struct NetworkData {
     UDPpacket *packet2;
 } *Network;
 
-Game createGame();
+Game createGame(Network net);
 void updateGame(Game game, Network net);
 void exitGame(Game game, Network net);
 Network createNet();

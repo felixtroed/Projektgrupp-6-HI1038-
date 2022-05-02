@@ -25,7 +25,7 @@ PUBLIC Network createNet() {
     return net;
 }
 
-PUBLIC Game createGame() {
+PUBLIC Game createGame(Network net) {
     Game game = malloc(sizeof(struct GameSettings));
 
     if (initWinRen(game)) {
@@ -61,8 +61,34 @@ PUBLIC Game createGame() {
     game->menuOptionPos[3].w = 212;
     game->menuOptionPos[3].h = 71;
 
-    game->p1 = createPlayer(1, 64, 64, game);
-    game->p2 = createPlayer(2, 960, 64, game);
+    // Send arbitrary data to server so server acknowledges client
+    sprintf((char *)net->packet1->data, "%d\n", 99);
+    net->packet1->address.host = net->srvAddr.host;	                    /* Set the destination host */
+    net->packet1->address.port = net->srvAddr.port;	                    /* And destination port */
+    net->packet1->len = strlen((char *)net->packet1->data) + 1;
+    SDLNet_UDP_Send(net->sd, -1, net->packet1);
+    
+    SDL_Delay(1000);                                                    // Wait some time for server to send acknowledgement
+
+    if (SDLNet_UDP_Recv(net->sd, net->packet1)) {
+        printf("Packet received from server.\n");
+
+        int x, y, playerNumber;
+        sscanf((char * )net->packet1->data, "%d %d %d\n", &playerNumber, &x, &y);
+        if (playerNumber == 1) {
+            game->p1 = createPlayer(1, x, y, game);
+            game->p2 = createPlayer(2, 960, 64, game);
+        }
+        else if (playerNumber == 2) {
+            game->p1 = createPlayer(1, 64, 64, game);
+            game->p2 = createPlayer(2, x, y, game);
+        }
+    }
+    else {
+        game->p1 = createPlayer(1, 64, 64, game);
+        game->p2 = createPlayer(2, 960, 64, game);
+    }
+
     game->p3 = createPlayer(3, 64, 704, game);
     game->p4 = createPlayer(4, 960, 704, game);
     // game->boxes = createBoxes(game);
@@ -216,12 +242,12 @@ PUBLIC void updateGame(Game game, Network net) {
 
 PRIVATE void receiveUDPData(Game game, Network net) {
     if (SDLNet_UDP_Recv(net->sd, net->packet2)){
-        int x, y, currentFrame; 
+        int x, y, currentFrame;
         sscanf((char * )net->packet2->data, "%d %d %d\n", &x, &y, &currentFrame);
         game->p1->pos.x = x;
         game->p1->pos.y = y;
         game->p1->currentFrame = currentFrame;
-        printf("UDP Packet incoming %d %d\n", game->p1->pos.x, game->p1->pos.y);
+        // printf("UDP Packet incoming %d %d %d\n", game->p1->pos.x, game->p1->pos.y, game->p1->currentFrame);
     }
 }
 

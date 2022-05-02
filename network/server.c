@@ -3,17 +3,20 @@
 typedef struct udpData {
 	int x, y, frame;
 } udpData;
+
+void initClient(UDPsocket sd, UDPpacket *pReceive, UDPpacket *pSend, Uint32 *clientIP, Uint32 *clientPort, uint8_t *nrOfClients);
     
 int main(int argc, char **argv) {
 	
 	UDPsocket sd;       /* Socket descriptor */
 	UDPpacket *pReceive;       /* Pointer to packet memory */
-	UDPpacket *pSent;
-    Uint32 client1IP = 0; 
+	UDPpacket *pSend;
+    Uint32 client1IP = 0;
     Uint32 client2IP = 0;
-    Uint32 client1Port = 0; 
+    Uint32 client1Port = 0;
     Uint32 client2Port = 0;
-	bool isRunning = 1;
+	uint8_t nrOfClients = 0;
+	bool running = true;
 
 	udpData data = {0, 0, 0};
 
@@ -33,65 +36,81 @@ int main(int argc, char **argv) {
 	}
 
 	/* Make space for the packet */
-	if (!((pSent = SDLNet_AllocPacket(512)) && (pReceive = SDLNet_AllocPacket(512))))
+	if (!((pSend = SDLNet_AllocPacket(512)) && (pReceive = SDLNet_AllocPacket(512))))
 	{
 		fprintf(stderr, "SDLNet_AllocPacket Error: %s\n", SDLNet_GetError());
 		exit(EXIT_FAILURE);
 	}
 
+	printf("Server initiated\n");
+
 	/* Main loop */
-	while (isRunning)
-	{
+	while (running) {
+
 		/* Wait a packet. UDP_Recv returns != 0 if a packet is coming */
-		if (SDLNet_UDP_Recv(sd, pReceive))
-		{
-			//printf("UDP Packet incoming\n");
-			//printf("\tData:    %s\n", (char *)pReceive->data);
-			//printf("\tAddress: %x %x\n", pReceive->address.host, pReceive->address.port);
-            if(client1IP == 0 && client1Port == 0){
-                printf("Client 1\n");
-                client1IP = pReceive->address.host;
-                client1Port = pReceive->address.port;
-            }else if(pReceive->address.port != client1Port  && client2IP == 0){
-                printf("Client 2\n");
-                client2IP = pReceive->address.host;
-                client2Port = pReceive->address.port;
-            }else{
+		if (SDLNet_UDP_Recv(sd, pReceive)) {
+
+            if(client1IP == 0 && client1Port == 0) {
+				initClient(sd, pReceive, pSend, &client1IP, &client1Port, &nrOfClients);
+            } 
+			else if(pReceive->address.port != client1Port && client2IP == 0) {
+				initClient(sd, pReceive, pSend, &client2IP, &client2Port, &nrOfClients);
+            }
+			else {
                 if (pReceive->address.port == client1Port){
-                    printf("Received data\n");
+                    // printf("Received data from client 1\n");
                     if(client2IP != 0){
                         printf("Send to Client 2\n");
-                        pSent->address.host = client2IP;	/* Set the destination host */
-		                pSent->address.port = client2Port;
+                        pSend->address.host = client2IP;	/* Set the destination host */
+		                pSend->address.port = client2Port;
                         sscanf((char * )pReceive->data, "%d %d %d\n", &data.x, &data.y, &data.frame);
                         printf("%d %d %d\n", data.x, data.y, data.frame);
-                        sprintf((char *)pSent->data, "%d %d %d\n", data.x, data.y, data.frame);
-                        pSent->len = strlen((char *)pSent->data) + 1;
-                        SDLNet_UDP_Send(sd, -1, pSent);
+                        sprintf((char *)pSend->data, "%d %d %d\n", data.x, data.y, data.frame);
+                        pSend->len = strlen((char *)pSend->data) + 1;
+                        SDLNet_UDP_Send(sd, -1, pSend);
                     }
                 } else if (pReceive->address.port == client2Port){
-                    printf("Send to Client 1\n");    
-                    pSent->address.host = client1IP;	/* Set the destination host */
-		            pSent->address.port = client1Port;
+					printf("Send to Client 1\n");
+                    pSend->address.host = client1IP;	/* Set the destination host */
+		            pSend->address.port = client1Port;
                     sscanf((char * )pReceive->data, "%d %d %d\n", &data.x, &data.y, &data.frame);
 					printf("%d %d %d\n", data.x, data.y, data.frame);
-                    sprintf((char *)pSent->data, "%d %d %d\n", data.x, data.y, data.frame);
-                    pSent->len = strlen((char *)pSent->data) + 1;
-                    SDLNet_UDP_Send(sd, -1, pSent);
+                    sprintf((char *)pSend->data, "%d %d %d\n", data.x, data.y, data.frame);
+                    pSend->len = strlen((char *)pSend->data) + 1;
+                    SDLNet_UDP_Send(sd, -1, pSend);
                 }
-                
             }
             
 
 			/* Quit if packet contains "quit" */
-			if (strcmp((char *)pSent->data, "quit") == 0)
-				isRunning = false;
-		}		
+			if (strcmp((char *)pSend->data, "quit") == 0)
+				running = false;
+		}
 	}
 
 	/* Clean and exit */
-	SDLNet_FreePacket(pSent);
+	SDLNet_FreePacket(pSend);
     SDLNet_FreePacket(pReceive);
 	SDLNet_Quit();
 	return EXIT_SUCCESS;
-} 
+}
+
+void initClient(UDPsocket sd, UDPpacket *pReceive, UDPpacket *pSend, Uint32 *clientIP, Uint32 *clientPort, uint8_t *nrOfClients) {
+		*clientIP = pReceive->address.host;
+		*clientPort = pReceive->address.port;
+
+		pSend->address.host = *clientIP;
+		pSend->address.port = *clientPort;
+		if (*nrOfClients == 0) {
+			printf("Client 1\n");
+			sprintf((char *)pSend->data, "%d %d %d\n", 1, 192, 64);  // Sets player 1:s starting position to 64x, 64y
+		}
+		else if (*nrOfClients == 1) {
+			printf("Client 2\n");
+			sprintf((char *)pSend->data, "%d %d %d\n", 2, 832, 64);  // Sets player 2:s starting position to 832x, 64y
+		}
+		pSend->len = strlen((char *)pSend->data) + 1;
+		SDLNet_UDP_Send(sd, -1, pSend);
+
+		*nrOfClients += 1;
+}
