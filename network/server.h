@@ -1,7 +1,7 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#define _CRT_SECURE_NO_WARNINGS"
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <SDL2/SDL_net.h>
 // #include <SDL_net.h>
