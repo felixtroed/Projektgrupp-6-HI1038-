@@ -6,53 +6,17 @@ PowerUPS createPowers(Game game)
 
 	power->pos.h = POWERUP_SIZE;
 	power->pos.w = POWERUP_SIZE;
-	power->surface = IMG_Load("resources/powUpSpeed.png");
-	if (power->surface == NULL) {
-		printf("Unable to load power up speed! SDL_image Error: %s\n", IMG_GetError());
-	}
 
-	else 
-	{                                                          
-		power->speed = SDL_CreateTextureFromSurface(game->renderer, power->surface);
-		if (power->speed == NULL) 
-		{
-			printf("Unable to create power up speed texture! SDL Error: %s\n", SDL_GetError());
-		}
+	char pictureDestination[64];
 
-		SDL_FreeSurface(power->surface);                        
-	}
+	SDL_strlcpy(pictureDestination, "resources/powUpSpeed.png", sizeof pictureDestination);
+	loadTextures(&game->renderer, &game->bitmapSurface, &power->speed, pictureDestination);
 
-			
-	power->surface = IMG_Load("resources/powUpMorebombs.png");
-	if (power->surface == NULL)
-	{
-		printf("Unable to load power up more bombs! SDL_image Error: %s\n", IMG_GetError());
+	SDL_strlcpy(pictureDestination, "resources/powUpMorebombs.png", sizeof pictureDestination);
+	loadTextures(&game->renderer, &game->bitmapSurface, &power->moreBombs, pictureDestination);
 
-	}
-	else {
-		power->moreBombs = SDL_CreateTextureFromSurface(game->renderer, power->surface);
-		if (power->moreBombs == NULL)
-		{
-			printf("Unable to create power up more bombs texture! SDL Error: %s\n", SDL_GetError());
-		}
-		SDL_FreeSurface(power->surface);
-	}
-
-
-	power->surface = IMG_Load("resources/powUpExp.png");
-
-	if (power->surface == NULL)
-	{
-		printf("Unable to load power up stronger explosion! SDL_image Error: %s\n", IMG_GetError());
-	}
-	else {
-		power->biggerExplosions = SDL_CreateTextureFromSurface(game->renderer, power->surface);
-		if (power->biggerExplosions == NULL)
-		{
-			printf("Unable to create power up more stronger explosion texture! SDL Error: %s\n", SDL_GetError());
-		}
-		SDL_FreeSurface(power->surface);
-	}
+	SDL_strlcpy(pictureDestination, "resources/powUpExp.png", sizeof pictureDestination);
+	loadTextures(&game->renderer, &game->bitmapSurface, &power->biggerExplosions, pictureDestination);
 
 	return power;
 }

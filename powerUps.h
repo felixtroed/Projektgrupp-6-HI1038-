@@ -14,7 +14,6 @@ typedef struct GameSettings* Game;
 
 typedef struct PowerUPS {
 	SDL_Rect pos;
-	SDL_Surface* surface;
 	SDL_Texture* speed;
 	SDL_Texture* moreBombs;
 	SDL_Texture* biggerExplosions; 

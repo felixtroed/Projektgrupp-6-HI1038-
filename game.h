@@ -58,5 +58,6 @@ Game createGame(Network net);
 void updateGame(Game game, Network net);
 void exitGame(Game game, Network net);
 Network createNet();
+bool loadTextures(SDL_Renderer** renderer, SDL_Surface** bitmapSurface, SDL_Texture** texture, char pictureDestination[64]);
 
 #endif /* GAME_H */

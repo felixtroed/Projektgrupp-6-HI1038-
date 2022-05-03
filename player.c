@@ -12,62 +12,32 @@ PUBLIC void renderPlayers(Game game);
 PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
     Player player = malloc(sizeof(struct PlayerSettings));
 
+    char pictureDestination[64];
+
     switch (playerNumber) {                                                 // Laddar upp rätt bild för rätt player
-        case 1:
-            player->surface = IMG_Load("resources/old-man.png");
-            if (player->surface == NULL) {
-                printf("Unable to load player 1 image! SDL_image Error: %s\n", IMG_GetError());
-            }
-            else {                                                          // Create texture from surface pixels
-                player->texture = SDL_CreateTextureFromSurface(game->renderer, player->surface);
-                if (player->texture == NULL) {
-                    printf("Unable to create player 1 texture! SDL Error: %s\n", SDL_GetError());
-                }
-                SDL_FreeSurface(player->surface);                           // Get rid of old loaded surface
-                player->currentFrame = 8;                                   // Player is turned right from start
-            } break;
+    case 1:
+        SDL_strlcpy(pictureDestination, "resources/old-man.png", sizeof pictureDestination);
+        loadTextures(&game->renderer, &game->bitmapSurface, &player->texture, pictureDestination);
+        player->currentFrame = 8;                                   // Player is turned right from start
+        break;
 
-        case 2:
-            player->surface = IMG_Load("resources/green-man.png");
-            if (player->surface == NULL) {
-                printf("Unable to load player 2 image! SDL_image Error: %s\n", IMG_GetError());
-            }
-            else {
-                player->texture = SDL_CreateTextureFromSurface(game->renderer, player->surface);
-                if (player->texture == NULL) {
-                    printf("Unable to create player 2 texture! SDL Error: %s\n", SDL_GetError());
-                }
-                SDL_FreeSurface(player->surface);
-                player->currentFrame = 12;                                  // Player is turned left from start
-            } break;
+    case 2:
+        SDL_strlcpy(pictureDestination, "resources/green-man.png", sizeof pictureDestination);
+        loadTextures(&game->renderer, &game->bitmapSurface, &player->texture, pictureDestination);
+        player->currentFrame = 12;                                  // Player is turned left from start
+        break;
 
-        case 3:
-            player->surface = IMG_Load("resources/blue-man.png");
-            if (player->surface == NULL) {
-                printf("Unable to load player 3 image! SDL_image Error: %s\n", IMG_GetError());
-            }
-            else {
-                player->texture = SDL_CreateTextureFromSurface(game->renderer, player->surface);
-                if (player->texture == NULL) {
-                    printf("Unable to create player 3 texture! SDL Error: %s\n", SDL_GetError());
-                }
-                SDL_FreeSurface(player->surface);
-                player->currentFrame = 8;
-            } break;
+    case 3:
+        SDL_strlcpy(pictureDestination, "resources/blue-man.png", sizeof pictureDestination);
+        loadTextures(&game->renderer, &game->bitmapSurface, &player->texture, pictureDestination);
+        player->currentFrame = 8;
+        break;
 
-        case 4:
-            player->surface = IMG_Load("resources/red-man.png");
-            if (player->surface == NULL) {
-                printf("Unable to load player 4 image! SDL_image Error: %s\n", IMG_GetError());
-            }
-            else {
-                player->texture = SDL_CreateTextureFromSurface(game->renderer, player->surface);
-                if (player->texture == NULL) {
-                    printf("Unable to create player 4 texture! SDL Error: %s\n", SDL_GetError());
-                }
-                SDL_FreeSurface(player->surface);
-                player->currentFrame = 12;
-            } break;
+    case 4:
+        SDL_strlcpy(pictureDestination, "resources/red-man.png", sizeof pictureDestination);
+        loadTextures(&game->renderer, &game->bitmapSurface, &player->texture, pictureDestination);
+        player->currentFrame = 12;
+        break;
     }
 
     player->pos.x = x;

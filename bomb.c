@@ -334,65 +334,22 @@ PUBLIC void renderBombsAndExplosions(Game game) {
 PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer, int explosionRange) {
     Bomb bomb = malloc(sizeof(struct BombSettings));
 
-    bomb->surface = IMG_Load("resources/bomb.png");                                     // Laddar in svart bomb
-    if (bomb->surface == NULL) {
-        printf("Unable to load bomb image. SDL_image error: %s\n", IMG_GetError());
-    }
-    else {
-        bomb->textureBomb = SDL_CreateTextureFromSurface(renderer, bomb->surface);
-        if (bomb->textureBomb == NULL) {
-            printf("Unable to create bomb texture. SDL error: %s\n", SDL_GetError());
-        }
-        SDL_FreeSurface(bomb->surface);
-    }
+    char pictureDestination[64];
 
-    bomb->surface = IMG_Load("resources/bomb-red.png");                                 // Laddar in r�d bomb
-    if (bomb->surface == NULL) {
-        printf("Unable to load bomb-red image. SDL_image error: %s\n", IMG_GetError());
-    }
-    else {
-        bomb->textureBombRed = SDL_CreateTextureFromSurface(renderer, bomb->surface);
-        if (bomb->textureBombRed == NULL) {
-            printf("Unable to create bomb-red texture. SDL error: %s\n", SDL_GetError());
-        }
-        SDL_FreeSurface(bomb->surface);
-    }
+    SDL_strlcpy(pictureDestination, "resources/bomb.png", sizeof pictureDestination);
+    loadTextures(&renderer, &bomb->surface, &bomb->textureBomb, pictureDestination);
 
-    bomb->surface = IMG_Load("resources/explosion-start.png");                                     // Laddar in start explosionen
-    if (bomb->surface == NULL) {
-        printf("Unable to load explosion-start. SDL_image error: %s\n", IMG_GetError());
-    }
-    else {
-        bomb->textureExplosionStart = SDL_CreateTextureFromSurface(renderer, bomb->surface);
-        if (bomb->textureExplosionStart == NULL) {
-            printf("Unable to create explosion-start texture. SDL error: %s\n", SDL_GetError());
-        }
-        SDL_FreeSurface(bomb->surface);
-    }
+    SDL_strlcpy(pictureDestination, "resources/bomb-red.png", sizeof pictureDestination);
+    loadTextures(&renderer, &bomb->surface, &bomb->textureBombRed, pictureDestination);
 
-    bomb->surface = IMG_Load("resources/explosion-middle.png");                                     // Laddar in mitten explosionen
-    if (bomb->surface == NULL) {
-        printf("Unable to load explosion-middle SDL_image error: %s\n", IMG_GetError());
-    }
-    else {
-        bomb->textureExplosionMiddle = SDL_CreateTextureFromSurface(renderer, bomb->surface);
-        if (bomb->textureExplosionMiddle == NULL) {
-            printf("Unable to create explosion-middle texture. SDL error: %s\n", SDL_GetError());
-        }
-        SDL_FreeSurface(bomb->surface);
-    }
+    SDL_strlcpy(pictureDestination, "resources/explosion-start.png", sizeof pictureDestination);
+    loadTextures(&renderer, &bomb->surface, &bomb->textureExplosionStart, pictureDestination);
 
-    bomb->surface = IMG_Load("resources/explosion-end.png");                                     // Laddar in slut explosionen
-    if (bomb->surface == NULL) {
-        printf("Unable to load explosion-end. SDL_image error: %s\n", IMG_GetError());
-    }
-    else {
-        bomb->textureExplosionEnd = SDL_CreateTextureFromSurface(renderer, bomb->surface);
-        if (bomb->textureExplosionEnd == NULL) {
-            printf("Unable to create explosion-end texture. SDL error: %s\n", SDL_GetError());
-        }
-        SDL_FreeSurface(bomb->surface);
-    }
+    SDL_strlcpy(pictureDestination, "resources/explosion-middle.png", sizeof pictureDestination);
+    loadTextures(&renderer, &bomb->surface, &bomb->textureExplosionMiddle, pictureDestination);
+
+    SDL_strlcpy(pictureDestination, "resources/explosion-end.png", sizeof pictureDestination);
+    loadTextures(&renderer, &bomb->surface, &bomb->textureExplosionEnd, pictureDestination);
 
     bomb->bombPos.x = ((playerPosX + 32) / 64) * 64 + 7;       // Formel f�r att placera bomben i n�rmaste ruta (utg�r fr�n karakt�rens mittpunkt)
     bomb->bombPos.y = ((playerPosY + 32) / 64) * 64 + 7;       // +7 f�r bomben �r 50x50 pixlar (64-50=7) M�ste �ndras ifall karakt�rens eller bombens storlek �ndras!!!
