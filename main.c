@@ -3,8 +3,8 @@
 #include "player.h"
 
 int main(int argc, char* argv[]) {
-    Game game = createGame();
     Network net = createNet();
+    Game game = createGame(net);
     updateGame(game, net);
     exitGame(game, net);
     return 0;

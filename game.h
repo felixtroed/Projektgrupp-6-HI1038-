@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#define _CRT_SECURE_NO_WARNINGS"
+
 // #include <SDL.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
@@ -12,8 +14,9 @@
 
 #define WINDOW_WIDTH 1088
 #define WINDOW_HEIGHT 832
-#define BOMBS 4
+#define BOMBS 12
 #define MENUOPTIONS 4
+#define NUMPLAYERS 4
 
 typedef struct PlayerSettings* Player;
 typedef struct BombSettings* Bomb;
@@ -35,11 +38,10 @@ typedef struct GameSettings {
     SDL_Rect boxPos;                  //Anv�nds f�r positionen av l�dorna
     SDL_Event event;
     //Boxes boxes;
-    Player p1;
-    Player p2;
-    Player p3;
-    Player p4;
+    Player player[NUMPLAYERS];
     Bomb bombs[BOMBS];                // Contains all simultaneously allowed bombs
+    uint8_t activePlayers;
+    uint8_t pIdx;
 } *Game;
 
 typedef struct NetworkData {
@@ -49,7 +51,7 @@ typedef struct NetworkData {
     UDPpacket *packet2;
 } *Network;
 
-Game createGame();
+Game createGame(Network net);
 void updateGame(Game game, Network net);
 void exitGame(Game game, Network net);
 Network createNet();

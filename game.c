@@ -25,7 +25,7 @@ PUBLIC Network createNet() {
     return net;
 }
 
-PUBLIC Game createGame() {
+PUBLIC Game createGame(Network net) {
     Game game = malloc(sizeof(struct GameSettings));
 
     if (initWinRen(game)) {
@@ -61,10 +61,58 @@ PUBLIC Game createGame() {
     game->menuOptionPos[3].w = 212;
     game->menuOptionPos[3].h = 71;
 
-    game->p1 = createPlayer(1, 64, 64, game);
-    game->p2 = createPlayer(2, 960, 64, game);
-    game->p3 = createPlayer(3, 64, 704, game);
-    game->p4 = createPlayer(4, 960, 704, game);
+    // Send arbitrary data to server so server acknowledges client
+    sprintf((char *)net->packet1->data, "%d\n", 99);
+    net->packet1->address.host = net->srvAddr.host;	                    /* Set the destination host */
+    net->packet1->address.port = net->srvAddr.port;	                    /* And destination port */
+    net->packet1->len = strlen((char *)net->packet1->data) + 1;
+    SDLNet_UDP_Send(net->sd, -1, net->packet1);
+    
+    SDL_Delay(1000);                                                    // Wait some time for server to send data back
+
+    // Assign correct player number based on server response
+    if (SDLNet_UDP_Recv(net->sd, net->packet1)) {
+        printf("Packet received from server.\n");
+
+        int playerIdx;
+        sscanf((char * )net->packet1->data, "%d\n", &playerIdx);
+        game->pIdx = playerIdx;
+
+        switch (game->pIdx) {
+            case 0:
+                game->player[0] = createPlayer(1, 64, 64, game);
+                game->activePlayers = 1;
+                break;
+            case 1:
+                game->player[0] = createPlayer(1, 64, 64, game);
+                game->player[1] = createPlayer(2, 960, 64, game);
+                game->activePlayers = 2;
+                break;
+            case 2:
+                game->player[0] = createPlayer(1, 64, 64, game);
+                game->player[1] = createPlayer(2, 960, 64, game);
+                game->player[2] = createPlayer(3, 64, 704, game);
+                game->activePlayers = 3;
+                break;
+            case 3:
+                game->player[0] = createPlayer(1, 64, 64, game);
+                game->player[1] = createPlayer(2, 960, 64, game);
+                game->player[2] = createPlayer(3, 64, 704, game);
+                game->player[3] = createPlayer(4, 960, 704, game);
+                game->activePlayers = 4;
+                break;
+            default: break;
+        }
+    }
+    else {                                                              // Start single player if no server response
+        game->pIdx = 0;
+        game->player[0] = createPlayer(1, 64, 64, game);
+        game->player[1] = createPlayer(2, 960, 64, game);
+        game->player[2] = createPlayer(3, 64, 704, game);
+        game->player[3] = createPlayer(4, 960, 704, game);
+        game->activePlayers = 4;
+    }
+
     // game->boxes = createBoxes(game);
     initBombs(game->bombs);                           // Sets all bombs to NULL
 
@@ -87,10 +135,10 @@ PUBLIC void updateGame(Game game, Network net) {
                 running = false;
             }
             if (!inMenu) {
-                if (game->p1->isAlive) {
+                if (game->player[game->pIdx]->isAlive) {
                     if (game->event.type == SDL_KEYDOWN) {
                         if (game->event.key.keysym.sym == SDLK_SPACE) {                     // Space intryckt (gamla sättet som pausar i 1 sek när man håller in knappen)
-                            bombPlacement(game->p1, game->bombs, game->renderer);
+                            bombPlacement(game->player[game->pIdx], game->bombs, game->renderer);
                             // removeBox(game->p1, game->boxes->activeBox);
                         }
                     }
@@ -166,18 +214,18 @@ PUBLIC void updateGame(Game game, Network net) {
 
         if (!inMenu) {
             currentKeyStates = SDL_GetKeyboardState(NULL);
-            if (game->p1->isAlive) {
+            if (game->player[game->pIdx]->isAlive) {
                 if (currentKeyStates[SDL_SCANCODE_W] || currentKeyStates[SDL_SCANCODE_UP]) {                // Funkar för både WASD och pilar
-                    move(game->p1, &newMove, &lastMove, KEYUP, game->bombs, &frames, net);
+                    move(game->player[game->pIdx], &newMove, &lastMove, KEYUP, game->bombs, &frames, net, game->pIdx);
                 }
                 else if (currentKeyStates[SDL_SCANCODE_S] || currentKeyStates[SDL_SCANCODE_DOWN]) {
-                    move(game->p1, &newMove, &lastMove, KEYDOWN, game->bombs, &frames, net);
+                    move(game->player[game->pIdx], &newMove, &lastMove, KEYDOWN, game->bombs, &frames, net, game->pIdx);
                 }
                 else if (currentKeyStates[SDL_SCANCODE_A] || currentKeyStates[SDL_SCANCODE_LEFT]) {
-                    move(game->p1, &newMove, &lastMove, KEYLEFT, game->bombs, &frames, net);
+                    move(game->player[game->pIdx], &newMove, &lastMove, KEYLEFT, game->bombs, &frames, net, game->pIdx);
                 }
                 else if (currentKeyStates[SDL_SCANCODE_D] || currentKeyStates[SDL_SCANCODE_RIGHT]) {
-                    move(game->p1, &newMove, &lastMove, KEYRIGHT, game->bombs, &frames, net);
+                    move(game->player[game->pIdx], &newMove, &lastMove, KEYRIGHT, game->bombs, &frames, net, game->pIdx);
                 }
             }
 
@@ -216,12 +264,21 @@ PUBLIC void updateGame(Game game, Network net) {
 
 PRIVATE void receiveUDPData(Game game, Network net) {
     if (SDLNet_UDP_Recv(net->sd, net->packet2)){
-        int x, y, currentFrame; 
-        sscanf((char * )net->packet2->data, "%d %d %d\n", &x, &y, &currentFrame);
-        game->p1->pos.x = x;
-        game->p1->pos.y = y;
-        game->p1->currentFrame = currentFrame;
-        printf("UDP Packet incoming %d %d\n", game->p1->pos.x, game->p1->pos.y);
+        int idx, x, y, currentFrame, activePlayers;
+        sscanf((char * )net->packet2->data, "%d %d %d %d %d\n", &idx, &x, &y, &currentFrame, &activePlayers);
+
+        // printf("Active players: %d\n", activePlayers);
+        // printf("Game->activePlayers: %d\n", game->activePlayers);
+
+        if (activePlayers > game->activePlayers) {
+            game->player[game->activePlayers] = createPlayer(activePlayers, x, y, game);
+        }
+        else {
+            game->player[idx]->pos.x = x;
+            game->player[idx]->pos.y = y;
+            game->player[idx]->currentFrame = currentFrame;
+        }
+        game->activePlayers = activePlayers;
     }
 }
 
@@ -344,14 +401,12 @@ PUBLIC void exitGame(Game game, Network net) {
     SDLNet_FreePacket(net->packet2);
     free(net);
 	SDLNet_Quit();
-    SDL_DestroyTexture(game->p1->texture);
-    SDL_DestroyTexture(game->p2->texture);
-    SDL_DestroyTexture(game->p3->texture);
-    SDL_DestroyTexture(game->p4->texture);
-    free(game->p1);
-    free(game->p2);
-    free(game->p3);
-    free(game->p4);
+
+    for (uint8_t i = 0; i < game->activePlayers; i++) {
+        SDL_DestroyTexture(game->player[i]->texture);
+        free(game->player[i]);
+    }
+
     SDL_DestroyRenderer(game->renderer);
     SDL_DestroyWindow(game->window);
     IMG_Quit();
