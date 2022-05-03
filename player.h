@@ -16,7 +16,6 @@ typedef struct PlayerSettings {
     SDL_Rect pos;
     SDL_Rect hitboxPos;
     SDL_RendererFlip flip;
-    SDL_Surface *surface;
     SDL_TimerID invincibleTimer;
     bool isHurt;
     bool isAlive;
