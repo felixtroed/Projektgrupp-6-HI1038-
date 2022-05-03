@@ -91,14 +91,14 @@ PUBLIC Game createGame(Network net) {
             case 2:
                 game->player[0] = createPlayer(1, 64, 64, game);
                 game->player[1] = createPlayer(2, 960, 64, game);
-                game->player[2] = createPlayer(3, 64, 704, game);
+                game->player[2] = createPlayer(3, 64, 640, game);
                 game->activePlayers = 3;
                 break;
             case 3:
                 game->player[0] = createPlayer(1, 64, 64, game);
                 game->player[1] = createPlayer(2, 960, 64, game);
-                game->player[2] = createPlayer(3, 64, 704, game);
-                game->player[3] = createPlayer(4, 960, 704, game);
+                game->player[2] = createPlayer(3, 64, 640, game);
+                game->player[3] = createPlayer(4, 960, 640, game);
                 game->activePlayers = 4;
                 break;
             default: break;
