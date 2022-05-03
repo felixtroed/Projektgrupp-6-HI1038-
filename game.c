@@ -78,14 +78,30 @@ PUBLIC Game createGame(Network net) {
         sscanf((char * )net->packet1->data, "%d\n", &playerIdx);
         game->pIdx = playerIdx;
 
-        if (game->pIdx == 0) {
-            game->player[0] = createPlayer(1, 64, 64, game);
-            game->activePlayers = 1;
-        }
-        else if (game->pIdx == 1) {
-            game->player[0] = createPlayer(1, 64, 64, game);
-            game->player[1] = createPlayer(2, 960, 64, game);
-            game->activePlayers = 2;
+        switch (game->pIdx) {
+            case 0:
+                game->player[0] = createPlayer(1, 64, 64, game);
+                game->activePlayers = 1;
+                break;
+            case 1:
+                game->player[0] = createPlayer(1, 64, 64, game);
+                game->player[1] = createPlayer(2, 960, 64, game);
+                game->activePlayers = 2;
+                break;
+            case 2:
+                game->player[0] = createPlayer(1, 64, 64, game);
+                game->player[1] = createPlayer(2, 960, 64, game);
+                game->player[2] = createPlayer(3, 64, 704, game);
+                game->activePlayers = 3;
+                break;
+            case 3:
+                game->player[0] = createPlayer(1, 64, 64, game);
+                game->player[1] = createPlayer(2, 960, 64, game);
+                game->player[2] = createPlayer(3, 64, 704, game);
+                game->player[3] = createPlayer(4, 960, 704, game);
+                game->activePlayers = 4;
+                break;
+            default: break;
         }
     }
     else {                                                              // Start single player if no server response

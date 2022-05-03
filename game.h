@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#define _CRT_SECURE_NO_WARNINGS"
+
 // #include <SDL.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>

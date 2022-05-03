@@ -5,7 +5,7 @@ typedef struct udpData {
 } udpData;
 
 void initClient(UDPsocket sd, UDPpacket *pReceive, UDPpacket *pSend, Uint32 *clientIP, Uint32 *clientPort, uint8_t *nrOfClients);
-    
+
 int main(int argc, char **argv) {
 	
 	UDPsocket sd;       /* Socket descriptor */
@@ -13,8 +13,12 @@ int main(int argc, char **argv) {
 	UDPpacket *pSend;
     Uint32 client1IP = 0;
     Uint32 client2IP = 0;
+    Uint32 client3IP = 0;
+    Uint32 client4IP = 0;
     Uint32 client1Port = 0;
     Uint32 client2Port = 0;
+    Uint32 client3Port = 0;
+    Uint32 client4Port = 0;
 	uint8_t nrOfClients = 0;
 	bool running = true;
 
@@ -57,8 +61,7 @@ int main(int argc, char **argv) {
 				initClient(sd, pReceive, pSend, &client2IP, &client2Port, &nrOfClients);
             }
 			else {
-                if (pReceive->address.port == client1Port){
-                    // printf("Received data from client 1\n");
+                if (pReceive->address.port == client1Port) {
                     if(client2IP != 0){
                         printf("Send to Client 2\n");
                         pSend->address.host = client2IP;	/* Set the destination host */
@@ -69,9 +72,10 @@ int main(int argc, char **argv) {
                         pSend->len = strlen((char *)pSend->data) + 1;
                         SDLNet_UDP_Send(sd, -1, pSend);
                     }
-                } else if (pReceive->address.port == client2Port){
+                }
+				else if (pReceive->address.port == client2Port) {
 					printf("Send to Client 1\n");
-                    pSend->address.host = client1IP;	/* Set the destination host */
+                    pSend->address.host = client1IP;
 		            pSend->address.port = client1Port;
                     sscanf((char * )pReceive->data, "%d %d %d %d\n", &data.idx, &data.x, &data.y, &data.frame);
 					printf("x: %d y: %d frame: %d clients %d\n", data.x, data.y, data.frame, nrOfClients);
@@ -109,6 +113,14 @@ void initClient(UDPsocket sd, UDPpacket *pReceive, UDPpacket *pSend, Uint32 *cli
 	else if (*nrOfClients == 1) {
 		printf("Client 2\n");
 		sprintf((char *)pSend->data, "%d\n", 1);  // Sets client to player 2
+	}
+	else if (*nrOfClients == 2) {
+		printf("Client 3\n");
+		sprintf((char *)pSend->data, "%d\n", 2);  // Sets client to player 3
+	}
+	else if (*nrOfClients == 3) {
+		printf("Client 3\n");
+		sprintf((char *)pSend->data, "%d\n", 3);  // Sets client to player 4
 	}
 
 	pSend->len = strlen((char *)pSend->data) + 1;
