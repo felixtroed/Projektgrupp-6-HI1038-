@@ -4,6 +4,8 @@
 #include <SDL2/SDL.h>
 // #include <SDL.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
 #include "game.h"
 #include "player.h"
 #include "box.h"

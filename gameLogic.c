@@ -68,7 +68,6 @@ bool collisionMap(Player p1) {
 
     if (p1->pos.x < SCREENMIN_X)
     {
-    
         return false;
     }
 
@@ -88,9 +87,8 @@ bool collisionBoxes(Player p1)
 
     for (int row = 0; row < ROW_SIZE; row++) {
         for (int column = 0; column < COLUMN_SIZE; column++) {
-            if (activeBox[row][column] > 0)
+            if (activeBox[row][column] == 1 || activeBox[row][column] == 3)
             {
-
                 posBoxX = column * 64 + 64;
                 posBoxY = row * 64 + 64;
 
@@ -103,10 +101,7 @@ bool collisionBoxes(Player p1)
                     return false;
 
                 }
-
             }
-
-
         }
     }
     return true;
@@ -116,10 +111,10 @@ bool collisionBoxes(Player p1)
 bool collisionBomb(Player p1, Bomb bombs[]) {
     for (uint8_t i = 0; i < BOMBS; i++) {
         if (bombs[i] != NULL) {
-            int left = (bombs[i]->bombPos.x);
-            int right = (bombs[i]->bombPos.x) + ((64 - BOMB_SIZE) / 2 - 7);
-            int up = (bombs[i]->bombPos.y);
-            int down = (bombs[i]->bombPos.y) + ((64 - BOMB_SIZE) / 2 - 7);
+            int left = (bombs[i]->bombPos.x) - 5;
+            int right = (bombs[i]->bombPos.x) + ((64 - BOMB_SIZE) / 2 + 10);
+            int up = (bombs[i]->bombPos.y) - 10;
+            int down = (bombs[i]->bombPos.y) + ((64 - BOMB_SIZE) / 2 + 10);
         //    printf("Bomb pos: x: %d\ty:%d\n", bombs[i]->bombPos.x, bombs[i]->bombPos.y);
 
             if (bombs[i]->spawnInside) {

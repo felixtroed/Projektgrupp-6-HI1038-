@@ -114,6 +114,7 @@ PUBLIC Game createGame(Network net) {
     }
 
     // game->boxes = createBoxes(game);
+    game->power = createPowers(game);
     initBombs(game->bombs);                           // Sets all bombs to NULL
 
     return game;
@@ -231,9 +232,11 @@ PUBLIC void updateGame(Game game, Network net) {
 
             receiveUDPData(game, net);
             handlePlayerExplosionCollision(game);
+            pickUpPowerUps(game->player[game->pIdx]);
 
             SDL_RenderClear(game->renderer);
             SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
+            renderPowerUps(game);
             renderBoxes(game);
             renderBombsAndExplosions(game);
             renderPlayers(game);
@@ -406,6 +409,10 @@ PUBLIC void exitGame(Game game, Network net) {
         SDL_DestroyTexture(game->player[i]->texture);
         free(game->player[i]);
     }
+
+    SDL_DestroyTexture(game->power->biggerExplosions);
+    SDL_DestroyTexture(game->power->moreBombs);
+    SDL_DestroyTexture(game->power->biggerExplosions);
 
     SDL_DestroyRenderer(game->renderer);
     SDL_DestroyWindow(game->window);

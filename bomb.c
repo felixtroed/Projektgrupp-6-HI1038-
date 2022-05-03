@@ -14,7 +14,7 @@ typedef struct BombTimerCallbackArgs {
 PRIVATE Uint32 redBomb(Uint32 interval, void *switchToRedBomb);
 PRIVATE Uint32 explodeBomb(Uint32 interval, void *args);
 PRIVATE Uint32 explosionDone(Uint32 interval, void *deleteBomb);
-PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer);
+PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer, int explosionRange);
 PRIVATE uint8_t getBombIdx(Bomb bombs[]);
 PRIVATE void handleExplosions(Bomb bomb);
 PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer);
@@ -26,7 +26,7 @@ PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer) {
         (p->bombsAvailable)--;
 
         BombTimerCallbackArgs *callbackArgs = malloc(sizeof(BombTimerCallbackArgs));
-        callbackArgs->bomb = bombs[bombIdx] = createBomb(p->pos.x, p->pos.y, renderer);
+        callbackArgs->bomb = bombs[bombIdx] = createBomb(p->pos.x, p->pos.y, renderer, p->explosionRange);
         callbackArgs->bombsAvailable = &p->bombsAvailable;
 
         bombs[bombIdx]->redBombTime = SDL_AddTimer(2000, redBomb, callbackArgs);                     // Timer tills r�d bomb ska visas
@@ -78,6 +78,19 @@ PUBLIC void renderBombsAndExplosions(Game game) {
             else {
                 SDL_RenderCopy(game->renderer, game->bombs[i]->textureBomb, NULL, &game->bombs[i]->bombPos);        // Renderar svart bomb
             }
+            bool createPowerUpRight = false;
+            int rightBoxRow;
+            int rightBoxColumn;
+            bool createPowerUpLeft = false;
+            int leftBoxRow;
+            int leftBoxColumn;
+            bool createPowerUpUp = false;
+            int upBoxRow;
+            int upBoxColumn;
+            bool createPowerUpDown = false;
+            int downBoxRow;
+            int downBoxColumn;
+
             if (game->bombs[i]->startExplosion) {
 
                 int range = game->bombs[i]->explosionRange;
@@ -87,12 +100,13 @@ PUBLIC void renderBombsAndExplosions(Game game) {
                 SDL_RenderCopy(game->renderer, game->bombs[i]->textureExplosionStart, NULL, &game->bombs[i]->explosionPos);         // Renderar explosion-start
 
                 // Renderar explosion åt höger
-                for (int j = 0; j < range - 1; j++) {
+                for (int j = 0; j < range; j++) {
                     game->bombs[i]->explosionPos.x += 64;
 
                     for (int row = 0; row < ROW_SIZE; row++) {
                         for (int column = 0; column < COLUMN_SIZE; column++) {
-                            if (activeBox[row][column] > 0) {
+                            if (activeBox[row][column] == 1 || activeBox[row][column] == W) {
+
 
                                 int boxLeft = column * 64 + 64;
                                 int boxRight = boxLeft + 64;
@@ -102,8 +116,11 @@ PUBLIC void renderBombsAndExplosions(Game game) {
                                 if ((game->bombs[i]->explosionPos.x + 32) > boxLeft && (game->bombs[i]->explosionPos.x + 32) < boxRight && (game->bombs[i]->explosionPos.y + 32) > boxUp
                                     && (game->bombs[i]->explosionPos.y) + 32 < boxDown) {
 
-                                    if (activeBox[row][column] == 3) {
+                                    if (activeBox[row][column] == W) {
                                         stoneWall = true;
+                                    }
+                                    else if (activeBox[row][column] == 1) {
+                                        createPowerUpRight = true;
                                     }
 
                                     row = ROW_SIZE;
@@ -116,24 +133,33 @@ PUBLIC void renderBombsAndExplosions(Game game) {
                         }
                     }
                     if (!hitWall && game->bombs[i]->explosionPos.x < WINDOW_WIDTH - 92) {
-                        SDL_RenderCopy(game->renderer, game->bombs[i]->textureExplosionMiddle, NULL, &game->bombs[i]->explosionPos);
+                        if (j == range - 1) {
+                            game->bombs[i]->explosionPos.x -= 64;
+                        }
+                        else {
+                            SDL_RenderCopy(game->renderer, game->bombs[i]->textureExplosionMiddle, NULL, &game->bombs[i]->explosionPos);
+                        }
                     }
                 }
                 game->bombs[i]->explosionPos.x += 64;
                 if (!stoneWall && game->bombs[i]->explosionPos.x < WINDOW_WIDTH - 92) {
                     SDL_RenderCopy(game->renderer, game->bombs[i]->textureExplosionEnd, NULL, &game->bombs[i]->explosionPos);
                 }
+                if (createPowerUpRight) {
+                    rightBoxRow = game->bombs[i]->explosionPos.y / 64 - 1;
+                    rightBoxColumn = game->bombs[i]->explosionPos.x / 64 - 1;
+                }
                 game->bombs[i]->explosionPos.x = game->bombs[i]->bombPos.x - 7;                                                     // Återställer startvärden
                 stoneWall = false;
                 hitWall = false;
 
                 // Renderar explosion åt vänster
-                for (int j = 0; j < range - 1; j++) {
+                for (int j = 0; j < range; j++) {
                     game->bombs[i]->explosionPos.x -= 64;
 
                     for (int row = 0; row < ROW_SIZE; row++) {
                         for (int column = 0; column < COLUMN_SIZE; column++) {
-                            if (activeBox[row][column] > 0) {
+                            if (activeBox[row][column] == 1 || activeBox[row][column] == W) {
 
                                 int boxLeft = column * 64 + 64;
                                 int boxRight = boxLeft + 64;
@@ -143,8 +169,11 @@ PUBLIC void renderBombsAndExplosions(Game game) {
                                 if ((game->bombs[i]->explosionPos.x + 32) > boxLeft && (game->bombs[i]->explosionPos.x + 32) < boxRight && (game->bombs[i]->explosionPos.y + 32) > boxUp
                                     && (game->bombs[i]->explosionPos.y) + 32 < boxDown) {
 
-                                    if (activeBox[row][column] == 3) {
+                                    if (activeBox[row][column] == W) {
                                         stoneWall = true;
+                                    }
+                                    else if (activeBox[row][column] == 1) {
+                                        createPowerUpLeft = true;
                                     }
 
                                     row = ROW_SIZE;
@@ -157,24 +186,33 @@ PUBLIC void renderBombsAndExplosions(Game game) {
                         }
                     }
                     if (!hitWall && game->bombs[i]->explosionPos.x > 32) {
-                        SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionMiddle, NULL, &game->bombs[i]->explosionPos, 180, NULL, SDL_FLIP_NONE);
+                        if (j == range - 1) {
+                            game->bombs[i]->explosionPos.x += 64;
+                        }
+                        else {
+                            SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionMiddle, NULL, &game->bombs[i]->explosionPos, 180, NULL, SDL_FLIP_NONE);
+                        }
                     }
                 }
                 game->bombs[i]->explosionPos.x -= 64;
                 if (!stoneWall && game->bombs[i]->explosionPos.x > 32) {
                     SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionEnd, NULL, &game->bombs[i]->explosionPos, 180, NULL, SDL_FLIP_NONE);
                 }
+                if (createPowerUpLeft) {
+                    leftBoxRow = game->bombs[i]->explosionPos.y / 64 - 1;
+                    leftBoxColumn = game->bombs[i]->explosionPos.x / 64 - 1;
+                }
                 game->bombs[i]->explosionPos.x = game->bombs[i]->bombPos.x - 7;                                                     // Återställer startvärden
                 stoneWall = false;
                 hitWall = false;
 
                 // Renderar explosion uppåt
-                for (int j = 0; j < range - 1; j++) {
+                for (int j = 0; j < range; j++) {
                     game->bombs[i]->explosionPos.y -= 64;
 
                     for (int row = 0; row < ROW_SIZE; row++) {
                         for (int column = 0; column < COLUMN_SIZE; column++) {
-                            if (activeBox[row][column] > 0) {
+                            if (activeBox[row][column] == 1 || activeBox[row][column] == W) {
 
                                 int boxLeft = column * 64 + 64;
                                 int boxRight = boxLeft + 64;
@@ -184,8 +222,11 @@ PUBLIC void renderBombsAndExplosions(Game game) {
                                 if ((game->bombs[i]->explosionPos.x + 32) > boxLeft && (game->bombs[i]->explosionPos.x + 32) < boxRight && (game->bombs[i]->explosionPos.y + 32) > boxUp
                                     && (game->bombs[i]->explosionPos.y) + 32 < boxDown) {
 
-                                    if (activeBox[row][column] == 3) {
+                                    if (activeBox[row][column] == W) {
                                         stoneWall = true;
+                                    }
+                                    else if (activeBox[row][column] == 1) {
+                                        createPowerUpUp = true;
                                     }
 
                                     row = ROW_SIZE;
@@ -198,24 +239,33 @@ PUBLIC void renderBombsAndExplosions(Game game) {
                         }
                     }
                     if (!hitWall && game->bombs[i]->explosionPos.y > 32) {
-                        SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionMiddle, NULL, &game->bombs[i]->explosionPos, 270, NULL, SDL_FLIP_NONE);
+                        if (j == range - 1) {
+                            game->bombs[i]->explosionPos.y += 64;
+                        }
+                        else {
+                            SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionMiddle, NULL, &game->bombs[i]->explosionPos, 270, NULL, SDL_FLIP_NONE);
+                        }
                     }
                 }
                 game->bombs[i]->explosionPos.y -= 64;
                 if (!stoneWall && game->bombs[i]->explosionPos.y > 32) {
                     SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionEnd, NULL, &game->bombs[i]->explosionPos, 270, NULL, SDL_FLIP_NONE);
                 }
+                if (createPowerUpUp) {
+                    upBoxRow = game->bombs[i]->explosionPos.y / 64 - 1;
+                    upBoxColumn = game->bombs[i]->explosionPos.x / 64 - 1;
+                }
                 game->bombs[i]->explosionPos.y = game->bombs[i]->bombPos.y - 7;                                                     // Återställer startvärden
                 stoneWall = false;
                 hitWall = false;
 
                 // Renderar explosion nedåt
-                for (int j = 0; j < range - 1; j++) {
+                for (int j = 0; j < range; j++) {
                     game->bombs[i]->explosionPos.y += 64;
 
                     for (int row = 0; row < ROW_SIZE; row++) {
                         for (int column = 0; column < COLUMN_SIZE; column++) {
-                            if (activeBox[row][column] > 0) {
+                            if (activeBox[row][column] == 1 || activeBox[row][column] == W) {
 
                                 int boxLeft = column * 64 + 64;
                                 int boxRight = boxLeft + 64;
@@ -225,9 +275,13 @@ PUBLIC void renderBombsAndExplosions(Game game) {
                                 if ((game->bombs[i]->explosionPos.x + 32) > boxLeft && (game->bombs[i]->explosionPos.x + 32) < boxRight && (game->bombs[i]->explosionPos.y + 32) > boxUp
                                     && (game->bombs[i]->explosionPos.y) + 32 < boxDown) {
 
-                                    if (activeBox[row][column] == 3) {
+                                    if (activeBox[row][column] == W) {
                                         stoneWall = true;
                                     }
+                                    else if (activeBox[row][column] == 1) {
+                                        createPowerUpDown = true;
+                                    }
+
                                     row = ROW_SIZE;
                                     column = COLUMN_SIZE;
                                     j = range;
@@ -238,26 +292,46 @@ PUBLIC void renderBombsAndExplosions(Game game) {
                         }
                     }
                     if (!hitWall && game->bombs[i]->explosionPos.y < WINDOW_HEIGHT - 92) {
-                        SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionMiddle, NULL, &game->bombs[i]->explosionPos, 90, NULL, SDL_FLIP_NONE);
+                        if (j == range - 1) {
+                            game->bombs[i]->explosionPos.y -= 64;
+                        }
+                        else {
+                            SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionMiddle, NULL, &game->bombs[i]->explosionPos, 90, NULL, SDL_FLIP_NONE);
+                        }
                     }
                 }
                 game->bombs[i]->explosionPos.y += 64;
                 if (!stoneWall && game->bombs[i]->explosionPos.y < WINDOW_HEIGHT - 92) {
                     SDL_RenderCopyEx(game->renderer, game->bombs[i]->textureExplosionEnd, NULL, &game->bombs[i]->explosionPos, 90, NULL, SDL_FLIP_NONE);
                 }
+                if (createPowerUpDown) {
+                    downBoxRow = game->bombs[i]->explosionPos.y / 64 - 1;
+                    downBoxColumn = game->bombs[i]->explosionPos.x / 64 - 1;
+                }
                 game->bombs[i]->explosionPos.y = game->bombs[i]->bombPos.y - 7;                                                     // Återställer startvärden
                 stoneWall = false;
                 hitWall = false;
             }
             if (game->bombs[i]->endExplosion) {
+                if (createPowerUpRight) {
+                    activeBox[rightBoxRow][rightBoxColumn] = (rand() % +4) + 4;
+                }
+                if (createPowerUpLeft) {
+                    activeBox[leftBoxRow][leftBoxColumn] = (rand() % +4) + 4;
+                }
+                if (createPowerUpUp) {
+                    activeBox[upBoxRow][upBoxColumn] = (rand() % +4) + 4;
+                }
+                if (createPowerUpDown) {
+                    activeBox[downBoxRow][downBoxColumn] = (rand() % +4) + 4;
+                }
                 game->bombs[i] = NULL;                                                                          // Raderar bomben
-                // printf("Explosion timer done. Bomb deleted.\n");
-            } 
+            }
         }
     }
 }
 
-PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer) {
+PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer, int explosionRange) {
     Bomb bomb = malloc(sizeof(struct BombSettings));
 
     bomb->surface = IMG_Load("resources/bomb.png");                                     // Laddar in svart bomb
@@ -328,7 +402,7 @@ PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer) 
     bomb->explosionPos.y = bomb->bombPos.y - 7;
     bomb->explosionPos.w = 64;
     bomb->explosionPos.h = 64;
-    bomb->explosionRange = 4;
+    bomb->explosionRange = explosionRange;
 
     bomb->explosionHor.x = bomb->bombPos.x - 7 - (64 * (bomb->explosionRange));   // Start horizontal explosion to the left of bomb
     bomb->explosionHor.y = bomb->bombPos.y - 7;
@@ -356,6 +430,7 @@ PRIVATE void handleExplosions(Bomb bomb) {
     int xOffset = 0;
     int yStart = bomb->explosionVer.y;
     int yOffset = 0;
+    srand(time(0));
 
     // Adjust explosion size if box or wall exists on the left part of the explosion
     for (i = 0; i < bomb->explosionRange && col - i - 1 >= 0; i++) {
@@ -365,9 +440,11 @@ PRIVATE void handleExplosions(Bomb bomb) {
             break;
         }
         else if (activeBox[row][col - i - 1] == 1) {
+
             bomb->explosionHor.x += 64 * (bomb->explosionRange - i) - 64;
             xOffset = bomb->explosionHor.x - xStart;
-            activeBox[row][col - i - 1] = 0;                  // Deletes box
+
+            //    activeBox[row][col - i - 1] = (rand() % +4) + 4;               // Deletes box
             break;
         }
     }
@@ -380,7 +457,7 @@ PRIVATE void handleExplosions(Bomb bomb) {
         }
         else if (activeBox[row][col + i + 1] == 1) {
             bomb->explosionHor.w -= 64 * (bomb->explosionRange - i) - 64 + xOffset;
-            activeBox[row][col + i + 1] = 0;
+            //    activeBox[row][col + i + 1] = (rand() % +4) + 4;
             break;
         }
     }
@@ -395,7 +472,7 @@ PRIVATE void handleExplosions(Bomb bomb) {
         else if (activeBox[row - i - 1][col] == 1) {
             bomb->explosionVer.y += 64 * (bomb->explosionRange - i) - 64;
             yOffset = bomb->explosionVer.y - yStart;
-            activeBox[row - i - 1][col] = 0;
+            //    activeBox[row - i - 1][col] = (rand() % 4) + 4;
             break;
         }
     }
@@ -408,7 +485,7 @@ PRIVATE void handleExplosions(Bomb bomb) {
         }
         else if (activeBox[row + i + 1][col] == 1) {
             bomb->explosionVer.h -= 64 * (bomb->explosionRange - i) - 64 + yOffset;
-            activeBox[row + i + 1][col] = 0;
+            //    activeBox[row + i + 1][col] = (rand() % +4) + 4; ;
             break;
         }
     }
