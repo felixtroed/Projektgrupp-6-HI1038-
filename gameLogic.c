@@ -275,6 +275,11 @@ void removeBox(Player p1, Boxes boxes) {
 
 } */
 
+void boxeGone(int row, int col, int value) {
+    activeBox[row][col] = value;
+}
+
+
 
 void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *frames, Network net, udpData packetData) {
     int prevXPos = p1->pos.x;

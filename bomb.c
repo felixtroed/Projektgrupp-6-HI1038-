@@ -18,7 +18,7 @@ PRIVATE Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer, 
 PRIVATE uint8_t getBombIdx(Bomb bombs[]);
 PRIVATE void handleExplosions(Bomb bomb);
 PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer);
-PUBLIC void renderBombsAndExplosions(Game game);
+PUBLIC void renderBombsAndExplosions(Game game, Network net, udpData packetData);
 
 PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer) {
     if (p->bombsAvailable) {
@@ -69,7 +69,7 @@ PRIVATE Uint32 explosionDone(Uint32 interval, void *args) {
     return 0;
 }
 
-PUBLIC void renderBombsAndExplosions(Game game) {
+PUBLIC void renderBombsAndExplosions(Game game, Network net, udpData packetData) {
     for (uint8_t i = 0; i < BOMBS; i++) {
         if (game->bombs[i] != NULL) {
             if (game->bombs[i]->switchRedBomb) {
@@ -314,16 +314,33 @@ PUBLIC void renderBombsAndExplosions(Game game) {
             }
             if (game->bombs[i]->endExplosion) {
                 if (createPowerUpRight) {
-                    activeBox[rightBoxRow][rightBoxColumn] = (rand() % +4) + 4;
+                    net->willSend = true;     
+                    net->boxGone = true;
+                    packetData->boxCol = rightBoxColumn;
+                    packetData->boxRow = rightBoxRow;
+                    activeBox[rightBoxRow][rightBoxColumn] = packetData->boxValue =(rand() % +4) + 4;
                 }
                 if (createPowerUpLeft) {
-                    activeBox[leftBoxRow][leftBoxColumn] = (rand() % +4) + 4;
+                    net->willSend = true;
+                    net->boxGone = true;
+                    packetData->boxCol = leftBoxColumn;
+                    packetData->boxRow = leftBoxRow;
+                    
+                    activeBox[leftBoxRow][leftBoxColumn] = packetData->boxValue = (rand() % +4) + 4;
                 }
                 if (createPowerUpUp) {
-                    activeBox[upBoxRow][upBoxColumn] = (rand() % +4) + 4;
+                    net->willSend = true;
+                    net->boxGone = true;
+                    packetData->boxCol = upBoxColumn;
+                    packetData->boxRow = upBoxRow;
+                    activeBox[upBoxRow][upBoxColumn] = packetData->boxValue =(rand() % +4) + 4;
                 }
                 if (createPowerUpDown) {
-                    activeBox[downBoxRow][downBoxColumn] = (rand() % +4) + 4;
+                    net->willSend = true;
+                    net->boxGone = true;
+                    packetData->boxCol = downBoxColumn;
+                    packetData->boxRow = downBoxRow;
+                    activeBox[downBoxRow][downBoxColumn] = packetData->boxValue = (rand() % +4) + 4;
                 }
                 game->bombs[i] = NULL;                                                                          // Raderar bomben
             }

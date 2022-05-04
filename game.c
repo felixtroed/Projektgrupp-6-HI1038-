@@ -130,6 +130,7 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
     int mousePos_x, mousePos_y;
     bool menuOptionSelected[MENUOPTIONS] = { 0,0,0,0 };
     const Uint8* currentKeyStates;
+    net->boxGone = false; 
 
     while (running) {
         while (SDL_PollEvent(&game->event) != 0) {
@@ -231,6 +232,7 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
                 }
             }
 
+
             sendUDPData(net, packetData);
             receiveUDPData(game, net);
             handlePlayerExplosionCollision(game, net, packetData);
@@ -240,11 +242,8 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
             SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
             renderPowerUps(game);
             renderBoxes(game);
-            renderBombsAndExplosions(game);
+            renderBombsAndExplosions(game,net,packetData);
             renderPlayers(game);
-            if (!game->player[game->pIdx]->isAlive) {
-                SDL_RenderCopy(game->renderer, game->dead, NULL, NULL);
-            }
             SDL_RenderPresent(game->renderer);
         }
         else {
@@ -271,20 +270,27 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
 }
 
 PRIVATE void sendUDPData(Network net, udpData packetData) {
+    if (!net->boxGone)
+    {
+        packetData->boxCol = 0;
+        packetData->boxRow = 0; 
+        packetData->boxValue = 0; 
+    }
     if (net->willSend) {
-        sprintf((char *)net->packet1->data, "%d %d %d %d %d %d\n", packetData->pIdx, packetData->xPos, packetData->yPos, packetData->frame, packetData->isHurt, packetData->isDead);
+        sprintf((char *)net->packet1->data, "%d %d %d %d %d %d %d %d %d\n", packetData->pIdx, packetData->xPos, packetData->yPos, packetData->frame, packetData->isHurt, packetData->isDead,  packetData->boxCol, packetData->boxRow, packetData->boxValue);
         net->packet1->address.host = net->srvAddr.host;	                    /* Set the destination host */
         net->packet1->address.port = net->srvAddr.port;	                    /* And destination port */
         net->packet1->len = strlen((char *)net->packet1->data) + 1;
         SDLNet_UDP_Send(net->sd, -1, net->packet1);    
         net->willSend = false;
+        net->boxGone = false;
     }
 }
 
 PRIVATE void receiveUDPData(Game game, Network net) {
     if (SDLNet_UDP_Recv(net->sd, net->packet2)){
-        int idx, x, y, currentFrame, activePlayers, isHurt, isDead;
-        sscanf((char * )net->packet2->data, "%d %d %d %d %d %d %d\n", &idx, &x, &y, &currentFrame, &activePlayers, &isHurt, &isDead);
+        int idx, x, y, currentFrame, activePlayers, isHurt, isDead, boxCol, boxRow, boxValue;
+        sscanf((char * )net->packet2->data, "%d %d %d %d %d %d %d %d %d %d\n", &idx, &x, &y, &currentFrame, &activePlayers, &isHurt, &isDead,&boxCol,&boxRow, &boxValue);
 
         // printf("Active players: %d\n", activePlayers);
         // printf("Game->activePlayers: %d\n", game->activePlayers);
@@ -307,6 +313,11 @@ PRIVATE void receiveUDPData(Game game, Network net) {
         }
         else {
             game->player[idx]->isHurt = false;
+        }
+
+        if (boxValue != 0)
+        {
+            boxeGone(boxRow, boxCol, boxValue);
         }
     }
 }
@@ -369,9 +380,6 @@ PRIVATE bool createBackground(Game game) {
 
     char pictureDestination[64] = "resources/Background.png";
     loadTextures(&game->renderer, &game->bitmapSurface, &game->background, pictureDestination);
-
-    SDL_strlcpy(pictureDestination, "resources/Dead.png", sizeof pictureDestination);
-    loadTextures(&game->renderer, &game->bitmapSurface, &game->dead, pictureDestination);
 
     return true;
 }
