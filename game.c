@@ -17,6 +17,7 @@ PRIVATE bool showBoxes(Game game);
 PRIVATE void renderBoxes(Game game);
 PUBLIC bool loadTextures(SDL_Renderer** renderer, SDL_Surface** bitmapSurface, SDL_Texture** texture, char pictureDestination[64]);
 PRIVATE void initNetwork(Network net);
+PRIVATE void sendUDPData(Network net, udpData packetData);
 PRIVATE void receiveUDPData(Game game, Network net);
 
 PUBLIC Network createNet() {
@@ -120,7 +121,7 @@ PUBLIC Game createGame(Network net) {
     return game;
 }
 
-PUBLIC void updateGame(Game game, Network net) {
+PUBLIC void updateGame(Game game, Network net, udpData packetData) {
     bool running = true;
     int newMove = 1, lastMove = 0;
     int frames = 0;                 // Used for character refresh rate in gameLogic.c
@@ -217,21 +218,22 @@ PUBLIC void updateGame(Game game, Network net) {
             currentKeyStates = SDL_GetKeyboardState(NULL);
             if (game->player[game->pIdx]->isAlive) {
                 if (currentKeyStates[SDL_SCANCODE_W] || currentKeyStates[SDL_SCANCODE_UP]) {                // Funkar för både WASD och pilar
-                    move(game->player[game->pIdx], &newMove, &lastMove, KEYUP, game->bombs, &frames, net, game->pIdx);
+                    move(game->player[game->pIdx], &newMove, &lastMove, KEYUP, game->bombs, &frames, net, packetData);
                 }
                 else if (currentKeyStates[SDL_SCANCODE_S] || currentKeyStates[SDL_SCANCODE_DOWN]) {
-                    move(game->player[game->pIdx], &newMove, &lastMove, KEYDOWN, game->bombs, &frames, net, game->pIdx);
+                    move(game->player[game->pIdx], &newMove, &lastMove, KEYDOWN, game->bombs, &frames, net, packetData);
                 }
                 else if (currentKeyStates[SDL_SCANCODE_A] || currentKeyStates[SDL_SCANCODE_LEFT]) {
-                    move(game->player[game->pIdx], &newMove, &lastMove, KEYLEFT, game->bombs, &frames, net, game->pIdx);
+                    move(game->player[game->pIdx], &newMove, &lastMove, KEYLEFT, game->bombs, &frames, net, packetData);
                 }
                 else if (currentKeyStates[SDL_SCANCODE_D] || currentKeyStates[SDL_SCANCODE_RIGHT]) {
-                    move(game->player[game->pIdx], &newMove, &lastMove, KEYRIGHT, game->bombs, &frames, net, game->pIdx);
+                    move(game->player[game->pIdx], &newMove, &lastMove, KEYRIGHT, game->bombs, &frames, net, packetData);
                 }
             }
 
+            sendUDPData(net, packetData);
             receiveUDPData(game, net);
-            handlePlayerExplosionCollision(game);
+            handlePlayerExplosionCollision(game, net, packetData);
             pickUpPowerUps(game->player[game->pIdx]);
 
             SDL_RenderClear(game->renderer);
@@ -265,10 +267,21 @@ PUBLIC void updateGame(Game game, Network net) {
     }
 }
 
+PRIVATE void sendUDPData(Network net, udpData packetData) {
+    if (net->willSend) {
+        sprintf((char *)net->packet1->data, "%d %d %d %d %d %d\n", packetData->pIdx, packetData->xPos, packetData->yPos, packetData->frame, packetData->isHurt, packetData->isDead);
+        net->packet1->address.host = net->srvAddr.host;	                    /* Set the destination host */
+        net->packet1->address.port = net->srvAddr.port;	                    /* And destination port */
+        net->packet1->len = strlen((char *)net->packet1->data) + 1;
+        SDLNet_UDP_Send(net->sd, -1, net->packet1);    
+        net->willSend = false;
+    }
+}
+
 PRIVATE void receiveUDPData(Game game, Network net) {
     if (SDLNet_UDP_Recv(net->sd, net->packet2)){
-        int idx, x, y, currentFrame, activePlayers;
-        sscanf((char * )net->packet2->data, "%d %d %d %d %d\n", &idx, &x, &y, &currentFrame, &activePlayers);
+        int idx, x, y, currentFrame, activePlayers, isHurt, isDead;
+        sscanf((char * )net->packet2->data, "%d %d %d %d %d %d %d\n", &idx, &x, &y, &currentFrame, &activePlayers, &isHurt, &isDead);
 
         // printf("Active players: %d\n", activePlayers);
         // printf("Game->activePlayers: %d\n", game->activePlayers);
@@ -281,6 +294,16 @@ PRIVATE void receiveUDPData(Game game, Network net) {
             game->player[idx]->pos.x = x;
             game->player[idx]->pos.y = y;
             game->player[idx]->currentFrame = currentFrame;
+        }
+        if (isHurt) {
+            game->player[idx]->isHurt = true;
+
+            if (isDead) {
+                game->player[idx]->isAlive = false;
+            }
+        }
+        else {
+            game->player[idx]->isHurt = false;
         }
     }
 }
@@ -310,6 +333,8 @@ PRIVATE void initNetwork(Network net) {
 		fprintf(stderr, "SDLNet_AllocPacket Error: %s\n", SDLNet_GetError());
 		exit(EXIT_FAILURE);
 	}
+
+    net->willSend = false;
 }
 
 PRIVATE bool initWinRen(Game game) {
@@ -399,9 +424,10 @@ PUBLIC bool loadTextures(SDL_Renderer** renderer, SDL_Surface** bitmapSurface, S
     return true;
 }
 
-PUBLIC void exitGame(Game game, Network net) {
+PUBLIC void exitGame(Game game, Network net, udpData packetData) {
     SDLNet_FreePacket(net->packet1);
     SDLNet_FreePacket(net->packet2);
+    free(packetData);
     free(net);
 	SDLNet_Quit();
 
@@ -435,4 +461,14 @@ PRIVATE void renderBoxes(Game game) {
      }
  }
 
+PUBLIC udpData createPacketData(uint8_t pIdx) {
+    udpData packetData = malloc(sizeof(struct udpData));
+    packetData->pIdx = pIdx;
+    packetData->xPos = 0;
+    packetData->yPos = 0;
+    packetData->frame = 0;
+    packetData->isHurt = 0;
+    packetData->isDead = 0;
 
+    return packetData;
+}

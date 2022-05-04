@@ -47,17 +47,28 @@ typedef struct GameSettings {
     uint8_t pIdx;
 } *Game;
 
+typedef struct udpData {
+    int pIdx;
+    int xPos;
+    int yPos;
+    int frame;
+    int isHurt;
+    int isDead;
+} *udpData;
+
 typedef struct NetworkData {
     UDPsocket sd;
     IPaddress srvAddr;
 	UDPpacket *packet1;
     UDPpacket *packet2;
+    bool willSend;
 } *Network;
 
 Game createGame(Network net);
-void updateGame(Game game, Network net);
-void exitGame(Game game, Network net);
+void updateGame(Game game, Network net, udpData packetData);
+void exitGame(Game game, Network net, udpData packetData);
 Network createNet();
+udpData createPacketData(uint8_t pIdx);
 bool loadTextures(SDL_Renderer** renderer, SDL_Surface** bitmapSurface, SDL_Texture** texture, char pictureDestination[64]);
 
 #endif /* GAME_H */

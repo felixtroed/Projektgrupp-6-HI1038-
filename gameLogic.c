@@ -9,9 +9,15 @@
 
 #define BOMB_SIZE 34
 
+typedef struct InvincibilityCallbackArgs {
+    Player player;
+    udpData packetData;
+    Network net;
+} InvincibilityCallbackArgs;
+
 Uint32 disableInvincibility(Uint32 interval, void *args);
 
-void handlePlayerExplosionCollision(Game game) {
+void handlePlayerExplosionCollision(Game game, Network net, udpData packetData) {
     if (game->player[game->pIdx]->isHurt == false) { 
 
         for (uint8_t i = 0; i < BOMBS; i++) {
@@ -22,15 +28,23 @@ void handlePlayerExplosionCollision(Game game) {
                 if (game->bombs[i]->startExplosion == true && game->bombs[i]->endExplosion == false) {
                     if (SDL_HasIntersection(&game->player[game->pIdx]->hitboxPos, &game->bombs[i]->explosionHor) || SDL_HasIntersection(&game->player[game->pIdx]->hitboxPos, &game->bombs[i]->explosionVer)) {
                         game->player[game->pIdx]->isHurt = true;
+                        packetData->isHurt = 1;
+                        net->willSend = true;
+
+                        InvincibilityCallbackArgs *callbackArgs = malloc(sizeof(InvincibilityCallbackArgs));
+                        callbackArgs->player = game->player[game->pIdx];
+                        callbackArgs->net = net;
+                        callbackArgs->packetData = packetData;
                         
                         (game->player[game->pIdx]->lifes)--;
                         if (game->player[game->pIdx]->lifes <= 0) {
                             game->player[game->pIdx]->isAlive = false;
                             printf("Player died.\n");
+                            packetData->isDead = 1;
                             return;
                         }
 
-                        game->player[game->pIdx]->invincibleTimer = SDL_AddTimer(2000, disableInvincibility, game->player[game->pIdx]);
+                        game->player[game->pIdx]->invincibleTimer = SDL_AddTimer(2000, disableInvincibility, callbackArgs);
                     }
                 }  
             } 
@@ -39,8 +53,12 @@ void handlePlayerExplosionCollision(Game game) {
 }
 
 Uint32 disableInvincibility(Uint32 interval, void *args) {
-    Player p = (Player) args;
-    p->isHurt = false;
+    InvincibilityCallbackArgs *cArgs = (InvincibilityCallbackArgs*) args;
+    cArgs->player->isHurt = false;
+    cArgs->packetData->isHurt = 0;
+    cArgs->net->willSend = true;
+
+    free(cArgs);
     return 0;
 }
 
@@ -258,7 +276,7 @@ void removeBox(Player p1, Boxes boxes) {
 } */
 
 
-void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *frames, Network net, uint8_t pIdx) {
+void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *frames, Network net, udpData packetData) {
     int prevXPos = p1->pos.x;
     int prevYPos = p1->pos.y;
     
@@ -360,12 +378,20 @@ void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *fr
 
     // Send position
     if(prevXPos != p1->pos.x || prevYPos != p1->pos.y) {
-        // printf("%d %d\n", p1->pos.x, p1->pos.y);
-        sprintf((char *)net->packet1->data, "%d %d %d %d\n", pIdx, p1->pos.x, p1->pos.y, p1->currentFrame);    
-        net->packet1->address.host = net->srvAddr.host;	                    /* Set the destination host */
-        net->packet1->address.port = net->srvAddr.port;	                    /* And destination port */
-        net->packet1->len = strlen((char *)net->packet1->data) + 1;
-        SDLNet_UDP_Send(net->sd, -1, net->packet1);
+        net->willSend = true;
+        packetData->xPos = p1->pos.x;
+        packetData->yPos = p1->pos.y;
+        packetData->frame = p1->currentFrame;
+
+        // memcpy(net->packet1->data, packetData, sizeof(struct udpData)+1);
+        // net->packet1->len = sizeof(struct udpData)+1;
+
+        // sprintf((char *)net->packet1->data, "%d %d %d %d\n", packetData->pIdx, packetData->xPos, packetData->yPos, packetData->frame);
+        // net->packet1->address.host = net->srvAddr.host;	                    /* Set the destination host */
+        // net->packet1->address.port = net->srvAddr.port;	                    /* And destination port */
+        // net->packet1->len = strlen((char *)net->packet1->data) + 1;
+        // SDLNet_UDP_Send(net->sd, -1, net->packet1);
+
         prevXPos = p1->pos.x;
         prevYPos = p1->pos.y;
     }

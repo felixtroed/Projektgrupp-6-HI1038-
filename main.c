@@ -5,7 +5,8 @@
 int main(int argc, char* argv[]) {
     Network net = createNet();
     Game game = createGame(net);
-    updateGame(game, net);
-    exitGame(game, net);
+    udpData packetData = createPacketData(game->pIdx);
+    updateGame(game, net, packetData);
+    exitGame(game, net, packetData);
     return 0;
 }
