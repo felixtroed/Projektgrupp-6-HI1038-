@@ -274,14 +274,14 @@ PRIVATE void receiveUDPData(Game game, Network net) {
         // printf("Game->activePlayers: %d\n", game->activePlayers);
 
         if (activePlayers > game->activePlayers) {
-            game->player[game->activePlayers] = createPlayer(activePlayers, x, y, game);
+            game->player[game->activePlayers] = createPlayer(game->activePlayers + 1, x, y, game);
+            (game->activePlayers)++;
         }
         else {
             game->player[idx]->pos.x = x;
             game->player[idx]->pos.y = y;
             game->player[idx]->currentFrame = currentFrame;
         }
-        game->activePlayers = activePlayers;
     }
 }
 
