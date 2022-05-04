@@ -3,9 +3,10 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
-// #include <SDL.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_net.h>
+#include <SDL.h>
+#include <SDL_net.h>
+//#include <SDL2/SDL.h>
+//#include <SDL2/SDL_net.h>
 #include <string.h>
 #include "player.h"
 #include "box.h"
@@ -29,7 +30,6 @@ typedef struct GameSettings {
     SDL_Renderer *renderer;
     SDL_Surface *bitmapSurface;         //Anv�nds f�r ladda upp bilder
     SDL_Texture *background;             //Anv�nds f�r att ladda in bilden av bakgrunden
-    SDL_Texture *dead;
     SDL_Texture *box;                   //Anv�nds f�r att ladda in bilden av l�dan
     SDL_Texture *startMenu;
     SDL_Texture *instructionsMenu;
@@ -55,6 +55,9 @@ typedef struct udpData {
     int frame;
     int isHurt;
     int isDead;
+    int boxCol;
+    int boxRow;
+    int boxValue;
 } *udpData;
 
 typedef struct NetworkData {
@@ -63,6 +66,7 @@ typedef struct NetworkData {
 	UDPpacket *packet1;
     UDPpacket *packet2;
     bool willSend;
+    bool boxGone;
 } *Network;
 
 Game createGame(Network net);

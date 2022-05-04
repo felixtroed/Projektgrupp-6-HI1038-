@@ -6,9 +6,9 @@
 #include "box.h"
 #include "bomb.h"
 #include <stdbool.h>
-// #include <SDL.h>
+#include <SDL.h>
 #include <math.h>
-#include <SDL2/SDL.h>
+//#include <SDL2/SDL.h>
 
 typedef struct PlayerSettings* Player;
 typedef struct GameSettings* Game;
@@ -23,6 +23,7 @@ bool collisionBoxes(Player p1);
 bool checkCollision(Player p1, Bomb bombs[]);
 bool collisionBomb(Player p1, Bomb bombs[]);
 void handlePlayerExplosionCollision(Game game, Network net, udpData packetData);
+void boxeGone(int row,int col,int value); 
 // void removeBox(Player p1, Boxes boxes);
 
 #endif /* GAME_LOGIC_H */
