@@ -242,6 +242,9 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
             renderBoxes(game);
             renderBombsAndExplosions(game);
             renderPlayers(game);
+            if (!game->player[game->pIdx]->isAlive) {
+                SDL_RenderCopy(game->renderer, game->dead, NULL, NULL);
+            }
             SDL_RenderPresent(game->renderer);
         }
         else {
@@ -366,6 +369,9 @@ PRIVATE bool createBackground(Game game) {
 
     char pictureDestination[64] = "resources/Background.png";
     loadTextures(&game->renderer, &game->bitmapSurface, &game->background, pictureDestination);
+
+    SDL_strlcpy(pictureDestination, "resources/Dead.png", sizeof pictureDestination);
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->dead, pictureDestination);
 
     return true;
 }
