@@ -22,6 +22,5 @@ typedef struct PowerUPS {
 
 PowerUPS createPowers(Game game); 
 void renderPowerUps(Game game);
-void pickUpPowerUps(Player p1);
 
 #endif /* POWERUPS_H */

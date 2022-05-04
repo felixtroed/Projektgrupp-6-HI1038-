@@ -236,7 +236,7 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
             sendUDPData(net, packetData);
             receiveUDPData(game, net);
             handlePlayerExplosionCollision(game, net, packetData);
-            pickUpPowerUps(game->player[game->pIdx]);
+            pickUpPowerUps(game->player[game->pIdx],net,packetData);
 
             SDL_RenderClear(game->renderer);
             SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
@@ -274,7 +274,7 @@ PRIVATE void sendUDPData(Network net, udpData packetData) {
     {
         packetData->boxCol = 0;
         packetData->boxRow = 0; 
-        packetData->boxValue = 0; 
+        packetData->boxValue = 9; 
     }
     if (net->willSend) {
         sprintf((char *)net->packet1->data, "%d %d %d %d %d %d %d %d %d\n", packetData->pIdx, packetData->xPos, packetData->yPos, packetData->frame, packetData->isHurt, packetData->isDead,  packetData->boxCol, packetData->boxRow, packetData->boxValue);
@@ -315,7 +315,7 @@ PRIVATE void receiveUDPData(Game game, Network net) {
             game->player[idx]->isHurt = false;
         }
 
-        if (boxValue != 0)
+        if (boxValue != 9 )
         {
             boxeGone(boxRow, boxCol, boxValue);
         }
