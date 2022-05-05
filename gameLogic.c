@@ -157,6 +157,7 @@ void pickUpPowerUps(Player p1,Network net, udpData packetData) {
                         if (p1->explosionRange < 5) {				// Max längd = mitten rutan + 5 rutor ut
                             p1->explosionRange += 1;
                             printf("Explosion Range increased!\n");
+                            packetData->explosionRange = p1->explosionRange;
                         }
                     }
                     net->boxGone = true; 
@@ -426,21 +427,11 @@ void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *fr
     default: break;
     }
 
-    // Send position
     if(prevXPos != p1->pos.x || prevYPos != p1->pos.y) {
         net->willSend = true;
         packetData->xPos = p1->pos.x;
         packetData->yPos = p1->pos.y;
         packetData->frame = p1->currentFrame;
-
-        // memcpy(net->packet1->data, packetData, sizeof(struct udpData)+1);
-        // net->packet1->len = sizeof(struct udpData)+1;
-
-        // sprintf((char *)net->packet1->data, "%d %d %d %d\n", packetData->pIdx, packetData->xPos, packetData->yPos, packetData->frame);
-        // net->packet1->address.host = net->srvAddr.host;	                    /* Set the destination host */
-        // net->packet1->address.port = net->srvAddr.port;	                    /* And destination port */
-        // net->packet1->len = strlen((char *)net->packet1->data) + 1;
-        // SDLNet_UDP_Send(net->sd, -1, net->packet1);
 
         prevXPos = p1->pos.x;
         prevYPos = p1->pos.y;

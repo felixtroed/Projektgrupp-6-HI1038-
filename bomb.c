@@ -317,10 +317,6 @@ PUBLIC void renderBombsAndExplosions(Game game, Network net, udpData packetData)
                 hitWall = false;
             }
             if (game->bombs[i]->endExplosion) {
-                game->bombs[i] = NULL;
-            }
-            /*
-            if (game->bombs[i]->endExplosion) {
                 if (createPowerUpRight) {
                     net->willSend = true;     
                     net->boxGone = true;
@@ -351,7 +347,7 @@ PUBLIC void renderBombsAndExplosions(Game game, Network net, udpData packetData)
                     activeBox[downBoxRow][downBoxColumn] = packetData->boxValue = (rand() % +4) + 4;
                 }
                 game->bombs[i] = NULL;                                                                          // Raderar bomben
-            } */
+            } 
         }
     }
 }
@@ -426,7 +422,7 @@ PRIVATE void handleExplosions(Bomb bomb) {
             bomb->explosionHor.x += 64 * (bomb->explosionRange - i) - 64;
             xOffset = bomb->explosionHor.x - xStart;
 
-            activeBox[row][col - i - 1] = 0;               // Deletes box
+            // activeBox[row][col - i - 1] = 0;               // Deletes box
             //    activeBox[row][col - i - 1] = (rand() % +4) + 4;               // Deletes box
             break;
         }
@@ -440,7 +436,7 @@ PRIVATE void handleExplosions(Bomb bomb) {
         }
         else if (activeBox[row][col + i + 1] == 1) {
             bomb->explosionHor.w -= 64 * (bomb->explosionRange - i) - 64 + xOffset;
-            activeBox[row][col + i + 1] = 0;
+            // activeBox[row][col + i + 1] = 0;
             //    activeBox[row][col + i + 1] = (rand() % +4) + 4;
             break;
         }
@@ -456,7 +452,7 @@ PRIVATE void handleExplosions(Bomb bomb) {
         else if (activeBox[row - i - 1][col] == 1) {
             bomb->explosionVer.y += 64 * (bomb->explosionRange - i) - 64;
             yOffset = bomb->explosionVer.y - yStart;
-            activeBox[row - i - 1][col] = 0;
+            // activeBox[row - i - 1][col] = 0;
             //    activeBox[row - i - 1][col] = (rand() % 4) + 4;
             break;
         }
@@ -470,7 +466,7 @@ PRIVATE void handleExplosions(Bomb bomb) {
         }
         else if (activeBox[row + i + 1][col] == 1) {
             bomb->explosionVer.h -= 64 * (bomb->explosionRange - i) - 64 + yOffset;
-            activeBox[row + i + 1][col] = 0;
+            // activeBox[row + i + 1][col] = 0;
             //    activeBox[row + i + 1][col] = (rand() % +4) + 4; ;
             break;
         }

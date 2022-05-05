@@ -61,6 +61,7 @@ typedef struct udpData {
     int bombDropped;
     int bombPosX;
     int bombPosY;
+    int explosionRange;
 } *udpData;
 
 typedef struct NetworkData {
@@ -76,7 +77,7 @@ Game createGame(Network net);
 void updateGame(Game game, Network net, udpData packetData);
 void exitGame(Game game, Network net, udpData packetData);
 Network createNet();
-udpData createPacketData(uint8_t pIdx);
+udpData createPacketData(Game game);
 bool loadTextures(SDL_Renderer** renderer, SDL_Surface** bitmapSurface, SDL_Texture** texture, char pictureDestination[64]);
 
 #endif /* GAME_H */
