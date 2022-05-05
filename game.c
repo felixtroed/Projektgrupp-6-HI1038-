@@ -391,6 +391,9 @@ PRIVATE bool createBackground(Game game) {
     char pictureDestination[64] = "resources/Background.png";
     loadTextures(&game->renderer, &game->bitmapSurface, &game->background, pictureDestination);
 
+    SDL_strlcpy(pictureDestination, "resources/Dead.png", sizeof pictureDestination);
+    loadTextures(&game->renderer, &game->bitmapSurface, &game->dead, pictureDestination);
+
     return true;
 }
 

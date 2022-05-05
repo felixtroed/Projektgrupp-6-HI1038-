@@ -40,6 +40,7 @@ typedef struct GameSettings {
     SDL_Rect menuOptionPos[MENUOPTIONS];
     SDL_Rect boxPos;                  //Anv�nds f�r positionen av l�dorna
     SDL_Event event;
+    SDL_Texture *dead;
     //Boxes boxes;
     PowerUPS power;
     Player player[NUMPLAYERS];
