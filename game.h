@@ -3,10 +3,10 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <SDL.h>
-#include <SDL_net.h>
-//#include <SDL2/SDL.h>
-//#include <SDL2/SDL_net.h>
+// #include <SDL.h>
+// #include <SDL_net.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
 #include <string.h>
 #include "player.h"
 #include "box.h"
@@ -58,6 +58,9 @@ typedef struct udpData {
     int boxCol;
     int boxRow;
     int boxValue;
+    int bombDropped;
+    int bombPosX;
+    int bombPosY;
 } *udpData;
 
 typedef struct NetworkData {
