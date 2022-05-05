@@ -8,6 +8,8 @@
 #include <SDL_image.h>
 #include "box.h"
 
+int powerMap[ROW_SIZE][COLUMN_SIZE];
+
 #define POWERUP_SIZE 50
 
 typedef struct GameSettings* Game;
@@ -22,6 +24,5 @@ typedef struct PowerUPS {
 
 PowerUPS createPowers(Game game); 
 void renderPowerUps(Game game);
-void pickUpPowerUps(Player p1);
 
 #endif /* POWERUPS_H */
