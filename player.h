@@ -19,6 +19,7 @@ typedef struct PlayerSettings {
     SDL_TimerID invincibleTimer;
     bool isHurt;
     bool isAlive;
+    bool powerUpTaken;
     int currentFrame;
     int speed;
     int explosionRange; 

@@ -160,11 +160,12 @@ void pickUpPowerUps(Player p1,Network net, udpData packetData) {
                             packetData->explosionRange = p1->explosionRange;
                         }
                     }
-                    net->boxGone = true; 
-                    packetData->boxCol = column; 
-                    packetData->boxRow = row;
-                    packetData->boxValue = 0; 
-                    boxeGone(row, column, 0);
+                    packetData->powerUpCol = column;
+                    packetData->powerUpRow = row;
+                    p1->powerUpTaken = true;
+                    packetData->powerUpTaken = 1;
+                    powerUpGone(row, column, 0);
+                    net->willSend = true;
                 }
             }
         }
@@ -321,7 +322,7 @@ void removeBox(Player p1, Boxes boxes) {
 
 } */
 
-void boxeGone(int row, int col, int value) {
+void powerUpGone(int row, int col, int value) {
     activeBox[row][col] = value;
 }
 

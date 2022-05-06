@@ -35,20 +35,28 @@ typedef struct BombSettings {
     bool switchRedBomb;
     bool spawnInside;
     int explosionRange;
+    int pIdxWhoDroppedBomb;
 } *Bomb;
 
 typedef struct BombTimerCallbackArgs {
     Bomb bomb;
     uint8_t *bombsAvailable;
+    uint8_t pIdx;
+    udpData packetData;
+    Network net;
+    int leftBoxVal;
+    int leftBoxRow;
+    int leftBoxCol;
 } BombTimerCallbackArgs;
 
-void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer, Network net, udpData packetData);
+void bombPlacement(Player p, Bomb bombs[], uint8_t pIdx, SDL_Renderer *renderer, Network net, udpData packetData);
 void initBombs(Bomb bombs[]);
-Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer, int explosionRange);
+Bomb createBomb(int playerPosX, int playerPosY, uint8_t pIdx, SDL_Renderer *renderer, int explosionRange);
 void renderBombsAndExplosions(Game game, Network net, udpData packetData);
 uint8_t getBombIdx(Bomb bombs[]);
 Uint32 redBomb(Uint32 interval, void *switchToRedBomb);
 Uint32 explodeBomb(Uint32 interval, void *args);
+Uint32 explodeBombClient(Uint32 interval, void *args);
 Uint32 explosionDoneClient(Uint32 interval, void *args);
 
 #endif /* BOMB_H */

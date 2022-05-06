@@ -7,18 +7,22 @@
 #define BOMB_HEIGHT 50
 
 PRIVATE Uint32 explosionDone(Uint32 interval, void *deleteBomb);
-PRIVATE void handleExplosions(Bomb bomb);
-PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer, Network net, udpData packetData);
+PRIVATE void handleExplosions(Bomb bomb, Network net, uint8_t pIdxSelf, udpData packetData);
+PUBLIC void bombPlacement(Player p, Bomb bombs[], uint8_t pIdx, SDL_Renderer *renderer, Network net, udpData packetData);
 PUBLIC void renderBombsAndExplosions(Game game, Network net, udpData packetData);
 
-PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer, Network net, udpData packetData) {
+PUBLIC void bombPlacement(Player p, Bomb bombs[], uint8_t pIdx, SDL_Renderer *renderer, Network net, udpData packetData) {
     if (p->bombsAvailable) {
         uint8_t bombIdx = getBombIdx(bombs);             // Get first free index to store bomb
         (p->bombsAvailable)--;
 
         BombTimerCallbackArgs *callbackArgs = malloc(sizeof(BombTimerCallbackArgs));
-        callbackArgs->bomb = bombs[bombIdx] = createBomb(p->pos.x, p->pos.y, renderer, p->explosionRange);
+        callbackArgs->bomb = bombs[bombIdx] = createBomb(p->pos.x, p->pos.y, pIdx, renderer, p->explosionRange);
         callbackArgs->bombsAvailable = &p->bombsAvailable;
+        callbackArgs->pIdx = pIdx;
+        callbackArgs->packetData = packetData;
+        callbackArgs->net = net;
+        // printf("Callback pIdx before: %d\n", callbackArgs->pIdx);
 
         packetData->bombDropped = 1;
         packetData->bombPosX = bombs[bombIdx]->bombPos.x;
@@ -50,8 +54,19 @@ PUBLIC Uint32 redBomb(Uint32 interval, void *args) {
 PUBLIC Uint32 explodeBomb(Uint32 interval, void *args) {
     BombTimerCallbackArgs* bargs = (BombTimerCallbackArgs*) args;
     bargs->bomb->startExplosion = true;
+    // printf("Callback pIdx in cb: %d\n", bargs->pIdx);
 
-    handleExplosions(bargs->bomb);    // Modifies explosion hitbox based on collision with walls and boxes as well as deletes boxes
+    handleExplosions(bargs->bomb, bargs->net, bargs->pIdx, bargs->packetData);    // Modifies explosion hitbox based on collision with walls and boxes as well as deletes boxes
+
+    return 0;
+}
+
+PUBLIC Uint32 explodeBombClient(Uint32 interval, void *args) {
+    BombTimerCallbackArgs* bargs = (BombTimerCallbackArgs*) args;
+    bargs->bomb->startExplosion = true;
+    printf("Callback pIdx in client cb: %d\n", bargs->pIdx);
+
+    handleExplosions(bargs->bomb, bargs->net, bargs->pIdx, bargs->packetData);
 
     return 0;
 }
@@ -317,42 +332,46 @@ PUBLIC void renderBombsAndExplosions(Game game, Network net, udpData packetData)
                 hitWall = false;
             }
             if (game->bombs[i]->endExplosion) {
+                game->bombs[i] = NULL;
+            }
+            /*
+            if (game->bombs[i]->endExplosion) {
                 if (createPowerUpRight) {
-                    net->willSend = true;     
-                    net->boxGone = true;
-                    packetData->boxCol = rightBoxColumn;
-                    packetData->boxRow = rightBoxRow;
+                    net->willSend = true;
+                    net->powerUpGone = true;
+                    packetData->powerUpCol = rightBoxColumn;
+                    packetData->powerUpRow = rightBoxRow;
                     activeBox[rightBoxRow][rightBoxColumn] = packetData->boxValue =(rand() % +4) + 4;
                 }
                 if (createPowerUpLeft) {
                     net->willSend = true;
-                    net->boxGone = true;
-                    packetData->boxCol = leftBoxColumn;
-                    packetData->boxRow = leftBoxRow;
+                    net->powerUpGone = true;
+                    packetData->powerUpCol = leftBoxColumn;
+                    packetData->powerUpRow = leftBoxRow;
                     
                     activeBox[leftBoxRow][leftBoxColumn] = packetData->boxValue = (rand() % +4) + 4;
                 }
                 if (createPowerUpUp) {
                     net->willSend = true;
-                    net->boxGone = true;
-                    packetData->boxCol = upBoxColumn;
-                    packetData->boxRow = upBoxRow;
+                    net->powerUpGone = true;
+                    packetData->powerUpCol = upBoxColumn;
+                    packetData->powerUpRow = upBoxRow;
                     activeBox[upBoxRow][upBoxColumn] = packetData->boxValue =(rand() % +4) + 4;
                 }
                 if (createPowerUpDown) {
                     net->willSend = true;
-                    net->boxGone = true;
-                    packetData->boxCol = downBoxColumn;
-                    packetData->boxRow = downBoxRow;
+                    net->powerUpGone = true;
+                    packetData->powerUpCol = downBoxColumn;
+                    packetData->powerUpRow = downBoxRow;
                     activeBox[downBoxRow][downBoxColumn] = packetData->boxValue = (rand() % +4) + 4;
                 }
                 game->bombs[i] = NULL;                                                                          // Raderar bomben
-            } 
+            } */ 
         }
     }
 }
 
-PUBLIC Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer, int explosionRange) {
+PUBLIC Bomb createBomb(int playerPosX, int playerPosY, uint8_t pIdx, SDL_Renderer *renderer, int explosionRange) {
     Bomb bomb = malloc(sizeof(struct BombSettings));
 
     char pictureDestination[64];
@@ -395,11 +414,12 @@ PUBLIC Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer, i
     bomb->startExplosion = false;
     bomb->endExplosion = false;
     bomb->spawnInside = true;
+    bomb->pIdxWhoDroppedBomb = pIdx;
 
     return bomb;
 }
 
-PRIVATE void handleExplosions(Bomb bomb) {
+PRIVATE void handleExplosions(Bomb bomb, Network net, uint8_t pIdxSelf, udpData packetData) {
     uint8_t col = bomb->explosionPos.x / 64 - 1;
     uint8_t row = bomb->explosionPos.y / 64 - 1;
     uint8_t i;
@@ -408,7 +428,6 @@ PRIVATE void handleExplosions(Bomb bomb) {
     int xOffset = 0;
     int yStart = bomb->explosionVer.y;
     int yOffset = 0;
-    // srand(time(0));
 
     // Adjust explosion size if box or wall exists on the left part of the explosion
     for (i = 0; i < bomb->explosionRange && col - i - 1 >= 0; i++) {
@@ -423,7 +442,14 @@ PRIVATE void handleExplosions(Bomb bomb) {
             xOffset = bomb->explosionHor.x - xStart;
 
             // activeBox[row][col - i - 1] = 0;               // Deletes box
-            //    activeBox[row][col - i - 1] = (rand() % +4) + 4;               // Deletes box
+            if (bomb->pIdxWhoDroppedBomb == pIdxSelf) {
+                activeBox[row][col - i - 1] = (rand() % +4) + 4;
+                packetData->leftBoxVal = activeBox[row][col - i - 1];
+                packetData->leftBoxRow = row;
+                packetData->leftBoxCol = col - i - 1;
+                packetData->explosionDone = 1;
+                net->willSend = true;
+            }
             break;
         }
     }
@@ -437,7 +463,7 @@ PRIVATE void handleExplosions(Bomb bomb) {
         else if (activeBox[row][col + i + 1] == 1) {
             bomb->explosionHor.w -= 64 * (bomb->explosionRange - i) - 64 + xOffset;
             // activeBox[row][col + i + 1] = 0;
-            //    activeBox[row][col + i + 1] = (rand() % +4) + 4;
+               activeBox[row][col + i + 1] = (rand() % +4) + 4;
             break;
         }
     }
@@ -453,7 +479,7 @@ PRIVATE void handleExplosions(Bomb bomb) {
             bomb->explosionVer.y += 64 * (bomb->explosionRange - i) - 64;
             yOffset = bomb->explosionVer.y - yStart;
             // activeBox[row - i - 1][col] = 0;
-            //    activeBox[row - i - 1][col] = (rand() % 4) + 4;
+               activeBox[row - i - 1][col] = (rand() % 4) + 4;
             break;
         }
     }
@@ -467,7 +493,7 @@ PRIVATE void handleExplosions(Bomb bomb) {
         else if (activeBox[row + i + 1][col] == 1) {
             bomb->explosionVer.h -= 64 * (bomb->explosionRange - i) - 64 + yOffset;
             // activeBox[row + i + 1][col] = 0;
-            //    activeBox[row + i + 1][col] = (rand() % +4) + 4; ;
+               activeBox[row + i + 1][col] = (rand() % +4) + 4;
             break;
         }
     }

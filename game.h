@@ -56,13 +56,20 @@ typedef struct udpData {
     int frame;
     int isHurt;
     int isDead;
-    int boxCol;
-    int boxRow;
-    int boxValue;
+    int powerUpCol;
+    int powerUpRow;
     int bombDropped;
     int bombPosX;
     int bombPosY;
     int explosionRange;
+    int powerUpTaken;
+    int leftBoxVal;
+    // int rightBoxVal;
+    // int topBoxVal;
+    // int bottomBoxVal;
+    int leftBoxRow;
+    int leftBoxCol;
+    int explosionDone;
 } *udpData;
 
 typedef struct NetworkData {
@@ -71,7 +78,6 @@ typedef struct NetworkData {
 	UDPpacket *packet1;
     UDPpacket *packet2;
     bool willSend;
-    bool boxGone;
 } *Network;
 
 Game createGame(Network net);
