@@ -1,7 +1,7 @@
 #include "server.h"
 
 typedef struct udpData {
-	int idx, x, y, frame, nrOfClients, isHurt, isDead, boxCol, boxRow, boxValue, bombDropped, bombPosX, bombPosY, PowerUpGone;
+	int idx, x, y, frame, nrOfClients, isHurt, isDead, powerCol, powerRow, powerUpGone, bombDropped, bombPosX, bombPosY, explosionRange, powerUpsInit[15][11], dataInit; 
 } *udpData;
 
 void initClient(UDPsocket sd, UDPpacket *pReceive, UDPpacket *pSend, Uint32 *clientIP, Uint32 *clientPort, udpData data);
@@ -28,10 +28,10 @@ int main(int argc, char **argv) {
 	data->y = 0;
 	data->frame = 0;
 	data->nrOfClients = 0;
-	data->boxCol = 0;
-	data->boxRow = 0;
-	data->PowerUpGone = 0; 
-
+	data->powerCol = 0;
+	data->powerRow = 0;
+	data->powerUpGone = 0; 
+	data->dataInit = 1;
 
 	/* Initialize SDL_net */
 	if (SDLNet_Init() < 0)
@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
 	}
 
 	/* Make space for the packet */
-	if (!((pSend = SDLNet_AllocPacket(512)) && (pReceive = SDLNet_AllocPacket(512))))
+	if (!((pSend = SDLNet_AllocPacket(512)) && (pReceive = SDLNet_AllocPacket(512) )))
 	{
 		fprintf(stderr, "SDLNet_AllocPacket Error: %s\n", SDLNet_GetError());
 		exit(EXIT_FAILURE);
@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
                 if (pReceive->address.port == client1Port) {
                     if(client2IP != 0) {
 						sendData(sd, pReceive, pSend, data, client2IP, client2Port);
-                    }
+					}	
 					if(client3IP != 0) {
                         sendData(sd, pReceive, pSend, data, client3IP, client3Port);
                     }
@@ -134,15 +134,14 @@ void sendData(UDPsocket sd, UDPpacket *pReceive, UDPpacket *pSend, udpData data,
 	sscanf((char * )pReceive->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d\n", 
 		&data->idx, &data->x, &data->y, 
 		&data->frame, &data->isHurt, &data->isDead,
-		&data->boxCol, &data->boxRow, &data->boxValue,
-		&data->bombDropped, &data->bombPosX, &data->bombPosY, &data->PowerUpGone
+		&data->powerCol, &data->powerRow, &data->powerUpGone,
+		&data->bombDropped, &data->bombPosX, &data->bombPosY, &data->explosionRange
 	);
-	// printf("boxCol: %d boxRow: %d \n", data->boxCol, data->boxRow);
-	sprintf((char *)pSend->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", data->idx, data->x, data->y, data->frame, data->nrOfClients, data->isHurt, data->isDead, data->boxCol, data->boxRow, 
-		data->boxValue, data->bombDropped, data->bombPosX, data->bombPosY,data->PowerUpGone);
+	sprintf((char *)pSend->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", data->idx, data->x, data->y, data->frame, data->nrOfClients, data->isHurt, data->isDead, data->powerCol, data->powerRow, data->powerUpGone, data->bombDropped, data->bombPosX, data->bombPosY, data->explosionRange);
 	pSend->len = strlen((char *)pSend->data) + 1;
 	SDLNet_UDP_Send(sd, -1, pSend);
 }
+
 
 void initClient(UDPsocket sd, UDPpacket *pReceive, UDPpacket *pSend, Uint32 *clientIP, Uint32 *clientPort, udpData data) {
 	*clientIP = pReceive->address.host;
@@ -150,7 +149,6 @@ void initClient(UDPsocket sd, UDPpacket *pReceive, UDPpacket *pSend, Uint32 *cli
 
 	pSend->address.host = *clientIP;
 	pSend->address.port = *clientPort;
-
 	if (data->nrOfClients == 0) {
 		printf("Client 1\n");
 		sprintf((char *)pSend->data, "%d\n", 0);  // Sets client to player 1

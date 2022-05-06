@@ -2,7 +2,6 @@
 #define GAME_H
 
 #define _CRT_SECURE_NO_WARNINGS
-
 #include <SDL.h>
 #include <SDL_net.h>
 //#include <SDL2/SDL.h>
@@ -40,12 +39,14 @@ typedef struct GameSettings {
     SDL_Rect menuOptionPos[MENUOPTIONS];
     SDL_Rect boxPos;                  //Anv�nds f�r positionen av l�dorna
     SDL_Event event;
-    //Boxes boxes;
+    SDL_Texture *dead;
+    Boxes boxes;
     PowerUPS power;
     Player player[NUMPLAYERS];
     Bomb bombs[BOMBS];                // Contains all simultaneously allowed bombs
     uint8_t activePlayers;
     uint8_t pIdx;
+
 } *Game;
 
 typedef struct udpData {
@@ -55,28 +56,39 @@ typedef struct udpData {
     int frame;
     int isHurt;
     int isDead;
+    int powerCol;
+    int powerRow;
+    int PowerUpGone;
     int bombDropped;
     int bombPosX;
     int bombPosY;
-    int PowerUpGone; 
-    int boxCol;
-    int boxRow;
-    int boxValue;
+    int explosionRange;
+    int powerUps[ROW_SIZE][COLUMN_SIZE];
+    int dataInit;
+    int length;
 } *udpData;
+
+
+typedef struct udpInit {
+    int powerUps[ROW_SIZE][COLUMN_SIZE];
+    int dataInit;
+}*udpInit;
 
 typedef struct NetworkData {
     UDPsocket sd;
     IPaddress srvAddr;
+    UDPpacket *packet0; 
 	UDPpacket *packet1;
     UDPpacket *packet2;
     bool willSend;
+    bool boxGone;
 } *Network;
 
 Game createGame(Network net);
 void updateGame(Game game, Network net, udpData packetData);
 void exitGame(Game game, Network net, udpData packetData);
 Network createNet();
-udpData createPacketData(uint8_t pIdx);
+udpData createPacketData(Game game);
 bool loadTextures(SDL_Renderer** renderer, SDL_Surface** bitmapSurface, SDL_Texture** texture, char pictureDestination[64]);
 
 #endif /* GAME_H */
