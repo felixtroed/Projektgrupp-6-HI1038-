@@ -16,17 +16,18 @@ PRIVATE bool createBackground(Game game);
 PRIVATE bool showBoxes(Game game);
 PRIVATE void renderBoxes(Game game);
 PUBLIC bool loadTextures(SDL_Renderer** renderer, SDL_Surface** bitmapSurface, SDL_Texture** texture, char pictureDestination[64]);
-PRIVATE void initNetwork(Network net);
+PRIVATE bool initNetwork(Network net, char inputIPAddress[]);
 PRIVATE void sendUDPData(Network net, udpData packetData);
 PRIVATE void receiveUDPData(Game game, Network net);
 
 PUBLIC Network createNet() {
     Network net = malloc(sizeof(struct NetworkData));
-    initNetwork(net);
+    char inputIPAddress[] = "1.1.1.1";
+    //initNetwork(net);
     return net;
 }
 
-PUBLIC Game createGame(Network net) {
+PUBLIC Game createGame() {
     Game game = malloc(sizeof(struct GameSettings));
 
     if (initWinRen(game)) {
@@ -61,11 +62,11 @@ PUBLIC Game createGame(Network net) {
     game->menuOptionPos[3].y = 725;
     game->menuOptionPos[3].w = 212;
     game->menuOptionPos[3].h = 71;
-
+    /*
     // Send arbitrary data to server so server acknowledges client
     sprintf((char *)net->packet1->data, "%d\n", 99);
-    net->packet1->address.host = net->srvAddr.host;	                    /* Set the destination host */
-    net->packet1->address.port = net->srvAddr.port;	                    /* And destination port */
+    net->packet1->address.host = net->srvAddr.host;	                    // Set the destination host 
+    net->packet1->address.port = net->srvAddr.port;	                    // And destination port 
     net->packet1->len = strlen((char *)net->packet1->data) + 1;
     SDLNet_UDP_Send(net->sd, -1, net->packet1);
     
@@ -104,19 +105,20 @@ PUBLIC Game createGame(Network net) {
                 break;
             default: break;
         }
-    }
-    else {                                                              // Start single player if no server response
+    } */
+ //   else {                                                              // Start single player if no server response
         game->pIdx = 0;
         game->player[0] = createPlayer(1, 64, 64, game);
         game->player[1] = createPlayer(2, 960, 64, game);
         game->player[2] = createPlayer(3, 64, 704, game);
         game->player[3] = createPlayer(4, 960, 704, game);
         game->activePlayers = 4;
-    }
+   // }
 
     // game->boxes = createBoxes(game);
     game->power = createPowers(game);
     initBombs(game->bombs);                           // Sets all bombs to NULL
+    game->accessToServer = false;
 
     return game;
 }
@@ -131,6 +133,7 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
     bool menuOptionSelected[MENUOPTIONS] = { 0,0,0,0 };
     const Uint8* currentKeyStates;
     net->boxGone = false; 
+    bool resetIpAddress = true;
 
     while (running) {
         while (SDL_PollEvent(&game->event) != 0) {
@@ -151,6 +154,90 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
                 mousePos_x = game->event.motion.x;
                 mousePos_y = game->event.motion.y;
                 if (!inInstructions) {
+
+                    // SERVER CONNECTION //
+
+                    if (resetIpAddress) {
+                        resetIpAddress = false;
+                        memset(net->inputIPAddress, '\0', strlen(net->inputIPAddress));
+                        printf("IPAddress: ");
+                    }
+                    if (game->event.type == SDL_TEXTINPUT) {
+                        strcat(net->inputIPAddress, game->event.text.text);
+                        printf("%s", game->event.text.text);
+                    }
+                    if (game->event.type == SDL_KEYDOWN) {
+                        if (game->event.key.keysym.sym == SDLK_BACKSPACE && strlen(net->inputIPAddress) > 0) {
+                            net->inputIPAddress[strlen(net->inputIPAddress) - 1] = NULL;
+                            printf("\b");
+                        }
+                        if ((game->event.key.keysym.sym == SDLK_KP_ENTER || game->event.key.keysym.sym == SDLK_RETURN) && net->inputIPAddress[0] != NULL) {
+                            printf("\nConnecting to server: %s\n", net->inputIPAddress);
+                            initNetwork(net, net->inputIPAddress);
+                            memset(net->inputIPAddress, '\0', strlen(net->inputIPAddress));
+
+                            if (!net->willSend) {
+                                // Send arbitrary data to server so server acknowledges client
+                                sprintf((char*)net->packet1->data, "%d\n", 99);
+                                net->packet1->address.host = net->srvAddr.host;	                    // Set the destination host 
+                                net->packet1->address.port = net->srvAddr.port;	                    // And destination port
+                                net->packet1->len = strlen((char*)net->packet1->data) + 1;
+                                SDLNet_UDP_Send(net->sd, -1, net->packet1);
+
+                                SDL_Delay(1000);
+
+                                // Assign correct player number based on server response
+                                if (SDLNet_UDP_Recv(net->sd, net->packet1)) {
+                                    printf("Packet received from server.\n");
+                                    game->accessToServer = true;
+
+                                    int playerIdx;
+                                    sscanf((char*)net->packet1->data, "%d\n", &playerIdx);
+                                    game->pIdx = playerIdx;
+                                    packetData->pIdx = playerIdx;
+
+                                    switch (playerIdx) {
+                                    case 0:
+                                        game->player[0] = createPlayer(1, 64, 64, game);
+                                        game->activePlayers = 1;
+                                        break;
+                                    case 1:
+                                        game->player[0] = createPlayer(1, 64, 64, game);
+                                        game->player[1] = createPlayer(2, 960, 64, game);
+                                        game->activePlayers = 2;
+                                        break;
+                                    case 2:
+                                        game->player[0] = createPlayer(1, 64, 64, game);
+                                        game->player[1] = createPlayer(2, 960, 64, game);
+                                        game->player[2] = createPlayer(3, 64, 640, game);
+                                        game->activePlayers = 3;
+                                        break;
+                                    case 3:
+                                        game->player[0] = createPlayer(1, 64, 64, game);
+                                        game->player[1] = createPlayer(2, 960, 64, game);
+                                        game->player[2] = createPlayer(3, 64, 640, game);
+                                        game->player[3] = createPlayer(4, 960, 640, game);
+                                        game->activePlayers = 4;
+                                        break;
+                                    default: break;
+                                    }
+                                }
+                                else {
+                                    SDLNet_FreePacket(net->packet1);
+                                    printf("Could not connect to the server\nIPAddress: ");
+                                }
+                            }
+                            else {
+                                SDLNet_FreePacket(net->packet1);
+                                printf("Could not find the server\nIPAddress: ");
+                            }
+                        }
+                    }
+
+                    // SERVER CONNECTION END //
+
+
+
                     for (int i = 0; i < MENUOPTIONS; i++) {
                         if (mousePos_x >= 440 && mousePos_x <= 650 && mousePos_y >= 430 && mousePos_y <= 505) {         // Om musen är på "PLAY"
                             if (!menuOptionSelected[0]) {
@@ -232,9 +319,11 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
                 }
             }
 
+            if (game->accessToServer) {
+                sendUDPData(net, packetData);
+                receiveUDPData(game, net);
+            }
 
-            sendUDPData(net, packetData);
-            receiveUDPData(game, net);
             handlePlayerExplosionCollision(game, net, packetData);
             pickUpPowerUps(game->player[game->pIdx], net, packetData);
 
@@ -332,33 +421,35 @@ PRIVATE void receiveUDPData(Game game, Network net) {
     }
 }
 
-PRIVATE void initNetwork(Network net) {
+PRIVATE bool initNetwork(Network net, char inputIPAddress[]) {
+    net->willSend = false;
+
     if (SDLNet_Init() < 0)
 	{
 		fprintf(stderr, "SDLNet_Init Error: %s\n", SDLNet_GetError());
-		exit(EXIT_FAILURE);
+        net->willSend = true;
 	}
 
     if (!(net->sd = SDLNet_UDP_Open(0)))
 	{
 		fprintf(stderr, "SDLNet_UDP_Open Error: %s\n", SDLNet_GetError());
-		exit(EXIT_FAILURE);
+        net->willSend = true;
 	}
 
     /* Resolve server name  */
-	if (SDLNet_ResolveHost(&net->srvAddr, "127.0.0.1", 2000) == -1)
+	if (SDLNet_ResolveHost(&net->srvAddr, inputIPAddress, 2000) == -1)
 	{
 		fprintf(stderr, "SDLNet_ResolveHost(192.0.0.1 2000) Error: %s\n", SDLNet_GetError());
-		exit(EXIT_FAILURE);
+        net->willSend = true;
 	}
 
     if (!((net->packet1 = SDLNet_AllocPacket(512)) && (net->packet2 = SDLNet_AllocPacket(512))))
 	{
 		fprintf(stderr, "SDLNet_AllocPacket Error: %s\n", SDLNet_GetError());
-		exit(EXIT_FAILURE);
+        net->willSend = true;
 	}
 
-    net->willSend = false;
+    return net->willSend;
 }
 
 PRIVATE bool initWinRen(Game game) {
