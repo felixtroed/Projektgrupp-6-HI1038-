@@ -62,58 +62,13 @@ PUBLIC Game createGame() {
     game->menuOptionPos[3].y = 725;
     game->menuOptionPos[3].w = 212;
     game->menuOptionPos[3].h = 71;
-    /*
-    // Send arbitrary data to server so server acknowledges client
-    sprintf((char *)net->packet1->data, "%d\n", 99);
-    net->packet1->address.host = net->srvAddr.host;	                    // Set the destination host 
-    net->packet1->address.port = net->srvAddr.port;	                    // And destination port 
-    net->packet1->len = strlen((char *)net->packet1->data) + 1;
-    SDLNet_UDP_Send(net->sd, -1, net->packet1);
-    
-    SDL_Delay(1000);                                                    // Wait some time for server to send data back
-
-    // Assign correct player number based on server response
-    if (SDLNet_UDP_Recv(net->sd, net->packet1)) {
-        printf("Packet received from server.\n");
-
-        int playerIdx;
-        sscanf((char * )net->packet1->data, "%d\n", &playerIdx);
-        game->pIdx = playerIdx;
-
-        switch (game->pIdx) {
-            case 0:
-                game->player[0] = createPlayer(1, 64, 64, game);
-                game->activePlayers = 1;
-                break;
-            case 1:
-                game->player[0] = createPlayer(1, 64, 64, game);
-                game->player[1] = createPlayer(2, 960, 64, game);
-                game->activePlayers = 2;
-                break;
-            case 2:
-                game->player[0] = createPlayer(1, 64, 64, game);
-                game->player[1] = createPlayer(2, 960, 64, game);
-                game->player[2] = createPlayer(3, 64, 640, game);
-                game->activePlayers = 3;
-                break;
-            case 3:
-                game->player[0] = createPlayer(1, 64, 64, game);
-                game->player[1] = createPlayer(2, 960, 64, game);
-                game->player[2] = createPlayer(3, 64, 640, game);
-                game->player[3] = createPlayer(4, 960, 640, game);
-                game->activePlayers = 4;
-                break;
-            default: break;
-        }
-    } */
- //   else {                                                              // Start single player if no server response
-        game->pIdx = 0;
-        game->player[0] = createPlayer(1, 64, 64, game);
-        game->player[1] = createPlayer(2, 960, 64, game);
-        game->player[2] = createPlayer(3, 64, 704, game);
-        game->player[3] = createPlayer(4, 960, 704, game);
-        game->activePlayers = 4;
-   // }
+                                     // Start single player if no server response
+    game->pIdx = 0;
+    game->player[0] = createPlayer(1, 64, 64, game);
+    game->player[1] = createPlayer(2, 960, 64, game);
+    game->player[2] = createPlayer(3, 64, 704, game);
+    game->player[3] = createPlayer(4, 960, 704, game);
+    game->activePlayers = 4;
 
     // game->boxes = createBoxes(game);
     game->power = createPowers(game);
@@ -235,8 +190,6 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
                     }
 
                     // SERVER CONNECTION END //
-
-
 
                     for (int i = 0; i < MENUOPTIONS; i++) {
                         if (mousePos_x >= 440 && mousePos_x <= 650 && mousePos_y >= 430 && mousePos_y <= 505) {         // Om musen är på "PLAY"
