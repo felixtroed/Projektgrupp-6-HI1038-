@@ -123,10 +123,10 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
                     }
                     if (game->event.type == SDL_KEYDOWN) {
                         if (game->event.key.keysym.sym == SDLK_BACKSPACE && strlen(net->inputIPAddress) > 0) {
-                            net->inputIPAddress[strlen(net->inputIPAddress) - 1] = NULL;
+                            net->inputIPAddress[strlen(net->inputIPAddress) - 1] = '\0';
                             printf("\b");
                         }
-                        if ((game->event.key.keysym.sym == SDLK_KP_ENTER || game->event.key.keysym.sym == SDLK_RETURN) && net->inputIPAddress[0] != NULL) {
+                        if ((game->event.key.keysym.sym == SDLK_KP_ENTER || game->event.key.keysym.sym == SDLK_RETURN) && net->inputIPAddress[0] != '\0') {
                             printf("\nConnecting to server: %s\n", net->inputIPAddress);
                             initNetwork(net, net->inputIPAddress);
                             memset(net->inputIPAddress, '\0', strlen(net->inputIPAddress));
