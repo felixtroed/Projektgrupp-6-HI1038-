@@ -25,9 +25,10 @@ bool checkCollision(Player p1, Bomb bombs[]);
 bool collisionBomb(Player p1, Bomb bombs[]);
 void handlePlayerExplosionCollision(Game game, Network net, udpData packetData);
 //void pickUpPowerUps(Player player, Network net, udpData packetData, PowerUPS power);
-void PlayerPickUpPower(Player player, PowerUPS power);
-void CreatePowerMap(PowerUPS power);
-void loadPowerMap(PowerUPS power);
+void PlayerPickUpPower(Player player, PowerUPS power, udpData packetData);
+void whatBoxes(PowerUPS power, udpData packetData);
+void powerUpRemoved(int powerRow, int powerCol, PowerUPS power);
+
 //void powerUpRemoved(int row, int col); 
 // void removeBox(Player p1, Boxes boxes);
 

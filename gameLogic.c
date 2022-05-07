@@ -100,6 +100,8 @@ bool collisionMap(Player p1) {
     return true;
 }
 
+
+
 bool collisionBoxes(Player p1)
 {
     int posBoxX = 0, posBoxY = 0;
@@ -130,7 +132,56 @@ bool collisionBoxes(Player p1)
 }
 
 
-void PlayerPickUpPower(Player player, PowerUPS power) {
+void whatBoxes(PowerUPS power, udpData packetData){
+    int arrayRow[3], arrayValue[3], arrayCol[3], i = 0;
+
+    for (int row =0 ; row < ROW_SIZE;row++)
+    {
+        for (int col = 0; col < COLUMN_SIZE;col++)
+        {
+            if (activeBox[row][col] == 5)
+            {
+                arrayValue[i] = power->powerMap[row][col] = (rand() % +4) + 4;
+                arrayRow[i] = row; 
+                arrayCol[i] = col; 
+               // printf("COL %d   ROW %D ", col, row);
+                activeBox[row][col] = 0;
+                i++;
+                
+            }
+
+        }
+    }
+    //printf(" %d  IIII ", i);
+
+    if (i < 2 && i>0)
+    {
+        packetData->colBoxOne = arrayCol[0];
+        packetData->rowBoxOne = arrayRow[0];
+        packetData->valueBoxOne = arrayValue[0];
+    }
+
+    if (i < 3 && i > 0)
+    {
+        packetData->colBoxTwo = arrayCol[1];
+        packetData->rowBoxTwo = arrayRow[1];
+        packetData->valueBoxTwo = arrayValue[1];
+
+    }
+
+    if (i == 3 && i > 0)
+    {
+        packetData->colBoxThree = arrayCol[2];
+        packetData->rowBoxThree = arrayRow[2];
+        packetData->valueBoxThree = arrayValue[2];
+
+    }
+
+   
+}
+
+
+void PlayerPickUpPower(Player player, PowerUPS power, udpData packetData) {
     int indexCol = ((((player->pos.x + 32) / 64) * 64 ) / 64) - 1;
     int indexRow = ((((player->pos.y + 32) / 64) * 64 ) / 64) - 1;
     printf("%d %d\n", indexCol, indexRow);
@@ -142,16 +193,22 @@ void PlayerPickUpPower(Player player, PowerUPS power) {
             if (player->speed < 5) {
                 player->speed += 1;
                 power->powerMap[indexRow][indexCol] = 0;
+                packetData->PowerUpGone = 1;
+                packetData->powerCol = indexCol;
+                packetData->powerRow = indexRow;
 
             }
         }
 
         if (power->powerMap[indexRow][indexCol] == 5)
         {
-            if (player->speed < 5) {
+            if (player->bombsAvailable < 5) {
                 printf("Picked up power-up: +1 Bombs\n");
-                player->speed += 1;
+                player->bombsAvailable += 1;
                 power->powerMap[indexRow][indexCol] = 0;
+                packetData->PowerUpGone = 1;
+                packetData->powerCol = indexCol;
+                packetData->powerRow = indexRow;
 
             }
         }
@@ -165,30 +222,16 @@ void PlayerPickUpPower(Player player, PowerUPS power) {
                 player->explosionRange += 1;
             }
             power->powerMap[indexRow][indexCol] = 0;
+            packetData->PowerUpGone = 1; 
+            packetData->powerCol = indexCol;
+            packetData->powerRow = indexRow;
         }
 
 
 }
 
-
-void CreatePowerMap(PowerUPS power) {
-    srand(time(0));
-    for (int row = 0; row < ROW_SIZE;row++)
-    {
-        for (int col = 0; col < COLUMN_SIZE;col++)
-        {
-            if (activeBox[row][col] == 1)
-            {
-                power->powerMap[row][col] = (rand() % 4) + 4;
-   
-            }
-            else
-            {
-                power->powerMap[row][col] = 0;
-            }
-
-        }
-    }
+void powerUpRemoved(int powerRow, int powerCol, PowerUPS power) {
+    power->powerMap[powerRow][powerCol] = 0; 
 }
 
 /*
@@ -414,7 +457,7 @@ void move(Player player,int *lastMove, int *newMove, char key, Bomb bombs[], int
             player->currentFrame = 0;
             *lastMove = *newMove = 0;
         }
-        PlayerPickUpPower(player, power);
+        PlayerPickUpPower(player, power, packetData);
         break;
 
     case 'w':
@@ -438,7 +481,7 @@ void move(Player player,int *lastMove, int *newMove, char key, Bomb bombs[], int
             player->currentFrame = 4;
             *lastMove = *newMove = 4;
         }
-        PlayerPickUpPower(player, power);
+        PlayerPickUpPower(player, power, packetData);
 
         break;
 
@@ -463,7 +506,7 @@ void move(Player player,int *lastMove, int *newMove, char key, Bomb bombs[], int
             player->currentFrame = 12;
             *lastMove = *newMove = 12;
         }
-        PlayerPickUpPower(player, power);
+        PlayerPickUpPower(player, power, packetData);
 
         break;
 
@@ -488,7 +531,7 @@ void move(Player player,int *lastMove, int *newMove, char key, Bomb bombs[], int
             player->currentFrame = 8;
             *lastMove = *newMove = 8;
         }
-        PlayerPickUpPower(player, power);
+        PlayerPickUpPower(player, power, packetData);
         break;
 
     default: break;

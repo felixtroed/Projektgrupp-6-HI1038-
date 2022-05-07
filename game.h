@@ -63,16 +63,21 @@ typedef struct udpData {
     int bombPosX;
     int bombPosY;
     int explosionRange;
-    int powerUps[ROW_SIZE][COLUMN_SIZE];
-    int dataInit;
-    int length;
+
+    int rowBoxOne;
+    int colBoxOne;
+    int valueBoxOne;
+
+    int rowBoxTwo;
+    int colBoxTwo;
+    int valueBoxTwo;
+
+    int rowBoxThree;
+    int colBoxThree;
+    int valueBoxThree;
+    
 } *udpData;
 
-
-typedef struct udpInit {
-    int powerUps[ROW_SIZE][COLUMN_SIZE];
-    int dataInit;
-}*udpInit;
 
 typedef struct NetworkData {
     UDPsocket sd;

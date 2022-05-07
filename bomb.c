@@ -6,17 +6,17 @@
 #define BOMB_WIDTH 50
 #define BOMB_HEIGHT 50
 
-PRIVATE Uint32 explosionDone(Uint32 interval, void *deleteBomb);
+PRIVATE Uint32 explosionDone(Uint32 interval, void* deleteBomb);
 PRIVATE void handleExplosions(Bomb bomb);
-PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer, Network net, udpData packetData);
+PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer* renderer, Network net, udpData packetData);
 PUBLIC void renderBombsAndExplosions(Game game, Network net, udpData packetData);
 
-PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer, Network net, udpData packetData) {
+PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer* renderer, Network net, udpData packetData) {
     if (p->bombsAvailable) {
         uint8_t bombIdx = getBombIdx(bombs);             // Get first free index to store bomb
         (p->bombsAvailable)--;
 
-        BombTimerCallbackArgs *callbackArgs = malloc(sizeof(BombTimerCallbackArgs));
+        BombTimerCallbackArgs* callbackArgs = malloc(sizeof(BombTimerCallbackArgs));
         callbackArgs->bomb = bombs[bombIdx] = createBomb(p->pos.x, p->pos.y, renderer, p->explosionRange);
         callbackArgs->bombsAvailable = &p->bombsAvailable;
 
@@ -32,7 +32,7 @@ PUBLIC void bombPlacement(Player p, Bomb bombs[], SDL_Renderer *renderer, Networ
 }
 
 PUBLIC uint8_t getBombIdx(Bomb bombs[]) {
-    for (uint8_t i = BOMBS-1; i > 0; i--) {
+    for (uint8_t i = BOMBS - 1; i > 0; i--) {
         if (bombs[i] == NULL) {
             return i;
         }
@@ -40,15 +40,15 @@ PUBLIC uint8_t getBombIdx(Bomb bombs[]) {
     return 0;
 }
 
-PUBLIC Uint32 redBomb(Uint32 interval, void *args) {
-    BombTimerCallbackArgs* bargs = (BombTimerCallbackArgs*) args;
+PUBLIC Uint32 redBomb(Uint32 interval, void* args) {
+    BombTimerCallbackArgs* bargs = (BombTimerCallbackArgs*)args;
     bargs->bomb->switchRedBomb = true;
 
     return 0;
 }
 
-PUBLIC Uint32 explodeBomb(Uint32 interval, void *args) {
-    BombTimerCallbackArgs* bargs = (BombTimerCallbackArgs*) args;
+PUBLIC Uint32 explodeBomb(Uint32 interval, void* args) {
+    BombTimerCallbackArgs* bargs = (BombTimerCallbackArgs*)args;
     bargs->bomb->startExplosion = true;
 
     handleExplosions(bargs->bomb);    // Modifies explosion hitbox based on collision with walls and boxes as well as deletes boxes
@@ -56,8 +56,8 @@ PUBLIC Uint32 explodeBomb(Uint32 interval, void *args) {
     return 0;
 }
 
-PRIVATE Uint32 explosionDone(Uint32 interval, void *args) {
-    BombTimerCallbackArgs *bargs = (BombTimerCallbackArgs*) args;
+PRIVATE Uint32 explosionDone(Uint32 interval, void* args) {
+    BombTimerCallbackArgs* bargs = (BombTimerCallbackArgs*)args;
     bargs->bomb->endExplosion = true;
     (*(bargs->bombsAvailable))++;
 
@@ -65,8 +65,8 @@ PRIVATE Uint32 explosionDone(Uint32 interval, void *args) {
     return 0;
 }
 
-PUBLIC Uint32 explosionDoneClient(Uint32 interval, void *args) {
-    BombTimerCallbackArgs *bargs = (BombTimerCallbackArgs*) args;
+PUBLIC Uint32 explosionDoneClient(Uint32 interval, void* args) {
+    BombTimerCallbackArgs* bargs = (BombTimerCallbackArgs*)args;
     bargs->bomb->endExplosion = true;
 
     free(bargs);
@@ -318,26 +318,25 @@ PUBLIC void renderBombsAndExplosions(Game game, Network net, udpData packetData)
             }
             if (game->bombs[i]->endExplosion) {
                 if (createPowerUpRight) {
-                    activeBox[rightBoxRow][rightBoxColumn] = 0;
+                    activeBox[rightBoxRow][rightBoxColumn] = 5;
                 }
                 if (createPowerUpLeft) {
-                    
-                    activeBox[leftBoxRow][leftBoxColumn] = 0;
+                    activeBox[leftBoxRow][leftBoxColumn] = 5;
                 }
                 if (createPowerUpUp) {
-               
-                    activeBox[upBoxRow][upBoxColumn] =  0;
+                    activeBox[upBoxRow][upBoxColumn] = 5;
+
                 }
                 if (createPowerUpDown) {
-                    activeBox[downBoxRow][downBoxColumn] =  0;
+                    activeBox[downBoxRow][downBoxColumn] =  5;
                 }
                 game->bombs[i] = NULL;                                                                          // Raderar bomben
-            } 
+            }
         }
     }
 }
 
-PUBLIC Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer *renderer, int explosionRange) {
+PUBLIC Bomb createBomb(int playerPosX, int playerPosY, SDL_Renderer* renderer, int explosionRange) {
     Bomb bomb = malloc(sizeof(struct BombSettings));
 
     char pictureDestination[64];

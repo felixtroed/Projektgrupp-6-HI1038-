@@ -19,6 +19,7 @@ PUBLIC bool loadTextures(SDL_Renderer** renderer, SDL_Surface** bitmapSurface, S
 PRIVATE void initNetwork(Network net);
 PRIVATE void sendUDPData(Network net, udpData packetData);
 PRIVATE void receiveUDPData(Game game, Network net);
+PRIVATE void sendInitData(Network net, udpData packetData);
 
 PUBLIC Network createNet() {
     Network net = malloc(sizeof(struct NetworkData));
@@ -83,20 +84,20 @@ PUBLIC Game createGame(Network net) {
                 game->player[0] = createPlayer(1, 64, 64, game);
                 game->activePlayers = 1;
                 game->power = createPowers(game); 
-                CreatePowerMap(game->power);
                 break;
             case 1:
                 game->player[0] = createPlayer(1, 64, 64, game);
                 game->player[1] = createPlayer(2, 960, 64, game);
                 game->activePlayers = 2;
                 game->power = createPowers(game);
-                CreatePowerMap(game->power);
                 break;
             case 2:
                 game->player[0] = createPlayer(1, 64, 64, game);
                 game->player[1] = createPlayer(2, 960, 64, game);
                 game->player[2] = createPlayer(3, 64, 640, game);
                 game->activePlayers = 3;
+                game->power = createPowers(game);
+
                 break;
             case 3:
                 game->player[0] = createPlayer(1, 64, 64, game);
@@ -104,6 +105,7 @@ PUBLIC Game createGame(Network net) {
                 game->player[2] = createPlayer(3, 64, 640, game);
                 game->player[3] = createPlayer(4, 960, 640, game);
                 game->activePlayers = 4;
+                game->power = createPowers(game);
                 break;
             default: break;
         }
@@ -237,6 +239,7 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
             sendUDPData(net, packetData);
             receiveUDPData(game, net);
             handlePlayerExplosionCollision(game, net, packetData);
+            whatBoxes(game->power, packetData);
             //pickUpPowerUps(game->player[game->pIdx], net, packetData,game->power->powerMap)
             SDL_RenderClear(game->renderer);
             SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
@@ -269,11 +272,15 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
     }
 }
 
+
 PRIVATE void sendUDPData(Network net, udpData packetData) {
     
     if (net->willSend) {
-        sprintf((char *)net->packet1->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d\n", packetData->pIdx, packetData->xPos, packetData->yPos, 
-       packetData->frame, packetData->isHurt, packetData->isDead, packetData->powerCol, packetData->powerRow, packetData->PowerUpGone, packetData->bombDropped, packetData->bombPosX, packetData->bombPosY, packetData->explosionRange);
+        sprintf((char *)net->packet1->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d  \n", packetData->pIdx, packetData->xPos, packetData->yPos, packetData->frame, packetData->isHurt, packetData->isDead, packetData->powerCol, packetData->powerRow, packetData->PowerUpGone, 
+            packetData->bombDropped, packetData->bombPosX, packetData->bombPosY, packetData->explosionRange,
+            packetData->valueBoxOne, packetData->colBoxOne, packetData->rowBoxOne,
+            packetData->valueBoxTwo, packetData->colBoxTwo, packetData->rowBoxTwo,
+            packetData->valueBoxThree,packetData->colBoxThree,packetData->rowBoxThree);
         net->packet1->address.host = net->srvAddr.host;	                    /* Set the destination host */
         net->packet1->address.port = net->srvAddr.port;	                    /* And destination port */
         net->packet1->len = strlen((char *)net->packet1->data) + 1;
@@ -281,13 +288,23 @@ PRIVATE void sendUDPData(Network net, udpData packetData) {
         net->willSend = false;
         packetData->bombDropped = 0;
         packetData->PowerUpGone = 0; 
+        packetData->valueBoxOne = 0;
+        packetData->valueBoxTwo = 0;
+        packetData->valueBoxThree = 0;
+
+
     }
 }
 
 PRIVATE void receiveUDPData(Game game, Network net) {
     if (SDLNet_UDP_Recv(net->sd, net->packet2)){
-        int idx, x, y, currentFrame, activePlayers, isHurt, isDead, powerCol, powerRow, powerUpGone, bombDropped, bombPosX, bombPosY, explosionRange;
-        sscanf((char * )net->packet2->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", &idx, &x, &y, &currentFrame, &activePlayers, &isHurt, &isDead, &powerCol, &powerRow, &powerUpGone, &bombDropped, &bombPosX, &bombPosY, &explosionRange);
+        int idx, x, y, currentFrame, activePlayers, isHurt, isDead, powerCol, powerRow, powerUpGone, bombDropped, bombPosX, bombPosY, explosionRange ,rowBoxOne,
+        colBoxOne, valueBoxOne,rowBoxTwo, colBoxTwo, valueBoxTwo, rowBoxThree, colBoxThree, valueBoxThree;
+        sscanf((char * )net->packet2->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d  %d %d %d\n", &idx, &x, &y, &currentFrame, 
+            &activePlayers, &isHurt, &isDead, &powerCol, &powerRow, &powerUpGone, &bombDropped, &bombPosX, &bombPosY, &explosionRange,
+            &valueBoxOne,&colBoxOne,&rowBoxOne,
+            &valueBoxTwo,&colBoxTwo,&rowBoxTwo,
+            &valueBoxThree,&colBoxThree,&rowBoxThree);
 
         // printf("Active players: %d\n", activePlayers);
         // printf("Game->activePlayers: %d\n", game->activePlayers);
@@ -323,9 +340,21 @@ PRIVATE void receiveUDPData(Game game, Network net) {
 
         if (powerUpGone)
         {
-            //powerUpRemoved(powerRow,powerCol);
+            powerUpRemoved(powerRow,powerCol,game->power);
         }
 
+        if (valueBoxOne > 3 && valueBoxOne < 7)
+        {
+            game->power->powerMap[rowBoxOne][colBoxOne]=valueBoxOne;
+        }
+        if(valueBoxTwo > 3 && valueBoxTwo < 7) {
+            game->power->powerMap[rowBoxTwo][colBoxTwo]=valueBoxTwo;
+
+        }
+        if (valueBoxThree > 3 && valueBoxThree < 7) {
+            game->power->powerMap[rowBoxThree][colBoxThree] =valueBoxThree;
+
+        }
     }
 }
 
@@ -500,6 +529,18 @@ PUBLIC udpData createPacketData(Game game) {
     packetData->powerCol = 0;
     packetData->powerRow = 0;
     packetData->PowerUpGone = 0; 
+
+    packetData->rowBoxOne = 0;
+    packetData->colBoxOne = 0;
+    packetData->valueBoxOne = 0;
+
+    packetData->rowBoxTwo = 0;
+    packetData->colBoxTwo = 0;
+    packetData->valueBoxTwo = 0;
+
+    packetData->rowBoxThree = 0;
+    packetData->colBoxThree = 0;
+    packetData->valueBoxThree = 0;
 
 }
 
