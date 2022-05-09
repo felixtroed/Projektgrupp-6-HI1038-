@@ -49,6 +49,11 @@ typedef struct GameSettings {
 
 } *Game;
 
+typedef struct Lock_t {
+    int flag;
+}lock_t;
+
+
 typedef struct udpData {
     int pIdx;
     int xPos;

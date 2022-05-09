@@ -133,6 +133,7 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
     bool inInstructions = false;
     int mousePos_x, mousePos_y;
     bool menuOptionSelected[MENUOPTIONS] = { 0,0,0,0 };
+    bool bombDropped = false; 
     const Uint8* currentKeyStates;
 
     while (running) {
@@ -239,15 +240,15 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
             sendUDPData(net, packetData);
             receiveUDPData(game, net);
             handlePlayerExplosionCollision(game, net, packetData);
-            whatBoxes(game->power, packetData);
             //pickUpPowerUps(game->player[game->pIdx], net, packetData,game->power->powerMap)
             SDL_RenderClear(game->renderer);
             SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
             renderPowerUps(game);
             renderBoxes(game);
-            renderBombsAndExplosions(game, net, packetData);
+            renderBombsAndExplosions(game,packetData);
             renderPlayers(game);
             SDL_RenderPresent(game->renderer);
+            
         }
         else {
             SDL_RenderClear(game->renderer);
@@ -288,10 +289,9 @@ PRIVATE void sendUDPData(Network net, udpData packetData) {
         net->willSend = false;
         packetData->bombDropped = 0;
         packetData->PowerUpGone = 0; 
-        packetData->valueBoxOne = 0;
-        packetData->valueBoxTwo = 0;
-        packetData->valueBoxThree = 0;
-
+        packetData->valueBoxOne = packetData->valueBoxTwo = packetData->valueBoxThree = 0; 
+        packetData->colBoxOne = packetData->colBoxTwo = packetData->colBoxThree = 0; 
+        packetData->rowBoxOne = packetData->rowBoxTwo = packetData->rowBoxThree = 0; 
 
     }
 }
@@ -306,6 +306,7 @@ PRIVATE void receiveUDPData(Game game, Network net) {
             &valueBoxTwo,&colBoxTwo,&rowBoxTwo,
             &valueBoxThree,&colBoxThree,&rowBoxThree);
 
+        //printf("valueBoxONE %d valueBOXTWO %d ValueBOXTHREE %d\n", valueBoxOne, valueBoxTwo, valueBoxThree);
         // printf("Active players: %d\n", activePlayers);
         // printf("Game->activePlayers: %d\n", game->activePlayers);
 

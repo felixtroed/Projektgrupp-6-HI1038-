@@ -154,26 +154,29 @@ void whatBoxes(PowerUPS power, udpData packetData){
     }
     //printf(" %d  IIII ", i);
 
-    if (i < 2 && i>0)
+    if (i == 1)
     {
         packetData->colBoxOne = arrayCol[0];
         packetData->rowBoxOne = arrayRow[0];
         packetData->valueBoxOne = arrayValue[0];
+        printf("1: %d %d %d\n", arrayCol[0], arrayRow[0], arrayValue[0]);
     }
 
-    if (i < 3 && i > 0)
+    if (i ==2)
     {
         packetData->colBoxTwo = arrayCol[1];
         packetData->rowBoxTwo = arrayRow[1];
         packetData->valueBoxTwo = arrayValue[1];
+        printf("2: %d %d %d\n", arrayCol[1], arrayRow[1], arrayValue[1]);
 
     }
 
-    if (i == 3 && i > 0)
+    if (i == 3)
     {
         packetData->colBoxThree = arrayCol[2];
         packetData->rowBoxThree = arrayRow[2];
         packetData->valueBoxThree = arrayValue[2];
+        printf("3: %d %d %d\n", arrayCol[2], arrayRow[2], arrayValue[2]);
 
     }
 
@@ -184,9 +187,7 @@ void whatBoxes(PowerUPS power, udpData packetData){
 void PlayerPickUpPower(Player player, PowerUPS power, udpData packetData) {
     int indexCol = ((((player->pos.x + 32) / 64) * 64 ) / 64) - 1;
     int indexRow = ((((player->pos.y + 32) / 64) * 64 ) / 64) - 1;
-    printf("%d %d\n", indexCol, indexRow);
    
-        printf("%d\n", power->powerMap[indexRow][indexCol]);
         if (power->powerMap[indexRow][indexCol] == 4)
         {
             printf("Picked up power-up: Speed\n");
