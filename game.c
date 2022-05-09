@@ -270,14 +270,8 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
 }
 
 PRIVATE void sendUDPData(Network net, udpData packetData) {
-    // if (net->powerUpGone == false)
-    // {
-    //     packetData->powerUpCol = 0;
-    //     packetData->powerUpRow = 0;
-    //     packetData->boxValue = 9;
-    // }
     if (net->willSend) {
-        sprintf((char *)net->packet1->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", packetData->pIdx, packetData->xPos, packetData->yPos, packetData->frame, packetData->isHurt, packetData->isDead, packetData->powerUpRow, packetData->powerUpCol, packetData->bombDropped, packetData->bombPosX, packetData->bombPosY, packetData->explosionRange, packetData->leftBoxVal, packetData->leftBoxRow, packetData->leftBoxCol, packetData->powerUpTaken, packetData->rightBoxVal, packetData->rightBoxRow, packetData->rightBoxCol, packetData->topBoxVal, packetData->topBoxRow, packetData->topBoxCol);
+        sprintf((char *)net->packet1->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", packetData->pIdx, packetData->xPos, packetData->yPos, packetData->frame, packetData->isHurt, packetData->isDead, packetData->powerUpRow, packetData->powerUpCol, packetData->bombDropped, packetData->bombPosX, packetData->bombPosY, packetData->explosionRange, packetData->leftBoxVal, packetData->leftBoxRow, packetData->leftBoxCol, packetData->powerUpTaken, packetData->rightBoxVal, packetData->rightBoxRow, packetData->rightBoxCol, packetData->topBoxVal, packetData->topBoxRow, packetData->topBoxCol, packetData->bottomBoxVal, packetData->bottomBoxRow, packetData->bottomBoxCol);
         net->packet1->address.host = net->srvAddr.host;	                    /* Set the destination host */
         net->packet1->address.port = net->srvAddr.port;	                    /* And destination port */
         net->packet1->len = strlen((char *)net->packet1->data) + 1;
@@ -288,13 +282,14 @@ PRIVATE void sendUDPData(Network net, udpData packetData) {
         packetData->leftBoxVal = -1;
         packetData->rightBoxVal = -1;
         packetData->topBoxVal = -1;
+        packetData->bottomBoxVal = -1;
     }
 }
 
 PRIVATE void receiveUDPData(Game game, Network net) {
     if (SDLNet_UDP_Recv(net->sd, net->packet2)){
-        int idx, x, y, currentFrame, activePlayers, isHurt, isDead, powerUpRow, powerUpCol, bombDropped, bombPosX, bombPosY, explosionRange, leftBoxVal, leftBoxRow, leftBoxCol, powerUpTaken, rightBoxVal, rightBoxRow, rightBoxCol, topBoxVal, topBoxRow, topBoxCol;
-        sscanf((char * )net->packet2->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", &idx, &x, &y, &currentFrame, &activePlayers, &isHurt, &isDead, &powerUpRow, &powerUpCol, &bombDropped, &bombPosX, &bombPosY, &explosionRange, &leftBoxVal, &leftBoxRow, &leftBoxCol, &powerUpTaken, &rightBoxVal, &rightBoxRow, &rightBoxCol, &topBoxVal, &topBoxRow, &topBoxCol);
+        int idx, x, y, currentFrame, activePlayers, isHurt, isDead, powerUpRow, powerUpCol, bombDropped, bombPosX, bombPosY, explosionRange, leftBoxVal, leftBoxRow, leftBoxCol, powerUpTaken, rightBoxVal, rightBoxRow, rightBoxCol, topBoxVal, topBoxRow, topBoxCol, bottomBoxVal, bottomBoxRow, bottomBoxCol;
+        sscanf((char * )net->packet2->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", &idx, &x, &y, &currentFrame, &activePlayers, &isHurt, &isDead, &powerUpRow, &powerUpCol, &bombDropped, &bombPosX, &bombPosY, &explosionRange, &leftBoxVal, &leftBoxRow, &leftBoxCol, &powerUpTaken, &rightBoxVal, &rightBoxRow, &rightBoxCol, &topBoxVal, &topBoxRow, &topBoxCol, &bottomBoxVal, &bottomBoxRow, &bottomBoxCol);
 
         // printf("Active players: %d\n", activePlayers);
         // printf("Game->activePlayers: %d\n", game->activePlayers);
@@ -328,15 +323,9 @@ PRIVATE void receiveUDPData(Game game, Network net) {
         if (topBoxVal >= 0) {
             activeBox[topBoxRow][topBoxCol] = topBoxVal; 
         }
-
-        /*
-        if (explosionDone) {
-            activeBox[leftBoxRow][leftBoxCol] = leftBoxVal;
-            activeBox[rightBoxRow][rightBoxCol] = rightBoxVal;
-            activeBox[topBoxRow][topBoxCol] = topBoxVal;
-        } */
-
-
+        if (bottomBoxVal >= 0) {
+            activeBox[bottomBoxRow][bottomBoxCol] = bottomBoxVal; 
+        }
         if (powerUpTaken) {
             activeBox[powerUpRow][powerUpCol] = 0;
         }

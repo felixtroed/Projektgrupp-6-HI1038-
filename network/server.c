@@ -2,7 +2,7 @@
 
 typedef struct udpData {
 	int idx, x, y, frame, nrOfClients, isHurt, isDead, powerUpCol, powerUpRow, boxValue, bombDropped, bombPosX, bombPosY, explosionRange,
-	leftBoxVal, leftBoxRow, leftBoxCol, powerUpTaken, rightBoxVal, rightBoxRow, rightBoxCol, topBoxVal, topBoxRow, topBoxCol;
+	leftBoxVal, leftBoxRow, leftBoxCol, powerUpTaken, rightBoxVal, rightBoxRow, rightBoxCol, topBoxVal, topBoxRow, topBoxCol, bottomBoxVal, bottomBoxRow, bottomBoxCol;
 } *udpData;
 
 void initClient(UDPsocket sd, UDPpacket *pReceive, UDPpacket *pSend, Uint32 *clientIP, Uint32 *clientPort, udpData data);
@@ -132,17 +132,18 @@ int main(int argc, char **argv) {
 void sendData(UDPsocket sd, UDPpacket *pReceive, UDPpacket *pSend, udpData data, Uint32 clientIP, Uint32 clientPort) {
 	pSend->address.host = clientIP;		/* Set the destination host */
 	pSend->address.port = clientPort;
-	sscanf((char * )pReceive->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", 
+	sscanf((char * )pReceive->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", 
 		&data->idx, &data->x, &data->y, 
 		&data->frame, &data->isHurt, &data->isDead,
 		&data->powerUpRow, &data->powerUpCol, &data->bombDropped,
 		&data->bombPosX, &data->bombPosY, &data->explosionRange,
 		&data->leftBoxVal, &data->leftBoxRow, &data->leftBoxCol,
 		&data->powerUpTaken, &data->rightBoxVal, &data->rightBoxRow, &data->rightBoxCol,
-		&data->topBoxVal, &data->topBoxRow, &data->topBoxCol
+		&data->topBoxVal, &data->topBoxRow, &data->topBoxCol,
+		&data->bottomBoxVal, &data->bottomBoxRow, &data->bottomBoxCol
 	);
 	// printf("powerUpCol: %d boxRow: %d \n", data->powerUpCol, data->boxRow);
-	sprintf((char *)pSend->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", data->idx, data->x, data->y, data->frame, data->nrOfClients, data->isHurt, data->isDead, data->powerUpRow, data->powerUpCol, data->bombDropped, data->bombPosX, data->bombPosY, data->explosionRange, data->leftBoxVal, data->leftBoxRow, data->leftBoxCol, data->powerUpTaken, data->rightBoxVal, data->rightBoxRow, data->rightBoxCol, data->topBoxVal, data->topBoxRow, data->topBoxCol);
+	sprintf((char *)pSend->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", data->idx, data->x, data->y, data->frame, data->nrOfClients, data->isHurt, data->isDead, data->powerUpRow, data->powerUpCol, data->bombDropped, data->bombPosX, data->bombPosY, data->explosionRange, data->leftBoxVal, data->leftBoxRow, data->leftBoxCol, data->powerUpTaken, data->rightBoxVal, data->rightBoxRow, data->rightBoxCol, data->topBoxVal, data->topBoxRow, data->topBoxCol, data->bottomBoxVal, data->bottomBoxRow, data->bottomBoxCol);
 	pSend->len = strlen((char *)pSend->data) + 1;
 	SDLNet_UDP_Send(sd, -1, pSend);
 }
