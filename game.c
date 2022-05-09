@@ -286,10 +286,6 @@ PRIVATE void sendUDPData(Network net, udpData packetData) {
         packetData->powerUpTaken = 0;
         packetData->bombDropped = 0;
         packetData->explosionDone = 0;
-        packetData->powerUpRow = 0;
-        packetData->powerUpCol = 0;
-        packetData->leftBoxRow = 0;
-        packetData->leftBoxCol = 0;
     }
 }
 

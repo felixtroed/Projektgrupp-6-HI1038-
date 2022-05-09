@@ -442,17 +442,18 @@ PRIVATE void handleExplosions(Bomb bomb, Network net, uint8_t pIdxSelf, udpData 
             xOffset = bomb->explosionHor.x - xStart;
 
             // activeBox[row][col - i - 1] = 0;               // Deletes box
-            activeBox[row][col - i - 1] = (rand() % 4) + 4;
-            // if (bomb->pIdxWhoDroppedBomb == pIdxSelf) {
-            //     activeBox[row][col - i - 1] = (rand() % +4) + 4;
-            //     packetData->leftBoxVal = activeBox[row][col - i - 1];
-            //     packetData->leftBoxRow = row;
-            //     packetData->leftBoxCol = col - i - 1;
-            //     packetData->explosionDone = 1;
-            //     // printf("packetData->leftBoxRow: %d\n", row);
-            //     // printf("packetData->leftBoxCol: %d\n", col - i - 1);
-            //     net->willSend = true;
-            // }
+            // activeBox[row][col - i - 1] = (rand() % 4) + 4;
+            /*
+            if (bomb->pIdxWhoDroppedBomb == pIdxSelf) {
+                activeBox[row][col - i - 1] = (rand() % 4) + 4;
+                packetData->leftBoxVal = activeBox[row][col - i - 1];
+                packetData->leftBoxRow = row;
+                packetData->leftBoxCol = col - i - 1;
+                packetData->explosionDone = 1;
+                // printf("packetData->leftBoxRow: %d\n", row);
+                // printf("packetData->leftBoxCol: %d\n", col - i - 1);
+                net->willSend = true;
+            } */
             break;
         }
     }
@@ -466,7 +467,17 @@ PRIVATE void handleExplosions(Bomb bomb, Network net, uint8_t pIdxSelf, udpData 
         else if (activeBox[row][col + i + 1] == 1) {
             bomb->explosionHor.w -= 64 * (bomb->explosionRange - i) - 64 + xOffset;
             // activeBox[row][col + i + 1] = 0;
-            activeBox[row][col + i + 1] = (rand() % 4) + 4;
+            // activeBox[row][col + i + 1] = (rand() % 4) + 4;
+
+            if (bomb->pIdxWhoDroppedBomb == pIdxSelf) {
+                printf("I dropped bomb!\n");
+                activeBox[row][col + i + 1] = (rand() % 4) + 4;
+                packetData->leftBoxVal = activeBox[row][col + i + 1];
+                packetData->leftBoxRow = row;
+                packetData->leftBoxCol = col + i + 1;
+                packetData->explosionDone = 1;
+                net->willSend = true;
+            }
             break;
         }
     }
@@ -482,7 +493,7 @@ PRIVATE void handleExplosions(Bomb bomb, Network net, uint8_t pIdxSelf, udpData 
             bomb->explosionVer.y += 64 * (bomb->explosionRange - i) - 64;
             yOffset = bomb->explosionVer.y - yStart;
             // activeBox[row - i - 1][col] = 0;
-            activeBox[row - i - 1][col] = (rand() % 4) + 4;
+            // activeBox[row - i - 1][col] = (rand() % 4) + 4;
             break;
         }
     }

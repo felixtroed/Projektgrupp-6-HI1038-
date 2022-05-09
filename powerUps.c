@@ -30,20 +30,20 @@ void renderPowerUps(Game game) {
 				game->power->pos.x= column * 64 + 64 + 7;
 				game->power->pos.y = row * 64 + 64 + 7;
 				SDL_RenderCopy(game->renderer, game->power->speed, NULL, &game->power->pos);
-				printf("'activeBox[row][column] == 4' - passed.\n");
+				// printf("'activeBox[row][column] == 4' - passed.\n");
 			}
 			if (activeBox[row][column] == 5) {
 				game->power->pos.x = column * 64 + 64 + 7;
 				game->power->pos.y = row * 64 + 64 + 7;
 				SDL_RenderCopy(game->renderer, game->power->moreBombs, NULL, &game->power->pos);
-				printf("'activeBox[row][column] == 5' - passed.\n");
+				// printf("'activeBox[row][column] == 5' - passed.\n");
 			}
 			if (activeBox[row][column] == 6)
 			{
 				game->power->pos.x = column * 64 + 64 + 7;
 				game->power->pos.y = row * 64 + 64 + 7;
 				SDL_RenderCopy(game->renderer, game->power->biggerExplosions, NULL, &game->power->pos);
-				printf("'activeBox[row][column] == 6' - passed.\n");
+				// printf("'activeBox[row][column] == 6' - passed.\n");
 			}
 		}
 	}
