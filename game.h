@@ -69,7 +69,9 @@ typedef struct udpData {
     int rightBoxVal;
     int rightBoxRow;
     int rightBoxCol;
-    // int topBoxVal;
+    int topBoxVal;
+    int topBoxRow;
+    int topBoxCol;
     // int bottomBoxVal;
     int explosionDone;
 } *udpData;

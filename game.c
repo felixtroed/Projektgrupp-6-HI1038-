@@ -277,7 +277,7 @@ PRIVATE void sendUDPData(Network net, udpData packetData) {
     //     packetData->boxValue = 9;
     // }
     if (net->willSend) {
-        sprintf((char *)net->packet1->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", packetData->pIdx, packetData->xPos, packetData->yPos, packetData->frame, packetData->isHurt, packetData->isDead, packetData->powerUpRow, packetData->powerUpCol, packetData->bombDropped, packetData->bombPosX, packetData->bombPosY, packetData->explosionRange, packetData->leftBoxVal, packetData->leftBoxRow, packetData->leftBoxCol, packetData->explosionDone, packetData->powerUpTaken, packetData->rightBoxVal, packetData->rightBoxRow, packetData->rightBoxCol);
+        sprintf((char *)net->packet1->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", packetData->pIdx, packetData->xPos, packetData->yPos, packetData->frame, packetData->isHurt, packetData->isDead, packetData->powerUpRow, packetData->powerUpCol, packetData->bombDropped, packetData->bombPosX, packetData->bombPosY, packetData->explosionRange, packetData->leftBoxVal, packetData->leftBoxRow, packetData->leftBoxCol, packetData->powerUpTaken, packetData->rightBoxVal, packetData->rightBoxRow, packetData->rightBoxCol, packetData->topBoxVal, packetData->topBoxRow, packetData->topBoxCol);
         net->packet1->address.host = net->srvAddr.host;	                    /* Set the destination host */
         net->packet1->address.port = net->srvAddr.port;	                    /* And destination port */
         net->packet1->len = strlen((char *)net->packet1->data) + 1;
@@ -285,14 +285,16 @@ PRIVATE void sendUDPData(Network net, udpData packetData) {
         net->willSend = false;
         packetData->powerUpTaken = 0;
         packetData->bombDropped = 0;
-        packetData->explosionDone = 0;
+        packetData->leftBoxVal = -1;
+        packetData->rightBoxVal = -1;
+        packetData->topBoxVal = -1;
     }
 }
 
 PRIVATE void receiveUDPData(Game game, Network net) {
     if (SDLNet_UDP_Recv(net->sd, net->packet2)){
-        int idx, x, y, currentFrame, activePlayers, isHurt, isDead, powerUpRow, powerUpCol, bombDropped, bombPosX, bombPosY, explosionRange, leftBoxVal, leftBoxRow, leftBoxCol, explosionDone, powerUpTaken, rightBoxVal, rightBoxRow, rightBoxCol;
-        sscanf((char * )net->packet2->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", &idx, &x, &y, &currentFrame, &activePlayers, &isHurt, &isDead, &powerUpRow, &powerUpCol, &bombDropped, &bombPosX, &bombPosY, &explosionRange, &leftBoxVal, &leftBoxRow, &leftBoxCol, &explosionDone, &powerUpTaken, &rightBoxVal, &rightBoxRow, &rightBoxCol);
+        int idx, x, y, currentFrame, activePlayers, isHurt, isDead, powerUpRow, powerUpCol, bombDropped, bombPosX, bombPosY, explosionRange, leftBoxVal, leftBoxRow, leftBoxCol, powerUpTaken, rightBoxVal, rightBoxRow, rightBoxCol, topBoxVal, topBoxRow, topBoxCol;
+        sscanf((char * )net->packet2->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", &idx, &x, &y, &currentFrame, &activePlayers, &isHurt, &isDead, &powerUpRow, &powerUpCol, &bombDropped, &bombPosX, &bombPosY, &explosionRange, &leftBoxVal, &leftBoxRow, &leftBoxCol, &powerUpTaken, &rightBoxVal, &rightBoxRow, &rightBoxCol, &topBoxVal, &topBoxRow, &topBoxCol);
 
         // printf("Active players: %d\n", activePlayers);
         // printf("Game->activePlayers: %d\n", game->activePlayers);
@@ -317,10 +319,24 @@ PRIVATE void receiveUDPData(Game game, Network net) {
             game->bombs[bombIdx]->bombTime = SDL_AddTimer(3000, explodeBomb, callbackArgs);
             game->bombs[bombIdx]->deleteBombTime = SDL_AddTimer(4000, explosionDoneClient, callbackArgs);
         }
+        if (leftBoxVal >= 0) {
+            activeBox[leftBoxRow][leftBoxCol] = leftBoxVal; 
+        }
+        if (rightBoxVal >= 0) {
+            activeBox[rightBoxRow][rightBoxCol] = rightBoxVal; 
+        }
+        if (topBoxVal >= 0) {
+            activeBox[topBoxRow][topBoxCol] = topBoxVal; 
+        }
+
+        /*
         if (explosionDone) {
             activeBox[leftBoxRow][leftBoxCol] = leftBoxVal;
             activeBox[rightBoxRow][rightBoxCol] = rightBoxVal;
-        }
+            activeBox[topBoxRow][topBoxCol] = topBoxVal;
+        } */
+
+
         if (powerUpTaken) {
             activeBox[powerUpRow][powerUpCol] = 0;
         }
@@ -508,7 +524,9 @@ PUBLIC udpData createPacketData(Game game) {
     packetData->bombPosY = 0;
     packetData->explosionRange = game->player[game->pIdx]->explosionRange;
     packetData->powerUpTaken = 0;
-    packetData->explosionDone = 0;
+    packetData->leftBoxVal = -1;
+    packetData->rightBoxVal = -1;
+    packetData->topBoxVal = -1;
 
     return packetData;
 }
