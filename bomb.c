@@ -443,17 +443,16 @@ PRIVATE void handleExplosions(Bomb bomb, Network net, uint8_t pIdxSelf, udpData 
 
             // activeBox[row][col - i - 1] = 0;               // Deletes box
             // activeBox[row][col - i - 1] = (rand() % 4) + 4;
-            /*
+            
             if (bomb->pIdxWhoDroppedBomb == pIdxSelf) {
+                printf("I dropped left bomb!\n");
                 activeBox[row][col - i - 1] = (rand() % 4) + 4;
                 packetData->leftBoxVal = activeBox[row][col - i - 1];
                 packetData->leftBoxRow = row;
                 packetData->leftBoxCol = col - i - 1;
                 packetData->explosionDone = 1;
-                // printf("packetData->leftBoxRow: %d\n", row);
-                // printf("packetData->leftBoxCol: %d\n", col - i - 1);
                 net->willSend = true;
-            } */
+            }
             break;
         }
     }
@@ -470,11 +469,11 @@ PRIVATE void handleExplosions(Bomb bomb, Network net, uint8_t pIdxSelf, udpData 
             // activeBox[row][col + i + 1] = (rand() % 4) + 4;
 
             if (bomb->pIdxWhoDroppedBomb == pIdxSelf) {
-                printf("I dropped bomb!\n");
+                printf("I dropped right bomb!\n");
                 activeBox[row][col + i + 1] = (rand() % 4) + 4;
-                packetData->leftBoxVal = activeBox[row][col + i + 1];
-                packetData->leftBoxRow = row;
-                packetData->leftBoxCol = col + i + 1;
+                packetData->rightBoxVal = activeBox[row][col + i + 1];
+                packetData->rightBoxRow = row;
+                packetData->rightBoxCol = col + i + 1;
                 packetData->explosionDone = 1;
                 net->willSend = true;
             }
@@ -507,7 +506,7 @@ PRIVATE void handleExplosions(Bomb bomb, Network net, uint8_t pIdxSelf, udpData 
         else if (activeBox[row + i + 1][col] == 1) {
             bomb->explosionVer.h -= 64 * (bomb->explosionRange - i) - 64 + yOffset;
             // activeBox[row + i + 1][col] = 5;
-            activeBox[row + i + 1][col] = (rand() % 4) + 4;
+            // activeBox[row + i + 1][col] = (rand() % 4) + 4;
 
             /*
             if (bomb->pIdxWhoDroppedBomb == pIdxSelf) {

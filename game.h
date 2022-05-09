@@ -64,11 +64,13 @@ typedef struct udpData {
     int explosionRange;
     int powerUpTaken;
     int leftBoxVal;
-    // int rightBoxVal;
-    // int topBoxVal;
-    // int bottomBoxVal;
     int leftBoxRow;
     int leftBoxCol;
+    int rightBoxVal;
+    int rightBoxRow;
+    int rightBoxCol;
+    // int topBoxVal;
+    // int bottomBoxVal;
     int explosionDone;
 } *udpData;
 
