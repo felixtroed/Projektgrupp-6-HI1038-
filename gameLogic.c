@@ -160,9 +160,8 @@ void pickUpPowerUps(Player p1,Network net, udpData packetData) {
                             packetData->explosionRange = p1->explosionRange;
                         }
                     }
-                    packetData->powerUpCol = column;
                     packetData->powerUpRow = row;
-                    p1->powerUpTaken = true;
+                    packetData->powerUpCol = column;
                     packetData->powerUpTaken = 1;
                     powerUpGone(row, column, 0);
                     net->willSend = true;

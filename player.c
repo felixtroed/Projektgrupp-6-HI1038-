@@ -52,7 +52,6 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
     // player->numOfBoxes = 1;
     player->isHurt = false;
     player->isAlive = true;
-    player->powerUpTaken = false;
     player->lifes = 3;
     initClips(player);
     return player;

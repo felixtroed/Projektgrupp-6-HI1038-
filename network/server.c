@@ -32,6 +32,7 @@ int main(int argc, char **argv) {
 	data->powerUpCol = 0;
 	data->powerUpRow = 0;
 	data->powerUpTaken = 0;
+	data->explosionDone = 0;
 
 
 	/* Initialize SDL_net */
