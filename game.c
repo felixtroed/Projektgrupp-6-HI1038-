@@ -220,20 +220,22 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
             if (game->player[game->pIdx]->isAlive) {
                 if (currentKeyStates[SDL_SCANCODE_W] || currentKeyStates[SDL_SCANCODE_UP]) {                // Funkar för både WASD och pilar
                     move(game->player[game->pIdx], &newMove, &lastMove, KEYUP, game->bombs, &frames, net, packetData);
+                    pickUpPowerUps(game->player[game->pIdx], net, packetData);
                 }
                 else if (currentKeyStates[SDL_SCANCODE_S] || currentKeyStates[SDL_SCANCODE_DOWN]) {
                     move(game->player[game->pIdx], &newMove, &lastMove, KEYDOWN, game->bombs, &frames, net, packetData);
+                    pickUpPowerUps(game->player[game->pIdx], net, packetData);
                 }
                 else if (currentKeyStates[SDL_SCANCODE_A] || currentKeyStates[SDL_SCANCODE_LEFT]) {
                     move(game->player[game->pIdx], &newMove, &lastMove, KEYLEFT, game->bombs, &frames, net, packetData);
+                    pickUpPowerUps(game->player[game->pIdx], net, packetData);
                 }
                 else if (currentKeyStates[SDL_SCANCODE_D] || currentKeyStates[SDL_SCANCODE_RIGHT]) {
                     move(game->player[game->pIdx], &newMove, &lastMove, KEYRIGHT, game->bombs, &frames, net, packetData);
+                    pickUpPowerUps(game->player[game->pIdx], net, packetData);
                 }
             }
 
-
-            pickUpPowerUps(game->player[game->pIdx], net, packetData);
             sendUDPData(net, packetData);
             receiveUDPData(game, net);
             handlePlayerExplosionCollision(game, net, packetData);
