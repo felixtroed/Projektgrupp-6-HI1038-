@@ -165,68 +165,66 @@ void whatBoxes(PowerUPS power, udpData packetData){
         packetData->colBoxOne = arrayCol[0];
         packetData->rowBoxOne = arrayRow[0];
         packetData->valueBoxOne = arrayValue[0];
+        printf("1 ARRAYCOL: %d  ARRAYROW: %d ARRAYVALUE %d\n", arrayCol[0],arrayRow[0],arrayValue[0]);
+
     }
 
-    if (i < 3 && i > 0)
+    if (i < 3 && i > 1)
     {
         packetData->colBoxTwo = arrayCol[1];
         packetData->rowBoxTwo = arrayRow[1];
         packetData->valueBoxTwo = arrayValue[1];
+        printf("2 ARRAYCOL: %d  ARRAYROW: %d ARRAYVALUE %d\n", arrayCol[1], arrayRow[1], arrayValue[1]);
+
 
     }
 
-    if (i == 3 && i > 0)
+    if (i == 3)
     {
         packetData->colBoxThree = arrayCol[2];
         packetData->rowBoxThree = arrayRow[2];
         packetData->valueBoxThree = arrayValue[2];
+        printf("3 ARRAYCOL: %d  ARRAYROW: %d ARRAYVALUE %d\n", arrayCol[2], arrayRow[2], arrayValue[2]);
+
 
     }
-
-   
-}
+   }
 
 
 void PlayerPickUpPower(Player player, PowerUPS power, udpData packetData) {
     int indexCol = ((((player->pos.x + 32) / 64) * 64 ) / 64) - 1;
     int indexRow = ((((player->pos.y + 32) / 64) * 64 ) / 64) - 1;
-    printf("%d %d\n", indexCol, indexRow);
    
-        printf("%d\n", power->powerMap[indexRow][indexCol]);
-        if (power->powerMap[indexRow][indexCol] == 4)
+        if (power->powerMap[indexRow][indexCol] == 4 && player->speed < 5)
         {
             printf("Picked up power-up: Speed\n");
-            if (player->speed < 5) {
-                player->speed += 1;
+          
+                player->speed ++;
                 power->powerMap[indexRow][indexCol] = 0;
                 packetData->PowerUpGone = 1;
                 packetData->powerCol = indexCol;
                 packetData->powerRow = indexRow;
 
-            }
         }
 
-        if (power->powerMap[indexRow][indexCol] == 5)
+        if (power->powerMap[indexRow][indexCol] == 5 && player->maxBombs < 5)
         {
-            if (player->bombsAvailable < 5) {
                 printf("Picked up power-up: +1 Bombs\n");
-                player->bombsAvailable += 1;
+                player->bombsAvailable++;
+                player->maxBombs++; 
                 power->powerMap[indexRow][indexCol] = 0;
                 packetData->PowerUpGone = 1;
                 packetData->powerCol = indexCol;
                 packetData->powerRow = indexRow;
 
-            }
+
         }
 
 
-        if (power->powerMap[indexRow][indexCol] == 6)
+        if (power->powerMap[indexRow][indexCol] == 6 && player->explosionRange < 5)
         {
-
             printf("Picked up power-up: Longer Explosion\n");
-            if (player->explosionRange < 5) {				// Max längd = mitten rutan + 5 rutor ut
-                player->explosionRange += 1;
-            }
+            player->explosionRange++;
             power->powerMap[indexRow][indexCol] = 0;
             packetData->PowerUpGone = 1; 
             packetData->powerCol = indexCol;
