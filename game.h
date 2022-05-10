@@ -3,10 +3,10 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <SDL.h>
-#include <SDL_net.h>
-//#include <SDL2/SDL.h>
-//#include <SDL2/SDL_net.h>
+// #include <SDL.h>
+// #include <SDL_net.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
 #include <string.h>
 #include "player.h"
 #include "box.h"
@@ -42,12 +42,13 @@ typedef struct GameSettings {
     SDL_Rect boxPos;                  //Anv�nds f�r positionen av l�dorna
     SDL_Event event;
     bool accessToServer;
+
+    //Boxes boxes;
     PowerUPS power;
     Player player[NUMPLAYERS];
     Bomb bombs[BOMBS];                // Contains all simultaneously allowed bombs
     uint8_t activePlayers;
     uint8_t pIdx;
-
 } *Game;
 
 typedef struct udpData {
@@ -57,35 +58,18 @@ typedef struct udpData {
     int frame;
     int isHurt;
     int isDead;
-
-    int powerCol;
-    int powerRow;
-    int PowerUpGone;
+    int boxCol;
+    int boxRow;
+    int boxValue;
     int bombDropped;
     int bombPosX;
     int bombPosY;
     int explosionRange;
-
-
-    int rowBoxOne;
-    int colBoxOne;
-    int valueBoxOne;
-
-    int rowBoxTwo;
-    int colBoxTwo;
-    int valueBoxTwo;
-
-    int rowBoxThree;
-    int colBoxThree;
-    int valueBoxThree;
-    
 } *udpData;
-
 
 typedef struct NetworkData {
     UDPsocket sd;
     IPaddress srvAddr;
-    UDPpacket *packet0; 
 	UDPpacket *packet1;
     UDPpacket *packet2;
     char inputIPAddress[20];

@@ -10,5 +10,4 @@
 #include <stdbool.h>
 #include <string.h>
 
-
 #endif /* SERVER_H */
