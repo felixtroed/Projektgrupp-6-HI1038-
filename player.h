@@ -24,7 +24,6 @@ typedef struct PlayerSettings {
     int speed;
     int explosionRange; 
     int numOfBoxes; 
-    uint8_t maxBombs; 
     uint8_t lifes;
     uint8_t bombsAvailable;
 } *Player;
