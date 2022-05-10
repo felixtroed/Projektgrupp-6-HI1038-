@@ -126,6 +126,55 @@ bool collisionBoxes(Player p1)
 }
 
 
+void PlayerPickUpPower(Player player, udpData packetData) {
+    int indexCol = ((((player->pos.x + 32) / 64) * 64) / 64) - 1;
+    int indexRow = ((((player->pos.y + 32) / 64) * 64) / 64) - 1;
+
+    if (activeBox[indexRow][indexCol] == 4 && player->speed < 5)
+    {
+        printf("Picked up power-up: Speed\n");
+
+        player->speed++;
+        activeBox[indexRow][indexCol] = 0;
+        player->explosionRange++;
+        packetData->powerUpRow = indexRow;
+        packetData->powerUpCol = indexCol;
+        packetData->powerUpTaken = 1;
+        powerUpGone(indexRow, indexCol, 0);
+        activeBox[indexRow][indexCol] = 0;
+     
+    }
+
+    if (activeBox[indexRow][indexCol] == 5 && player->maxBombs < 5)
+    {
+        printf("Picked up power-up: +1 Bombs\n");
+        player->bombsAvailable++;
+        player->maxBombs++;
+        player->explosionRange++;
+        packetData->powerUpRow = indexRow;
+        packetData->powerUpCol = indexCol;
+        packetData->powerUpTaken = 1;
+        powerUpGone(indexRow, indexCol, 0);
+        activeBox[indexRow][indexCol] = 0;
+        
+    }
+
+
+    if (activeBox[indexRow][indexCol] == 6  && player->explosionRange < 5)
+    {
+        printf("Picked up power-up: Longer Explosion\n");
+        player->explosionRange++;
+        packetData->powerUpRow = indexRow;
+        packetData->powerUpCol = indexCol;
+        packetData->powerUpTaken = 1;
+        powerUpGone(indexRow, indexCol, 0);
+        activeBox[indexRow][indexCol] = 0;
+    }
+
+
+}
+
+/*
 void pickUpPowerUps(Player p1,Network net, udpData packetData) {
     //printf("char posX: %d\tposY: %d\n", p1->pos.x, p1->pos.y);
     for (int row = 0; row < ROW_SIZE; row++) {
@@ -170,7 +219,7 @@ void pickUpPowerUps(Player p1,Network net, udpData packetData) {
         }
     }
 }
-
+ */
 
 bool collisionBomb(Player p1, Bomb bombs[]) {
     for (uint8_t i = 0; i < BOMBS; i++) {
@@ -431,7 +480,7 @@ void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *fr
     }
     
 
-    if(5 < abs(p1->prevPosx - p1->pos.x) || 5 < abs(p1->prevPosy - p1->pos.y) ) {
+    if(4 < abs(p1->prevPosx - p1->pos.x) || 4 < abs(p1->prevPosy - p1->pos.y) ) {
         net->willSend = true;
         packetData->xPos = p1->pos.x;
         packetData->yPos = p1->pos.y;
@@ -439,5 +488,6 @@ void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *fr
 
         p1->prevPosx = p1->pos.x;
         p1->prevPosy = p1->pos.y;
+        PlayerPickUpPower(p1, packetData);
     }
 }

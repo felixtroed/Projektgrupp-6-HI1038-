@@ -54,6 +54,7 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
     player->isAlive = true;
     player->lifes = 3;
     player->prevPosx = 0;
+    player->maxBombs = 1; 
     initClips(player);
     return player;
 }
