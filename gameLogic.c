@@ -132,8 +132,9 @@ bool collisionBoxes(Player p1)
 }
 
 
-void whatBoxes(PowerUPS power, udpData packetData){
+void whatBoxes(PowerUPS power, udpData packetData,Network net){
     int arrayRow[3], arrayValue[3], arrayCol[3], i = 0;
+    net->willSend = true; 
 
     for (int row =0 ; row < ROW_SIZE;row++)
     {

@@ -73,7 +73,7 @@ PUBLIC Uint32 explosionDoneClient(Uint32 interval, void* args) {
     return 0;
 }
 
-PUBLIC void renderBombsAndExplosions(Game game, udpData packetData) {
+PUBLIC void renderBombsAndExplosions(Game game, udpData packetData,Network net) {
     for (uint8_t i = 0; i < BOMBS; i++) {
         if (game->bombs[i] != NULL) {
             if (game->bombs[i]->switchRedBomb) {
@@ -330,7 +330,7 @@ PUBLIC void renderBombsAndExplosions(Game game, udpData packetData) {
                 if (createPowerUpDown) {
                     activeBox[downBoxRow][downBoxColumn] =  5;
                 }
-                whatBoxes(game->power, packetData);
+                whatBoxes(game->power, packetData,net);
                 game->bombs[i] = NULL;                                                                          // Raderar bomben
             }
         }

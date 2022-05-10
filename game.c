@@ -245,7 +245,7 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
             SDL_RenderCopy(game->renderer, game->background, NULL, NULL);
             renderPowerUps(game);
             renderBoxes(game);
-            renderBombsAndExplosions(game,packetData);
+            renderBombsAndExplosions(game,packetData,net);
             renderPlayers(game);
             SDL_RenderPresent(game->renderer);
             
@@ -542,6 +542,9 @@ PUBLIC udpData createPacketData(Game game) {
     packetData->rowBoxThree = 0;
     packetData->colBoxThree = 0;
     packetData->valueBoxThree = 0;
+
+
+    return packetData; 
 
 }
 
