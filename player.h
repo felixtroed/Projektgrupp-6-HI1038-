@@ -3,7 +3,6 @@
 
 #include "game.h"
 #include <stdbool.h>
-
 #include <SDL.h>
 #include <SDL_image.h>
 //#include <SDL2/SDL.h>
@@ -24,9 +23,10 @@ typedef struct PlayerSettings {
     int speed;
     int explosionRange; 
     int numOfBoxes; 
-    uint8_t maxBombs; 
     uint8_t lifes;
     uint8_t bombsAvailable;
+         int prevPosx;
+        int prevPosy;
 } *Player;
 
 Player createPlayer(int playerNumber, int x, int y, Game game);

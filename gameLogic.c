@@ -9,10 +9,6 @@
 
 #define BOMB_SIZE 34
 
-
-#define PUBLIC /* empty */
-#define PRIVATE static
-
 typedef struct InvincibilityCallbackArgs {
     Player player;
     udpData packetData;
@@ -100,8 +96,6 @@ bool collisionMap(Player p1) {
     return true;
 }
 
-
-
 bool collisionBoxes(Player p1)
 {
     int posBoxX = 0, posBoxY = 0;
@@ -132,118 +126,11 @@ bool collisionBoxes(Player p1)
 }
 
 
-/*void pickUpPowerUps(Player p1,Network net, udpData packetData) {
+void pickUpPowerUps(Player p1,Network net, udpData packetData) {
     //printf("char posX: %d\tposY: %d\n", p1->pos.x, p1->pos.y);
     for (int row = 0; row < ROW_SIZE; row++) {
         for (int column = 0; column < COLUMN_SIZE; column++) {
             if (activeBox[row][column] >= 4) {
-   */
-void whatBoxes(PowerUPS power, udpData packetData){
-    int arrayRow[3], arrayValue[3], arrayCol[3], i = 0;
-
-    for (int row =0 ; row < ROW_SIZE;row++)
-    {
-        for (int col = 0; col < COLUMN_SIZE;col++)
-        {
-            if (activeBox[row][col] == 5)
-            {
-                arrayValue[i] = power->powerMap[row][col] = (rand() % +4) + 4;
-                arrayRow[i] = row; 
-                arrayCol[i] = col; 
-               // printf("COL %d   ROW %D ", col, row);
-                activeBox[row][col] = 0;
-                i++;
-                
-            }
-
-        }
-    }
-    //printf(" %d  IIII ", i);
-
-    if (i == 1)
-    {
-        packetData->colBoxOne = arrayCol[0];
-        packetData->rowBoxOne = arrayRow[0];
-        packetData->valueBoxOne = arrayValue[0];
-        printf("1 ARRAYCOL: %d  ARRAYROW: %d ARRAYVALUE %d\n", arrayCol[0],arrayRow[0],arrayValue[0]);
-
-    }
-
-    if (i == 2)
-    {
-        packetData->colBoxTwo = arrayCol[1];
-        packetData->rowBoxTwo = arrayRow[1];
-        packetData->valueBoxTwo = arrayValue[1];
-        printf("2 ARRAYCOL: %d  ARRAYROW: %d ARRAYVALUE %d\n", arrayCol[1], arrayRow[1], arrayValue[1]);
-
-
-    }
-
-    if (i == 3)
-    {
-        packetData->colBoxThree = arrayCol[2];
-        packetData->rowBoxThree = arrayRow[2];
-        packetData->valueBoxThree = arrayValue[2];
-        printf("3 ARRAYCOL: %d  ARRAYROW: %d ARRAYVALUE %d\n", arrayCol[2], arrayRow[2], arrayValue[2]);
-
-
-    }
-   }
-
-
-void PlayerPickUpPower(Player player, PowerUPS power, udpData packetData) {
-    int indexCol = ((((player->pos.x + 32) / 64) * 64 ) / 64) - 1;
-    int indexRow = ((((player->pos.y + 32) / 64) * 64 ) / 64) - 1;
-   
-        if (power->powerMap[indexRow][indexCol] == 4 && player->speed < 5)
-        {
-            printf("Picked up power-up: Speed\n");
-          
-                player->speed ++;
-                power->powerMap[indexRow][indexCol] = 0;
-                packetData->PowerUpGone = 1;
-                packetData->powerCol = indexCol;
-                packetData->powerRow = indexRow;
-
-        }
-
-        if (power->powerMap[indexRow][indexCol] == 5 && player->maxBombs < 5)
-        {
-                printf("Picked up power-up: +1 Bombs\n");
-                player->bombsAvailable++;
-                player->maxBombs++; 
-                power->powerMap[indexRow][indexCol] = 0;
-                packetData->PowerUpGone = 1;
-                packetData->powerCol = indexCol;
-                packetData->powerRow = indexRow;
-
-
-        }
-
-
-        if (power->powerMap[indexRow][indexCol] == 6 && player->explosionRange < 5)
-        {
-            printf("Picked up power-up: Longer Explosion\n");
-            player->explosionRange++;
-            power->powerMap[indexRow][indexCol] = 0;
-            packetData->PowerUpGone = 1; 
-            packetData->powerCol = indexCol;
-            packetData->powerRow = indexRow;
-        }
-
-
-}
-
-void powerUpRemoved(int powerRow, int powerCol, PowerUPS power) {
-    power->powerMap[powerRow][powerCol] = 0; 
-}
-
-/*
-void pickUpPowerUps(Player p1,Network net, udpData packetData,PowerUPS power) {
-    //printf("char posX: %d\tposY: %d\n", p1->pos.x, p1->pos.y);
-    for (int row = 0; row < ROW_SIZE; row++) {
-        for (int column = 0; column < COLUMN_SIZE; column++) {
-            if (power->powerMap[row][column] >= 4) {
                 int powerUpLeft = column * 64 + 64 - 30;
                 int powerUpRight = powerUpLeft + 64;
                 int powerUpUp = row * 64 + 14;
@@ -252,7 +139,6 @@ void pickUpPowerUps(Player p1,Network net, udpData packetData,PowerUPS power) {
                 if (p1->pos.x > powerUpLeft && p1->pos.x < powerUpRight && p1->pos.y > powerUpUp && p1->pos.y < powerUpDown)
                 {
                     if (activeBox[row][column] == 4) {
-
                         printf("Picked up power-up: Speed\n");
                         if (p1->speed < 5) {				// Speed värdet startar 2, max 3 uppgraderingar
                             p1->speed += 1;
@@ -260,7 +146,6 @@ void pickUpPowerUps(Player p1,Network net, udpData packetData,PowerUPS power) {
                         }
                     }
                     else if (activeBox[row][column] == 5) {
-
                         printf("Picked up power-up: +1 Bombs\n");
                         if (p1->bombsAvailable < 5) {				// Max 5 bomber, (plockar up max 4 uppgraderingar)
                             p1->bombsAvailable += 1;
@@ -268,7 +153,6 @@ void pickUpPowerUps(Player p1,Network net, udpData packetData,PowerUPS power) {
                         }
                     }
                     else if (activeBox[row][column] == 6) {
-
                         printf("Picked up power-up: Longer Explosion\n");
                         if (p1->explosionRange < 5) {				// Max längd = mitten rutan + 5 rutor ut
                             p1->explosionRange += 1;
@@ -276,25 +160,17 @@ void pickUpPowerUps(Player p1,Network net, udpData packetData,PowerUPS power) {
                             packetData->explosionRange = p1->explosionRange;
                         }
                     }
-                    net->boxGone = true; 
-                    packetData->boxCol = column; 
-                    packetData->boxRow = row;
-                    packetData->boxValue = 0; 
-                    boxeGone(row, column, 0);
-                        }
-                    }
-                    packetData->PowerUpGone = 1; 
-                    packetData->powerCol = column; 
-                    packetData->powerRow = row;
-                    power->powerMap[row][column] = 0;
+                    packetData->powerUpRow = row;
+                    packetData->powerUpCol = column;
+                    packetData->powerUpTaken = 1;
+                    powerUpGone(row, column, 0);
+                    net->willSend = true;
                 }
             }
         }
     }
 }
 
-
-*/
 
 bool collisionBomb(Player p1, Bomb bombs[]) {
     for (uint8_t i = 0; i < BOMBS; i++) {
@@ -445,123 +321,123 @@ void removeBox(Player p1, Boxes boxes) {
 
 } */
 
+void powerUpGone(int row, int col, int value) {
+    activeBox[row][col] = value;
+}
 
 
-void move(Player player,int *lastMove, int *newMove, char key, Bomb bombs[], int *frames, Network net, udpData packetData, PowerUPS power) {
-    int prevXPos = player->pos.x;
-    int prevYPos = player->pos.y;
-    
+
+void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *frames, Network net, udpData packetData) {
+   
+    if (p1->prevPosx == 0)
+    {
+        p1->prevPosx = p1->pos.x;
+        p1->prevPosy = p1->pos.y;
+    }
     switch (key) {
     case 's':
-        player->pos.y += player->speed;
-        if (!checkCollision(player, bombs)) {
-            player->pos.y -= player->speed;
+        p1->pos.y += p1->speed;
+        if (!checkCollision(p1, bombs)) {
+            p1->pos.y -= p1->speed;
         }
-        if (*newMove == *lastMove && player->currentFrame <= 3) {
+        if (*newMove == *lastMove && p1->currentFrame <= 3) {
             *frames += 1;
-            if (*frames == CHAR_REFRESH_RATE / player->speed) {
+            if (*frames == CHAR_REFRESH_RATE / p1->speed) {
                 *frames = 0;
                 *lastMove = *newMove;
-                player->currentFrame++;
-                if (player->currentFrame > 3) {
-                    player->currentFrame = 0;
+                p1->currentFrame++;
+                if (p1->currentFrame > 3) {
+                    p1->currentFrame = 0;
                 }
             }
         }
         else {
             *frames = 0;
-            player->currentFrame = 0;
+            p1->currentFrame = 0;
             *lastMove = *newMove = 0;
         }
-        PlayerPickUpPower(player, power, packetData);
         break;
 
     case 'w':
-        player->pos.y -= player->speed;
-        if (!checkCollision(player, bombs)) {
-            player->pos.y += player->speed;
+        p1->pos.y -= p1->speed;
+        if (!checkCollision(p1, bombs)) {
+            p1->pos.y += p1->speed;
         }
-        if (*newMove == *lastMove && player->currentFrame <= 7 && player->currentFrame > 3) {
+        if (*newMove == *lastMove && p1->currentFrame <= 7 && p1->currentFrame > 3) {
             *frames += 1;
-            if (*frames == CHAR_REFRESH_RATE / player->speed) {
+            if (*frames == CHAR_REFRESH_RATE / p1->speed) {
                 *frames = 0;
                 *lastMove = *newMove;
-                player->currentFrame++;
-                if (player->currentFrame > 7) {
-                    player->currentFrame = 4;
+                p1->currentFrame++;
+                if (p1->currentFrame > 7) {
+                    p1->currentFrame = 4;
                 }
             }
         }
         else {
             *frames = 0;
-            player->currentFrame = 4;
+            p1->currentFrame = 4;
             *lastMove = *newMove = 4;
         }
-        PlayerPickUpPower(player, power, packetData);
-
         break;
 
     case 'a':
-        player->pos.x -= player->speed;
-        if (!checkCollision(player, bombs)) {
-            player->pos.x += player->speed;
+        p1->pos.x -= p1->speed;
+        if (!checkCollision(p1, bombs)) {
+            p1->pos.x += p1->speed;
         }
-        if (*newMove == *lastMove && player->currentFrame <= 15 && player->currentFrame > 11) {
+        if (*newMove == *lastMove && p1->currentFrame <= 15 && p1->currentFrame > 11) {
             *frames += 1;
-            if (*frames == CHAR_REFRESH_RATE / player->speed) {
+            if (*frames == CHAR_REFRESH_RATE / p1->speed) {
                 *frames = 0;
                 *lastMove = *newMove;
-                player->currentFrame++;
-                if (player->currentFrame > 15) {
-                    player->currentFrame = 12;
+                p1->currentFrame++;
+                if (p1->currentFrame > 15) {
+                    p1->currentFrame = 12;
                 }
             }
         }
         else {
             *frames = 0;
-            player->currentFrame = 12;
+            p1->currentFrame = 12;
             *lastMove = *newMove = 12;
         }
-        PlayerPickUpPower(player, power, packetData);
-
         break;
 
     case 'd':
-        player->pos.x += player->speed;
-        if (!checkCollision(player, bombs)) {
-            player->pos.x -= player->speed;
+        p1->pos.x += p1->speed;
+        if (!checkCollision(p1, bombs)) {
+            p1->pos.x -= p1->speed;
         }
-        if (*newMove == *lastMove && player->currentFrame <= 11 && player->currentFrame > 7) {
+        if (*newMove == *lastMove && p1->currentFrame <= 11 && p1->currentFrame > 7) {
             *frames += 1;
-            if (*frames == CHAR_REFRESH_RATE / player->speed) {
+            if (*frames == CHAR_REFRESH_RATE / p1->speed) {
                 *frames = 0;
                 *lastMove = *newMove;
-                player->currentFrame++;
-                if (player->currentFrame > 11) {
-                    player->currentFrame = 8;
+                p1->currentFrame++;
+                if (p1->currentFrame > 11) {
+                    p1->currentFrame = 8;
                 }
             }
         }
         else {
             *frames = 0;
-            player->currentFrame = 8;
+            p1->currentFrame = 8;
             *lastMove = *newMove = 8;
         }
-        PlayerPickUpPower(player, power, packetData);
         break;
 
     default: break;
     }
+    
 
-    if(prevXPos != player->pos.x || prevYPos != player->pos.y) {
-
+    if(5 < abs(p1->prevPosx - p1->pos.x) || 5 < abs(p1->prevPosy - p1->pos.y) ) {
         net->willSend = true;
-        packetData->xPos = player->pos.x;
-        packetData->yPos = player->pos.y;
-        packetData->frame = player->currentFrame;
+        packetData->xPos = p1->pos.x;
+        packetData->yPos = p1->pos.y;
+        packetData->frame = p1->currentFrame;
 
-        prevXPos = player->pos.x;
-        prevYPos = player->pos.y;
-
+        p1->prevPosx = p1->pos.x;
+        p1->prevPosy = p1->pos.y;
     }
 }

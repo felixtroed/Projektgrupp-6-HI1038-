@@ -37,17 +37,16 @@ typedef struct GameSettings {
     SDL_Texture *redInstructions;
     SDL_Texture *redQuit;
     SDL_Texture *redBack;
-    SDL_Texture *dead;
     SDL_Rect menuOptionPos[MENUOPTIONS];
     SDL_Rect boxPos;                  //Anv�nds f�r positionen av l�dorna
     SDL_Event event;
-    bool accessToServer;
+    SDL_Texture *dead;
+    //Boxes boxes;
     PowerUPS power;
     Player player[NUMPLAYERS];
     Bomb bombs[BOMBS];                // Contains all simultaneously allowed bombs
     uint8_t activePlayers;
     uint8_t pIdx;
-
 } *Game;
 
 typedef struct udpData {
@@ -57,43 +56,37 @@ typedef struct udpData {
     int frame;
     int isHurt;
     int isDead;
-
-    int powerCol;
-    int powerRow;
-    int PowerUpGone;
+    int powerUpCol;
+    int powerUpRow;
     int bombDropped;
     int bombPosX;
     int bombPosY;
     int explosionRange;
-
-
-    int rowBoxOne;
-    int colBoxOne;
-    int valueBoxOne;
-
-    int rowBoxTwo;
-    int colBoxTwo;
-    int valueBoxTwo;
-
-    int rowBoxThree;
-    int colBoxThree;
-    int valueBoxThree;
-    
+    int powerUpTaken;
+    int leftBoxVal;
+    int leftBoxRow;
+    int leftBoxCol;
+    int rightBoxVal;
+    int rightBoxRow;
+    int rightBoxCol;
+    int topBoxVal;
+    int topBoxRow;
+    int topBoxCol;
+    int bottomBoxVal;
+    int bottomBoxRow;
+    int bottomBoxCol;
+    int explosionDone;
 } *udpData;
-
 
 typedef struct NetworkData {
     UDPsocket sd;
     IPaddress srvAddr;
-    UDPpacket *packet0; 
 	UDPpacket *packet1;
     UDPpacket *packet2;
-    char inputIPAddress[20];
     bool willSend;
-    bool boxGone;
 } *Network;
 
-Game createGame();
+Game createGame(Network net);
 void updateGame(Game game, Network net, udpData packetData);
 void exitGame(Game game, Network net, udpData packetData);
 Network createNet();
