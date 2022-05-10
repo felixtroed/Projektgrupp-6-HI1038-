@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
 	}
 
 	/* Make space for the packet */
-	if (!((pSend = SDLNet_AllocPacket(512)) && (pReceive = SDLNet_AllocPacket(512))))
+	if (!((pSend = SDLNet_AllocPacket(512)) && (pReceive = SDLNet_AllocPacket(512) )))
 	{
 		fprintf(stderr, "SDLNet_AllocPacket Error: %s\n", SDLNet_GetError());
 		exit(EXIT_FAILURE);
@@ -148,7 +148,6 @@ void initClient(UDPsocket sd, UDPpacket *pReceive, UDPpacket *pSend, Uint32 *cli
 
 	pSend->address.host = *clientIP;
 	pSend->address.port = *clientPort;
-
 	if (data->nrOfClients == 0) {
 		printf("Client 1\n");
 		sprintf((char *)pSend->data, "%d\n", 0);  // Sets client to player 1
