@@ -555,15 +555,15 @@ void move(Player player,int *lastMove, int *newMove, char key, Bomb bombs[], int
     default: break;
     }
 
-    if(prevXPos != player->pos.x || prevYPos != player->pos.y) {
+    if(prevXPos != p1->pos.x || prevYPos != p1->pos.y) {
 
         net->willSend = true;
         packetData->xPos = player->pos.x;
         packetData->yPos = player->pos.y;
         packetData->frame = player->currentFrame;
 
-        prevXPos = player->pos.x;
-        prevYPos = player->pos.y;
+        prevXPos = p1->pos.x;
+        prevYPos = p1->pos.y;
 
     }
 }
