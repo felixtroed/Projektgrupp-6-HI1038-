@@ -160,7 +160,7 @@ void whatBoxes(PowerUPS power, udpData packetData){
     }
     //printf(" %d  IIII ", i);
 
-    if (i == 1)
+    if (i < 2 && i>0)
     {
         packetData->colBoxOne = arrayCol[0];
         packetData->rowBoxOne = arrayRow[0];
@@ -169,7 +169,7 @@ void whatBoxes(PowerUPS power, udpData packetData){
 
     }
 
-    if (i == 2)
+    if (i < 3 && i > 1)
     {
         packetData->colBoxTwo = arrayCol[1];
         packetData->rowBoxTwo = arrayRow[1];
