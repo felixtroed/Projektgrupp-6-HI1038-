@@ -10,6 +10,8 @@
 
 #define POWERUP_SIZE 50
 
+activePowers[ROW_SIZE][COLUMN_SIZE]; 
+
 typedef struct GameSettings* Game;
 
 typedef struct PowerUPS {

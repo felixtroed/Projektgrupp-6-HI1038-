@@ -25,10 +25,6 @@ typedef struct PlayerSettings {
     int numOfBoxes; 
     uint8_t lifes;
     uint8_t bombsAvailable;
-    int prevPosx;
-    int prevPosy;
-    int maxBombs; 
-    
 } *Player;
 
 Player createPlayer(int playerNumber, int x, int y, Game game);

@@ -126,60 +126,11 @@ bool collisionBoxes(Player p1)
 }
 
 
-void PlayerPickUpPower(Player player, udpData packetData) {
-    int indexCol = ((((player->pos.x + 32) / 64) * 64) / 64) - 1;
-    int indexRow = ((((player->pos.y + 32) / 64) * 64) / 64) - 1;
-
-    if (activeBox[indexRow][indexCol] == 4 && player->speed < 5)
-    {
-        printf("Picked up power-up: Speed\n");
-
-        player->speed++;
-        activeBox[indexRow][indexCol] = 0;
-        player->explosionRange++;
-        packetData->powerUpRow = indexRow;
-        packetData->powerUpCol = indexCol;
-        packetData->powerUpTaken = 1;
-        powerUpGone(indexRow, indexCol, 0);
-        activeBox[indexRow][indexCol] = 0;
-     
-    }
-
-    if (activeBox[indexRow][indexCol] == 5 && player->maxBombs < 5)
-    {
-        printf("Picked up power-up: +1 Bombs\n");
-        player->bombsAvailable++;
-        player->maxBombs++;
-        player->explosionRange++;
-        packetData->powerUpRow = indexRow;
-        packetData->powerUpCol = indexCol;
-        packetData->powerUpTaken = 1;
-        powerUpGone(indexRow, indexCol, 0);
-        activeBox[indexRow][indexCol] = 0;
-        
-    }
-
-
-    if (activeBox[indexRow][indexCol] == 6  && player->explosionRange < 5)
-    {
-        printf("Picked up power-up: Longer Explosion\n");
-        player->explosionRange++;
-        packetData->powerUpRow = indexRow;
-        packetData->powerUpCol = indexCol;
-        packetData->powerUpTaken = 1;
-        powerUpGone(indexRow, indexCol, 0);
-        activeBox[indexRow][indexCol] = 0;
-    }
-
-
-}
-
-/*
 void pickUpPowerUps(Player p1,Network net, udpData packetData) {
     //printf("char posX: %d\tposY: %d\n", p1->pos.x, p1->pos.y);
     for (int row = 0; row < ROW_SIZE; row++) {
         for (int column = 0; column < COLUMN_SIZE; column++) {
-            if (activeBox[row][column] >= 4) {
+            if (activePowers[row][column] >= 4) {
                 int powerUpLeft = column * 64 + 64 - 30;
                 int powerUpRight = powerUpLeft + 64;
                 int powerUpUp = row * 64 + 14;
@@ -187,7 +138,7 @@ void pickUpPowerUps(Player p1,Network net, udpData packetData) {
 
                 if (p1->pos.x > powerUpLeft && p1->pos.x < powerUpRight && p1->pos.y > powerUpUp && p1->pos.y < powerUpDown)
                 {
-                    if (activeBox[row][column] == 4) {
+                    if (activePowers[row][column] == 4) {
                         printf("Picked up power-up: Speed\n");
                         if (p1->speed < 5) {				// Speed värdet startar 2, max 3 uppgraderingar
                             p1->speed += 1;
@@ -201,7 +152,7 @@ void pickUpPowerUps(Player p1,Network net, udpData packetData) {
                             printf("+1 Bombs!\n");
                         }
                     }
-                    else if (activeBox[row][column] == 6) {
+                    else if (activePowers[row][column] == 6) {
                         printf("Picked up power-up: Longer Explosion\n");
                         if (p1->explosionRange < 5) {				// Max längd = mitten rutan + 5 rutor ut
                             p1->explosionRange += 1;
@@ -219,7 +170,7 @@ void pickUpPowerUps(Player p1,Network net, udpData packetData) {
         }
     }
 }
- */
+
 
 bool collisionBomb(Player p1, Bomb bombs[]) {
     for (uint8_t i = 0; i < BOMBS; i++) {
@@ -371,18 +322,15 @@ void removeBox(Player p1, Boxes boxes) {
 } */
 
 void powerUpGone(int row, int col, int value) {
-    activeBox[row][col] = value;
+    activePowers[row][col] = value;
 }
 
 
 
 void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *frames, Network net, udpData packetData) {
-   
-    if (p1->prevPosx == 0)
-    {
-        p1->prevPosx = p1->pos.x;
-        p1->prevPosy = p1->pos.y;
-    }
+    int prevXPos = p1->pos.x;
+    int prevYPos = p1->pos.y;
+    
     switch (key) {
     case 's':
         p1->pos.y += p1->speed;
@@ -478,16 +426,14 @@ void move(Player p1,int *lastMove, int *newMove, char key, Bomb bombs[], int *fr
 
     default: break;
     }
-    
 
-    if(4 < abs(p1->prevPosx - p1->pos.x) || 4 < abs(p1->prevPosy - p1->pos.y) ) {
+    if(prevXPos != p1->pos.x || prevYPos != p1->pos.y) {
         net->willSend = true;
         packetData->xPos = p1->pos.x;
         packetData->yPos = p1->pos.y;
         packetData->frame = p1->currentFrame;
 
-        p1->prevPosx = p1->pos.x;
-        p1->prevPosy = p1->pos.y;
-        PlayerPickUpPower(p1, packetData);
+        prevXPos = p1->pos.x;
+        prevYPos = p1->pos.y;
     }
 }

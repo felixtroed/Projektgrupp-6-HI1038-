@@ -1,5 +1,7 @@
 #include "powerUps.h"
 
+activePowers[ROW_SIZE][COLUMN_SIZE] = {0};
+
 PowerUPS createPowers(Game game)
 {
 	PowerUPS power = malloc(sizeof(struct PowerUPS));
@@ -26,19 +28,20 @@ void renderPowerUps(Game game) {
 
 	for (int row = 0; row < ROW_SIZE; row++) {
 		for (int column = 0; column < COLUMN_SIZE; column++) {
-			if (activeBox[row][column] == 4) {
+
+			if (activePowers[row][column] == 4) {
 				game->power->pos.x= column * 64 + 64 + 7;
 				game->power->pos.y = row * 64 + 64 + 7;
 				SDL_RenderCopy(game->renderer, game->power->speed, NULL, &game->power->pos);
 				// printf("'activeBox[row][column] == 4' - passed.\n");
 			}
-			if (activeBox[row][column] == 5) {
+			if (activePowers[row][column] == 5) {
 				game->power->pos.x = column * 64 + 64 + 7;
 				game->power->pos.y = row * 64 + 64 + 7;
 				SDL_RenderCopy(game->renderer, game->power->moreBombs, NULL, &game->power->pos);
 				// printf("'activeBox[row][column] == 5' - passed.\n");
 			}
-			if (activeBox[row][column] == 6)
+			if (activePowers[row][column] == 6)
 			{
 				game->power->pos.x = column * 64 + 64 + 7;
 				game->power->pos.y = row * 64 + 64 + 7;
