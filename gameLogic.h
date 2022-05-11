@@ -17,11 +17,11 @@ typedef struct BoxInit* Boxes;
 typedef struct NetworkData* Network;
 typedef struct udpData* udpData;
 
-bool collisionMap(Player p1);
-void move(Player p1, int* lastMove, int* newMove, char key, Bomb bombs[], int *frames, Network net, udpData packetData);
-bool collisionBoxes(Player p1);
-bool checkCollision(Player p1, Bomb bombs[]);
-bool collisionBomb(Player p1, Bomb bombs[]);
+bool collisionMap(Player player);
+void move(Player player, int* lastMove, int* newMove, char key, Bomb bombs[], int *frames, Network net, udpData packetData);
+bool collisionBoxes(Player player);
+bool checkCollision(Player player, Bomb bombs[]);
+bool collisionBomb(Player player, Bomb bombs[]);
 void handlePlayerExplosionCollision(Game game, Network net, udpData packetData);
 void powerUpGone(int row,int col,int value); 
 void pickUpPowerUps(Player player, Network net, udpData packetData);

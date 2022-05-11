@@ -25,6 +25,9 @@ typedef struct PlayerSettings {
     int numOfBoxes; 
     uint8_t lifes;
     uint8_t bombsAvailable;
+    int prevPosX;
+    int prevPosY;
+    int maxBombs; 
 } *Player;
 
 Player createPlayer(int playerNumber, int x, int y, Game game);

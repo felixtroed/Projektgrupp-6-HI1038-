@@ -578,6 +578,5 @@ PUBLIC udpData createPacketData(Game game) {
     packetData->rightBoxRow = 0;
     packetData->topBoxCol = 0; 
     packetData->topBoxRow = 0; 
-
     return packetData;
 }
