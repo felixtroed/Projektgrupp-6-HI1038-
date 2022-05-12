@@ -1,6 +1,5 @@
 #include "powerUps.h"
-
-activePowers[ROW_SIZE][COLUMN_SIZE] = {0};
+int activePowers[ROW_SIZE][COLUMN_SIZE] = { 0 };
 
 PowerUPS createPowers(Game game)
 {

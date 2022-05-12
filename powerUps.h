@@ -10,7 +10,7 @@
 
 #define POWERUP_SIZE 50
 
-activePowers[ROW_SIZE][COLUMN_SIZE]; 
+int activePowers[ROW_SIZE][COLUMN_SIZE]; 
 
 typedef struct GameSettings* Game;
 
@@ -19,6 +19,7 @@ typedef struct PowerUPS {
 	SDL_Texture* speed;
 	SDL_Texture* moreBombs;
 	SDL_Texture* biggerExplosions; 
+	int activePowers[ROW_SIZE][COLUMN_SIZE];
 }*PowerUPS;
 
 
