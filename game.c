@@ -359,19 +359,25 @@ PRIVATE void receiveUDPData(Game game, Network net) {
             game->bombs[bombIdx]->deleteBombTime = SDL_AddTimer(4000, explosionDoneClient, callbackArgs);
         }
         if (leftBoxVal >= 0) {
-            activeBox[leftBoxRow][leftBoxCol] = leftBoxVal; 
+            activePowers[leftBoxRow][leftBoxCol] = leftBoxVal; 
+            printf("ROW: %d  COL %d VALUE: %d\n", leftBoxRow, leftBoxCol, leftBoxVal);
+
         }
         if (rightBoxVal >= 0) {
-            activeBox[rightBoxRow][rightBoxCol] = rightBoxVal; 
+            activePowers[rightBoxRow][rightBoxCol] = rightBoxVal; 
+            printf("ROW: %d  COL %d VALUE: %d\n", rightBoxRow, rightBoxCol, rightBoxVal);
+
         }
         if (topBoxVal >= 0) {
-            activeBox[topBoxRow][topBoxCol] = topBoxVal; 
+            printf("ROW: %d  COL %d VALUE: %d\n", topBoxRow, topBoxCol, topBoxVal);
+            activePowers[topBoxRow][topBoxCol] = topBoxVal; 
         }
         if (bottomBoxVal >= 0) {
-            activeBox[bottomBoxRow][bottomBoxCol] = bottomBoxVal; 
+            printf("ROW: %d  COL %d VALUE: %d\n", bottomBoxRow, bottomBoxCol,bottomBoxVal);
+            activePowers[bottomBoxRow][bottomBoxCol] = bottomBoxVal; 
         }
         if (powerUpTaken) {
-            activeBox[powerUpRow][powerUpCol] = 0;
+            activePowers[powerUpRow][powerUpCol] = 0;
         }
         if (isHurt) {
             game->player[idx]->isHurt = true;
@@ -402,7 +408,7 @@ PRIVATE bool initNetwork(Network net, char inputIPAddress[]) {
 	}
 
     /* Resolve server name  */
-	if (SDLNet_ResolveHost(&net->srvAddr, inputIPAddress, 2000) == -1)
+	if (SDLNet_ResolveHost(&net->srvAddr, "127.0.0.1", 2000) == -1)
 	{
 		fprintf(stderr, "SDLNet_ResolveHost(192.0.0.1 2000) Error: %s\n", SDLNet_GetError());
         net->willSend = true;
@@ -564,5 +570,13 @@ PUBLIC udpData createPacketData(Game game) {
     packetData->topBoxVal = -1;
     packetData->bottomBoxVal = -1;
 
+    packetData->bottomBoxCol = 0;
+    packetData->bottomBoxRow = 0; 
+    packetData->leftBoxCol = 0;
+    packetData->leftBoxRow = 0; 
+    packetData->rightBoxCol = 0;
+    packetData->rightBoxRow = 0;
+    packetData->topBoxCol = 0; 
+    packetData->topBoxRow = 0; 
     return packetData;
 }
