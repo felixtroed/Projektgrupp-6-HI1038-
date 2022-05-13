@@ -55,7 +55,6 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
     player->lifes = 3;
     player->prevPosX = 0; 
     player->prevPosY = 0; 
-    player->maxBombs = 1; 
     initClips(player);
     return player;
 }
@@ -143,10 +142,6 @@ PRIVATE void initClips(Player player) {
  }
 
 PUBLIC void renderPlayers(Game game) {
-    if (!game->player[game->pIdx]->isAlive) {
-        SDL_RenderCopy(game->renderer, game->dead, NULL, NULL);
-    }
-    
     for (uint8_t i = 0; i < game->activePlayers; i++) {
         if (game->player[i]->isAlive) {
             if (game->player[i]->isHurt)

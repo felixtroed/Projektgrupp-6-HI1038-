@@ -41,6 +41,7 @@ void handlePlayerExplosionCollision(Game game, Network net, udpData packetData) 
                             game->player[game->pIdx]->isAlive = false;
                             printf("Player died.\n");
                             packetData->isDead = 1;
+                            game->playersDead++;
                             return;
                         }
 
@@ -140,25 +141,22 @@ void pickUpPowerUps(Player player,Network net, udpData packetData) {
                 {
                     if (activePowers[row][column] == 4) {
                         printf("Picked up power-up: Speed\n");
-                        if (player->speed < 5) 
-                    {				// Speed värdet startar 2, max 3 uppgraderingar
-                            player->speed ++;
+                        if (player->speed < 5) {				// Speed värdet startar 2, max 3 uppgraderingar
+                            player->speed++;
                             printf("Speed increased!\n");
                         }
                     }
                     else if (activePowers[row][column] == 5) {
                         printf("Picked up power-up: +1 Bombs\n");
-                        if (player->maxBombs< 5) {				// Max 5 bomber, (plockar up max 4 uppgraderingar)
-                            player->bombsAvailable ++;
-                            player->maxBombs++; 
+                        if (player->bombsAvailable < 5) {				// Max 5 bomber, (plockar up max 4 uppgraderingar)
+                            player->bombsAvailable++;
                             printf("+1 Bombs!\n");
-                            printf("%d\n",player->maxBombs); 
                         }
                     }
                     else if (activePowers[row][column] == 6) {
                         printf("Picked up power-up: Longer Explosion\n");
                         if (player->explosionRange < 5) {				// Max längd = mitten rutan + 5 rutor ut
-                            player->explosionRange ++;
+                            player->explosionRange++;
                             printf("Explosion Range increased!\n");
                             packetData->explosionRange = player->explosionRange;
                         }

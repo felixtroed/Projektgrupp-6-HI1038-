@@ -38,10 +38,16 @@ typedef struct GameSettings {
     SDL_Texture *redQuit;
     SDL_Texture *redBack;
     SDL_Texture *dead;
+    SDL_Texture* player1Wins;
+    SDL_Texture* player2Wins;
+    SDL_Texture* player3Wins;
+    SDL_Texture* player4Wins;
     SDL_Rect menuOptionPos[MENUOPTIONS];
     SDL_Rect boxPos;                  //Anv�nds f�r positionen av l�dorna
     SDL_Event event;
     bool accessToServer;
+    bool inMenu;
+    int playersDead;
 
     //Boxes boxes;
     PowerUPS power;
@@ -85,7 +91,7 @@ typedef struct NetworkData {
     IPaddress srvAddr;
 	UDPpacket *packet1;
     UDPpacket *packet2;
-    char inputIPAddress[20];
+    char inputIPAddress[30];
     bool willSend;
 } *Network;
 
