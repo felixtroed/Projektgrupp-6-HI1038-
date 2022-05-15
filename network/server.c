@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
 	}
 
 	/* Make space for the packet */
-	if (!((pSend = SDLNet_AllocPacket(sizeof(struct udpData))) && (pReceive = SDLNet_AllocPacket(sizeof(struct udpData)) )))
+	if (!((pSend = SDLNet_AllocPacket(512)) && (pReceive = SDLNet_AllocPacket(512))))
 	{
 		fprintf(stderr, "SDLNet_AllocPacket Error: %s\n", SDLNet_GetError());
 		exit(EXIT_FAILURE);

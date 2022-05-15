@@ -483,7 +483,7 @@ PRIVATE bool initNetwork(Network net, char inputIPAddress[]) {
         net->willSend = true;
 	}
 
-    if (!((net->packet1 = SDLNet_AllocPacket(sizeof(struct udpData))) && (net->packet2 = SDLNet_AllocPacket(sizeof(struct udpData)))))
+    if (!((net->packet1 = SDLNet_AllocPacket(512)) && (net->packet2 = SDLNet_AllocPacket(512))))
 	{
 		fprintf(stderr, "SDLNet_AllocPacket Error: %s\n", SDLNet_GetError());
         net->willSend = true;
