@@ -23,8 +23,6 @@ PRIVATE void resetGame(Game game, udpData packetData);
 
 PUBLIC Network createNet() {
     Network net = malloc(sizeof(struct NetworkData));
-    //char inputIPAddress[] = "1.1.1.1";
-    //initNetwork(net);
     return net;
 }
 
@@ -393,20 +391,14 @@ PRIVATE void receiveUDPData(Game game, Network net) {
         }
         if (leftBoxVal >= 0) {
             activePowers[leftBoxRow][leftBoxCol] = leftBoxVal; 
-            printf("ROW: %d  COL %d VALUE: %d\n", leftBoxRow, leftBoxCol, leftBoxVal);
-
         }
         if (rightBoxVal >= 0) {
             activePowers[rightBoxRow][rightBoxCol] = rightBoxVal; 
-            printf("ROW: %d  COL %d VALUE: %d\n", rightBoxRow, rightBoxCol, rightBoxVal);
-
         }
         if (topBoxVal >= 0) {
-            printf("ROW: %d  COL %d VALUE: %d\n", topBoxRow, topBoxCol, topBoxVal);
             activePowers[topBoxRow][topBoxCol] = topBoxVal; 
         }
         if (bottomBoxVal >= 0) {
-            printf("ROW: %d  COL %d VALUE: %d\n", bottomBoxRow, bottomBoxCol,bottomBoxVal);
             activePowers[bottomBoxRow][bottomBoxCol] = bottomBoxVal; 
         }
         if (powerUpTaken) {
@@ -491,7 +483,7 @@ PRIVATE bool initNetwork(Network net, char inputIPAddress[]) {
         net->willSend = true;
 	}
 
-    if (!((net->packet1 = SDLNet_AllocPacket(512)) && (net->packet2 = SDLNet_AllocPacket(512))))
+    if (!((net->packet1 = SDLNet_AllocPacket(sizeof(struct udpData))) && (net->packet2 = SDLNet_AllocPacket(sizeof(struct udpData)))))
 	{
 		fprintf(stderr, "SDLNet_AllocPacket Error: %s\n", SDLNet_GetError());
         net->willSend = true;
