@@ -329,6 +329,8 @@ void powerUpGone(int row, int col, int value) {
 
 
 void move(Player player,int *lastMove, int *newMove, char key, Bomb bombs[], int *frames, Network net, udpData packetData) {
+    static int netDelay = 0;
+
     if (player->prevPosX == 0)
     {
         player->prevPosX = player->pos.x;
@@ -430,14 +432,16 @@ void move(Player player,int *lastMove, int *newMove, char key, Bomb bombs[], int
     default: break;
     }
 
-    if (4 < abs(player->prevPosX - player->pos.x) || 4 < abs(player->prevPosY - player->pos.y))
-    {
-            packetData->xPos = player->pos.x;
-            packetData->yPos = player->pos.y;
-            packetData->frame = player->currentFrame;
-            player->prevPosX = player->pos.x; 
-            player->prevPosY = player->pos.y; 
-            net->willSend = true;
-
+    if (netDelay < 1) {                             // 1 = 50%, 2 = 66%, 3 = 75%, 4 = 80%, 5 = 83%...
+        netDelay++;                                 // Till exempel om 5: kör på 0-4 och skippa 5. Alltså kör 5 frames och skippa frame 6
+        packetData->xPos = player->pos.x;
+        packetData->yPos = player->pos.y;
+        packetData->frame = player->currentFrame;
+        player->prevPosX = player->pos.x;
+        player->prevPosY = player->pos.y;
+        net->willSend = true;
+    }
+    else {
+        netDelay = 0;
     }
 }

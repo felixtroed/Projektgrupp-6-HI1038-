@@ -339,6 +339,9 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
 }
 
 PRIVATE void sendUDPData(Network net, udpData packetData) {
+    static int timer = 0;                               // För att räkna hur många paket som skickas per sekund. (Bara ett test, kan raderas när spelet/nätverket är helt klart)
+    static int counter = 0;
+
     if (net->willSend) {
         sprintf((char *)net->packet1->data, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", packetData->pIdx, packetData->xPos, packetData->yPos, packetData->frame, packetData->isHurt, packetData->isDead, packetData->powerUpRow, packetData->powerUpCol, packetData->bombDropped, packetData->bombPosX, packetData->bombPosY, packetData->explosionRange, packetData->leftBoxVal, packetData->leftBoxRow, packetData->leftBoxCol, packetData->powerUpTaken, packetData->rightBoxVal, packetData->rightBoxRow, packetData->rightBoxCol, packetData->topBoxVal, packetData->topBoxRow, packetData->topBoxCol, packetData->bottomBoxVal, packetData->bottomBoxRow, packetData->bottomBoxCol);
         net->packet1->address.host = net->srvAddr.host;	                    // Set the destination host
@@ -352,6 +355,13 @@ PRIVATE void sendUDPData(Network net, udpData packetData) {
         packetData->rightBoxVal = -1;
         packetData->topBoxVal = -1;
         packetData->bottomBoxVal = -1;
+
+        counter++;                                      // För att räkna hur många paket som skickas per sekund
+        if (SDL_GetTicks() >= timer + 1000) {           // För att räkna hur många paket som skickas per sekund
+            timer = SDL_GetTicks();
+            printf("Sent %d packets in 1 second\n", counter);
+            counter = 0;
+        }
     }
 }
 
