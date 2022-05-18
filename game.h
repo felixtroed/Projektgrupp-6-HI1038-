@@ -47,6 +47,9 @@ typedef struct GameSettings {
     SDL_Event event;
     bool accessToServer;
     bool inMenu;
+    bool allPlayersDead;
+    bool resetInitiated;
+    SDL_TimerID resetGameTime;
     int playersDead;
 
     //Boxes boxes;

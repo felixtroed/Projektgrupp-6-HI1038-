@@ -40,8 +40,15 @@ void handlePlayerExplosionCollision(Game game, Network net, udpData packetData) 
                         if (game->player[game->pIdx]->lifes <= 0) {
                             game->player[game->pIdx]->isAlive = false;
                             printf("Player died.\n");
-                            packetData->isDead = 1;
+                            
                             game->playersDead++;
+                            
+                            if (game->activePlayers == game->playersDead) {
+                                game->allPlayersDead = true;
+                                game->player[game->pIdx]->lastPlayer = true;
+                            }
+
+                            packetData->isDead = 1;
                             return;
                         }
 
