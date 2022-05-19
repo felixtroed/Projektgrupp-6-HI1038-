@@ -468,7 +468,7 @@ PRIVATE Uint32 resetGame(Uint32 interval, void *args) {
         setPlayerToNotHurt(cArgs->game->player[i]);
         setPlayerLives(cArgs->game->player[i], 3);
         setPlayerToAlive(cArgs->game->player[i]);
-        setPlayerBombsAvailable(cArgs->game->player[i], 1);
+        setBombsAvailable(cArgs->game->player[i], 1);
         setPlayerSpeed(cArgs->game->player[i], 2);
         setPlayerExpRange(cArgs->game->player[i], 2);
         setToNotLastPlayer(cArgs->game->player[i]);

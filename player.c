@@ -15,7 +15,7 @@ PUBLIC void setPlayerSpeed(Player player, int speed) {
     player->speed = speed;
 }
 
-void setPlayerBombsAvailable(Player player, uint8_t bombs) {
+void setBombsAvailable(Player player, uint8_t bombs) {
     player->bombsAvailable = bombs;
 }
 

@@ -56,7 +56,7 @@ void decrementPlayerLives(Player player);
 bool playerHasLivesRemaining(Player player);
 bool playerIsLastPlayer(Player player);
 void setPlayerLives(Player player, uint8_t lives);
-void setPlayerBombsAvailable(Player player, uint8_t bombs);
+void setBombsAvailable(Player player, uint8_t bombs);
 void setPlayerSpeed(Player player, int speed);
 void destroyPlayerTexture(Player player);
 
