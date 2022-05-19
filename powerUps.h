@@ -8,8 +8,9 @@
 #include <SDL_image.h>
 #include "box.h"
 
-
 #define POWERUP_SIZE 50
+
+int activePowers[ROW_SIZE][COLUMN_SIZE]; 
 
 typedef struct GameSettings* Game;
 
@@ -18,7 +19,7 @@ typedef struct PowerUPS {
 	SDL_Texture* speed;
 	SDL_Texture* moreBombs;
 	SDL_Texture* biggerExplosions; 
-	int powerMap[ROW_SIZE][COLUMN_SIZE]; 
+	int activePowers[ROW_SIZE][COLUMN_SIZE];
 }*PowerUPS;
 
 

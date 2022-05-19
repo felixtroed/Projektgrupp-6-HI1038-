@@ -10,11 +10,12 @@
 #include <stdio.h>
 
 int activeBox[ROW_SIZE][COLUMN_SIZE];
+int resetBoxPos[ROW_SIZE][COLUMN_SIZE];
 
 typedef struct GameSettings* Game;
 
 typedef struct BoxInit {
-	int playField[ROW_SIZE][COLUMN_SIZE];
+	int activeBox[ROW_SIZE][COLUMN_SIZE];
 } *Boxes;
 
 //Boxes createBoxes(Game game);

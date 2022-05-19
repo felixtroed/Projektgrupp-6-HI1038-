@@ -10,6 +10,9 @@
 
 typedef struct GameSettings* Game;
 
+#define PUBLIC /* empty */
+#define PRIVATE static
+
 typedef struct PlayerSettings {
     SDL_Texture *texture;
     SDL_Rect clip[16];
@@ -25,9 +28,18 @@ typedef struct PlayerSettings {
     int numOfBoxes; 
     uint8_t lifes;
     uint8_t bombsAvailable;
+    int prevPosX;
+    int prevPosY;
+    int maxBombs; 
 } *Player;
 
 Player createPlayer(int playerNumber, int x, int y, Game game);
 void renderPlayers(Game game);
+
+
+PUBLIC int getPlayerPosY();
+PUBLIC int getPlayerPosX();
+PUBLIC int setPlayerPosX(int move);
+PUBLIC int setPlayerPosY(int move);
 
 #endif /* PLAYER_H */

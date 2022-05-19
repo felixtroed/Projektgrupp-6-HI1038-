@@ -1,8 +1,5 @@
 #include "player.h"
 
-#define PUBLIC /* empty */
-#define PRIVATE static
-
 PRIVATE int PLAYER_WIDTH = 64;
 PRIVATE int PLAYER_HEIGHT = 64;
 
@@ -53,8 +50,32 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
     player->isHurt = false;
     player->isAlive = true;
     player->lifes = 3;
+    player->prevPosX = 0; 
+    player->prevPosY = 0; 
     initClips(player);
     return player;
+}
+
+
+int getPlayerPosX() {
+
+    return player->pos.x;
+
+}
+
+
+int getPlayerPosY() {
+
+    return player->pos.y;
+}
+
+
+int setPlayerPosX(int move) {
+
+}
+
+int setPlayerPosY(int move) {
+
 }
 
 PRIVATE void initClips(Player player) {
@@ -140,10 +161,6 @@ PRIVATE void initClips(Player player) {
  }
 
 PUBLIC void renderPlayers(Game game) {
-    if (!game->player[game->pIdx]->isAlive) {
-        SDL_RenderCopy(game->renderer, game->dead, NULL, NULL);
-    }
-    
     for (uint8_t i = 0; i < game->activePlayers; i++) {
         if (game->player[i]->isAlive) {
             if (game->player[i]->isHurt)
