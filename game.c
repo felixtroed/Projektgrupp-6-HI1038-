@@ -105,7 +105,7 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
                 running = false;
             }
             if (!game->inMenu) {
-                if (game->player[game->pIdx]->isAlive) {
+                if (playerIsAlive(game->player[game->pIdx])) {
                     if (game->event.type == SDL_KEYDOWN) {
                         if (game->event.key.keysym.sym == SDLK_SPACE) {                     // Space intryckt (gamla sättet som pausar i 1 sek när man håller in knappen)
                             bombPlacement(game->player[game->pIdx], game->bombs, game->pIdx, game->renderer, net, packetData);
@@ -258,7 +258,7 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
 
         if (!game->inMenu) {
             currentKeyStates = SDL_GetKeyboardState(NULL);
-            if (game->player[game->pIdx]->isAlive) {
+            if (playerIsAlive(game->player[game->pIdx])) {
                 if (currentKeyStates[SDL_SCANCODE_W] || currentKeyStates[SDL_SCANCODE_UP]) {                // Funkar för både WASD och pilar
                     move(game->player[game->pIdx], &newMove, &lastMove, KEYUP, game->bombs, &frames, net, packetData);
                     pickUpPowerUps(game->player[game->pIdx], net, packetData);
@@ -379,7 +379,7 @@ PRIVATE void sendUDPData(Network net, udpData packetData) {
         counter++;                                      // För att räkna hur många paket som skickas per sekund
         if (SDL_GetTicks() >= timer + 1000) {           // För att räkna hur många paket som skickas per sekund
             timer = SDL_GetTicks();
-            printf("Sent %d packets in 1 second\n", counter);
+            // printf("Sent %d packets in 1 second\n", counter);
             counter = 0;
         }
     }
@@ -404,16 +404,16 @@ PRIVATE void receiveUDPData(Game game, Network net) {
             (game->activePlayers)++;
         } 
         else {
-            game->player[idx]->pos.x = x;
-            game->player[idx]->pos.y = y;
-            game->player[idx]->currentFrame = currentFrame;
-            game->player[idx]->explosionRange = explosionRange;
+            setPlayerPosX(game->player[idx], x);
+            setPlayerPosY(game->player[idx], y);
+            setPlayerFrame(game->player[idx], currentFrame);
+            setPlayerExpRange(game->player[idx], explosionRange);
         }
         if (bombDropped) {
             // printf("Bomb dropped\n");
             uint8_t bombIdx = getBombIdx(game->bombs);
             BombTimerCallbackArgs *callbackArgs = malloc(sizeof(BombTimerCallbackArgs));
-            callbackArgs->bomb = game->bombs[bombIdx] = createBomb(x, y, idx, game->renderer, game->player[idx]->explosionRange);
+            callbackArgs->bomb = game->bombs[bombIdx] = createBomb(x, y, idx, game->renderer, explosionRange);
             callbackArgs->pIdx = game->pIdx;
             game->bombs[bombIdx]->redBombTime = SDL_AddTimer(2000, redBomb, callbackArgs);
             game->bombs[bombIdx]->bombTime = SDL_AddTimer(3000, explodeBomb, callbackArgs);
@@ -435,20 +435,20 @@ PRIVATE void receiveUDPData(Game game, Network net) {
             activePowers[powerUpRow][powerUpCol] = 0;
         }
         if (isHurt) {
-            game->player[idx]->isHurt = true;
+            setPlayerToHurt(game->player[idx]);
 
             if (isDead) {
-                game->player[idx]->isAlive = false;
+                setPlayerToDead(game->player[idx]);
                 game->playersDead++;
 
                 if (game->activePlayers == game->playersDead) {
                     game->allPlayersDead = true;
-                    game->player[idx]->lastPlayer = true;
+                    setPlayerToLastPlayer(game->player[idx]);
                 }
             }
         }
         else {
-            game->player[idx]->isHurt = false;
+            setPlayerToNotHurt(game->player[idx]);
         }
     }
 }
@@ -521,7 +521,7 @@ PRIVATE bool initNetwork(Network net, char inputIPAddress[]) {
 	}
 
     /* Resolve server name  */
-	if (SDLNet_ResolveHost(&net->srvAddr, "127.0.0.1", 2000) == -1)
+	if (SDLNet_ResolveHost(&net->srvAddr, inputIPAddress, 2000) == -1)
 	{
 		fprintf(stderr, "SDLNet_ResolveHost(192.0.0.1 2000) Error: %s\n", SDLNet_GetError());
         net->willSend = true;

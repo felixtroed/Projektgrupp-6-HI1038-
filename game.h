@@ -50,6 +50,7 @@ typedef struct GameSettings {
     bool allPlayersDead;
     bool resetInitiated;
     SDL_TimerID resetGameTime;
+    SDL_TimerID invincibleTimer;
     int playersDead;
 
     //Boxes boxes;

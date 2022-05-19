@@ -12,13 +12,13 @@ PUBLIC void bombPlacement(Player p, Bomb bombs[], uint8_t pIdx, SDL_Renderer *re
 PUBLIC void renderBombsAndExplosions(Game game, Network net, udpData packetData);
 
 PUBLIC void bombPlacement(Player p, Bomb bombs[], uint8_t pIdx, SDL_Renderer *renderer, Network net, udpData packetData) {
-    if (p->bombsAvailable) {
+    if (bombsAvailable(p)) {
         uint8_t bombIdx = getBombIdx(bombs);             // Get first free index to store bomb
-        (p->bombsAvailable)--;
+        decrementBombs(p);
 
         BombTimerCallbackArgs *callbackArgs = malloc(sizeof(BombTimerCallbackArgs));
-        callbackArgs->bomb = bombs[bombIdx] = createBomb(p->pos.x, p->pos.y, pIdx, renderer, p->explosionRange);
-        callbackArgs->bombsAvailable = &p->bombsAvailable;
+        callbackArgs->bomb = bombs[bombIdx] = createBomb(getPlayerPosX(p), getPlayerPosY(p), pIdx, renderer, getPlayerExpRange(p));
+        callbackArgs->bombsAvailable = getBombsAvailableVal(p);
         callbackArgs->pIdx = pIdx;
         callbackArgs->packetData = packetData;
         callbackArgs->net = net;

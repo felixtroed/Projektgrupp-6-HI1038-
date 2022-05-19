@@ -33,5 +33,25 @@ typedef struct PlayerSettings {
 
 Player createPlayer(int playerNumber, int x, int y, Game game);
 void renderPlayers(Game game);
+bool playerIsAlive(Player player);
+bool bombsAvailable(Player player);
+void decrementBombs(Player player);
+int getPlayerPosX(Player player);
+int getPlayerPosY(Player player);
+int getPlayerExpRange(Player player);
+uint8_t* getBombsAvailableVal(Player player);
+void setPlayerPosX(Player player, int x);
+void setPlayerPosY(Player player, int y);
+void setPlayerFrame(Player player, int frame);
+void setPlayerExpRange(Player player, int explosionRange);
+void setPlayerToHurt(Player player);
+void setPlayerToNotHurt(Player player);
+void setPlayerToDead(Player player);
+void setPlayerToLastPlayer(Player player);
+bool playerIsHurt(Player player);
+void modifyHitboxPos(Player player);
+SDL_Rect* getPlayerHitboxPos(Player player);
+void decrementPlayerLives(Player player);
+bool playerHasLivesRemaining(Player player);
 
 #endif /* PLAYER_H */

@@ -5,9 +5,100 @@
 
 PRIVATE int PLAYER_WIDTH = 64;
 PRIVATE int PLAYER_HEIGHT = 64;
-
 PRIVATE void initClips(Player player);
-PUBLIC void renderPlayers(Game game);
+
+PUBLIC bool playerHasLivesRemaining(Player player) {
+    if (player->lifes <= 0) {
+        return false;
+    }
+    else return true;
+}
+
+PUBLIC void decrementPlayerLives(Player player) {
+    (player->lifes)--;
+}
+
+PUBLIC SDL_Rect* getPlayerHitboxPos(Player player) {
+    return &(player->hitboxPos);
+}
+
+PUBLIC void modifyHitboxPos(Player player) {
+    player->hitboxPos.x = getPlayerPosX(player) + 16;       // Puts hitbox in the same position as character
+    player->hitboxPos.y = getPlayerPosY(player) + 14;
+}
+
+PUBLIC bool playerIsHurt(Player player) {
+    if (player->isHurt) {
+        return true; 
+    }
+    else return false;
+}
+
+PUBLIC void setPlayerToLastPlayer(Player player) {
+    player->lastPlayer = true;
+}
+
+PUBLIC void setPlayerToDead(Player player) {
+    player->isAlive = false;
+}
+
+PUBLIC void setPlayerToHurt(Player player) {
+    player->isHurt = true;
+}
+
+PUBLIC void setPlayerToNotHurt(Player player) {
+    player->isHurt = false;
+}
+
+PUBLIC void setPlayerExpRange(Player player, int explosionRange) {
+    player->explosionRange = explosionRange;
+}
+
+PUBLIC void setPlayerFrame(Player player, int frame) {
+    player->currentFrame = frame;
+}
+
+PUBLIC void setPlayerPosY(Player player, int y) {
+    player->pos.y = y;
+}
+
+PUBLIC void setPlayerPosX(Player player, int x) {
+    player->pos.x = x;
+}
+
+PUBLIC uint8_t* getBombsAvailableVal(Player player) {
+    return &(player->bombsAvailable);
+}
+
+PUBLIC int getPlayerExpRange(Player player) {
+    return player->explosionRange;
+}
+
+PUBLIC int getPlayerPosX(Player player) {
+    return player->pos.x;
+}
+
+PUBLIC int getPlayerPosY(Player player) {
+    return player->pos.y;
+}
+
+PUBLIC void decrementBombs(Player player) {
+    (player->bombsAvailable)--;
+}
+
+PUBLIC bool playerIsAlive(Player player) {
+    if (player->isAlive) {
+        return true; 
+    }
+    else return false; 
+}
+
+PUBLIC bool bombsAvailable(Player player) {
+    if (player->bombsAvailable) {
+        return true; 
+    }
+    else return false;
+}
 
 PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
     Player player = malloc(sizeof(struct PlayerSettings));

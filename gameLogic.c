@@ -18,16 +18,15 @@ typedef struct InvincibilityCallbackArgs {
 Uint32 disableInvincibility(Uint32 interval, void *args);
 
 void handlePlayerExplosionCollision(Game game, Network net, udpData packetData) {
-    if (game->player[game->pIdx]->isHurt == false) { 
+    if (!playerIsHurt(game->player[game->pIdx])) { 
 
         for (uint8_t i = 0; i < BOMBS; i++) {
             if (game->bombs[i] != NULL) {
-                game->player[game->pIdx]->hitboxPos.x = game->player[game->pIdx]->pos.x + 16;       // Puts hitbox in the same position as character
-                game->player[game->pIdx]->hitboxPos.y = game->player[game->pIdx]->pos.y + 14;
+                modifyHitboxPos(game->player[game->pIdx]);
 
                 if (game->bombs[i]->startExplosion == true && game->bombs[i]->endExplosion == false) {
-                    if (SDL_HasIntersection(&game->player[game->pIdx]->hitboxPos, &game->bombs[i]->explosionHor) || SDL_HasIntersection(&game->player[game->pIdx]->hitboxPos, &game->bombs[i]->explosionVer)) {
-                        game->player[game->pIdx]->isHurt = true;
+                    if (SDL_HasIntersection(getPlayerHitboxPos(game->player[game->pIdx]), &game->bombs[i]->explosionHor) || SDL_HasIntersection(getPlayerHitboxPos(game->player[game->pIdx]), &game->bombs[i]->explosionVer)) {
+                        setPlayerToHurt(game->player[game->pIdx]);
                         packetData->isHurt = 1;
                         net->willSend = true;
 
@@ -35,24 +34,24 @@ void handlePlayerExplosionCollision(Game game, Network net, udpData packetData) 
                         callbackArgs->player = game->player[game->pIdx];
                         callbackArgs->net = net;
                         callbackArgs->packetData = packetData;
-                        
-                        (game->player[game->pIdx]->lifes)--;
-                        if (game->player[game->pIdx]->lifes <= 0) {
-                            game->player[game->pIdx]->isAlive = false;
+
+                        decrementPlayerLives(game->player[game->pIdx]);
+                        if (!playerHasLivesRemaining(game->player[game->pIdx])) {
+                            setPlayerToDead(game->player[game->pIdx]);
                             printf("Player died.\n");
                             
                             game->playersDead++;
                             
                             if (game->activePlayers == game->playersDead) {
                                 game->allPlayersDead = true;
-                                game->player[game->pIdx]->lastPlayer = true;
+                                setPlayerToLastPlayer(game->player[game->pIdx]);
                             }
 
                             packetData->isDead = 1;
                             return;
                         }
 
-                        game->player[game->pIdx]->invincibleTimer = SDL_AddTimer(2000, disableInvincibility, callbackArgs);
+                        game->invincibleTimer = SDL_AddTimer(2000, disableInvincibility, callbackArgs);
                     }
                 }  
             } 
@@ -62,7 +61,7 @@ void handlePlayerExplosionCollision(Game game, Network net, udpData packetData) 
 
 Uint32 disableInvincibility(Uint32 interval, void *args) {
     InvincibilityCallbackArgs *cArgs = (InvincibilityCallbackArgs*) args;
-    cArgs->player->isHurt = false;
+    setPlayerToNotHurt(cArgs->player);
     cArgs->packetData->isHurt = 0;
     cArgs->net->willSend = true;
 
