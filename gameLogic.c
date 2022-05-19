@@ -44,7 +44,7 @@ void handlePlayerExplosionCollision(Game game, Network net, udpData packetData) 
                             
                             if (game->activePlayers == game->playersDead) {
                                 game->allPlayersDead = true;
-                                setPlayerToLastPlayer(game->player[game->pIdx]);
+                                setToLastPlayer(game->player[game->pIdx]);
                             }
 
                             packetData->isDead = 1;

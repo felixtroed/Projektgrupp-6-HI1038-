@@ -7,6 +7,29 @@ PRIVATE int PLAYER_WIDTH = 64;
 PRIVATE int PLAYER_HEIGHT = 64;
 PRIVATE void initClips(Player player);
 
+PUBLIC void destroyPlayerTexture(Player player) {
+    SDL_DestroyTexture(player->texture);
+}
+
+PUBLIC void setPlayerSpeed(Player player, int speed) {
+    player->speed = speed;
+}
+
+void setPlayerBombsAvailable(Player player, uint8_t bombs) {
+    player->bombsAvailable = bombs;
+}
+
+void setPlayerLives(Player player, uint8_t lives) {
+    player->lifes = lives;
+}
+
+PUBLIC bool playerIsLastPlayer(Player player) {
+    if (player->lastPlayer) {
+        return true;
+    }
+    else return false;
+}
+
 PUBLIC bool playerHasLivesRemaining(Player player) {
     if (player->lifes <= 0) {
         return false;
@@ -34,12 +57,20 @@ PUBLIC bool playerIsHurt(Player player) {
     else return false;
 }
 
-PUBLIC void setPlayerToLastPlayer(Player player) {
+PUBLIC void setToLastPlayer(Player player) {
     player->lastPlayer = true;
+}
+
+PUBLIC void setToNotLastPlayer(Player player) {
+    player->lastPlayer = false;
 }
 
 PUBLIC void setPlayerToDead(Player player) {
     player->isAlive = false;
+}
+
+PUBLIC void setPlayerToAlive(Player player) {
+    player->isAlive = true;
 }
 
 PUBLIC void setPlayerToHurt(Player player) {

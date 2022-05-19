@@ -16,7 +16,6 @@ typedef struct PlayerSettings {
     SDL_Rect pos;
     SDL_Rect hitboxPos;
     SDL_RendererFlip flip;
-    SDL_TimerID invincibleTimer;
     bool isHurt;
     bool isAlive;
     int currentFrame;
@@ -47,11 +46,18 @@ void setPlayerExpRange(Player player, int explosionRange);
 void setPlayerToHurt(Player player);
 void setPlayerToNotHurt(Player player);
 void setPlayerToDead(Player player);
-void setPlayerToLastPlayer(Player player);
+void setPlayerToAlive(Player player);
+void setToLastPlayer(Player player);
+void setToNotLastPlayer(Player player);
 bool playerIsHurt(Player player);
 void modifyHitboxPos(Player player);
 SDL_Rect* getPlayerHitboxPos(Player player);
 void decrementPlayerLives(Player player);
 bool playerHasLivesRemaining(Player player);
+bool playerIsLastPlayer(Player player);
+void setPlayerLives(Player player, uint8_t lives);
+void setPlayerBombsAvailable(Player player, uint8_t bombs);
+void setPlayerSpeed(Player player, int speed);
+void destroyPlayerTexture(Player player);
 
 #endif /* PLAYER_H */

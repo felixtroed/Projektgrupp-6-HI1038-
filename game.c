@@ -291,20 +291,20 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
             renderPlayers(game);
             if (game->accessToServer) {
                 if (!game->allPlayersDead) {
-                    if (!game->player[game->pIdx]->isAlive && !(game->activePlayers == (game->playersDead + 1))) {
+                    if (!playerIsAlive(game->player[game->pIdx]) && !(game->activePlayers == (game->playersDead + 1))) {
                         SDL_RenderCopy(game->renderer, game->dead, NULL, NULL);
                     }
                     if ((game->activePlayers > 1) && (game->activePlayers == (game->playersDead + 1))) {
-                        if (game->player[0]->isAlive) {
+                        if (playerIsAlive(game->player[0])) {
                             SDL_RenderCopy(game->renderer, game->player1Wins, NULL, NULL);
                         }
-                        else if (game->player[1]->isAlive) {
+                        else if (playerIsAlive(game->player[1])) {
                             SDL_RenderCopy(game->renderer, game->player2Wins, NULL, NULL);
                         }
-                        else if (game->player[2]->isAlive) {
+                        else if (playerIsAlive(game->player[2])) {
                             SDL_RenderCopy(game->renderer, game->player3Wins, NULL, NULL);
                         }
-                        else if (game->player[3]->isAlive) {
+                        else if (playerIsAlive(game->player[3])) {
                             SDL_RenderCopy(game->renderer, game->player4Wins, NULL, NULL);
                         }
 
@@ -318,16 +318,16 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
                     }
                 }
                 else {
-                    if (game->player[0]->lastPlayer) {
+                    if (playerIsLastPlayer(game->player[0])) {
                         SDL_RenderCopy(game->renderer, game->player1Wins, NULL, NULL);
                     }
-                    else if (game->player[1]->lastPlayer) {
+                    else if (playerIsLastPlayer(game->player[1])) {
                         SDL_RenderCopy(game->renderer, game->player2Wins, NULL, NULL);
                     }
-                    else if (game->player[2]->lastPlayer) {
+                    else if (playerIsLastPlayer(game->player[2])) {
                         SDL_RenderCopy(game->renderer, game->player3Wins, NULL, NULL);
                     }
-                    else if (game->player[3]->lastPlayer) {
+                    else if (playerIsLastPlayer(game->player[3])) {
                         SDL_RenderCopy(game->renderer, game->player4Wins, NULL, NULL);
                     } 
                 }
@@ -443,7 +443,7 @@ PRIVATE void receiveUDPData(Game game, Network net) {
 
                 if (game->activePlayers == game->playersDead) {
                     game->allPlayersDead = true;
-                    setPlayerToLastPlayer(game->player[idx]);
+                    setToLastPlayer(game->player[idx]);
                 }
             }
         }
@@ -465,34 +465,34 @@ PRIVATE Uint32 resetGame(Uint32 interval, void *args) {
     cArgs->packetData->explosionRange = 2;
 
     for (int i = 0; i < cArgs->game->activePlayers; i++) {
-        cArgs->game->player[i]->isHurt = false;
-        cArgs->game->player[i]->lifes = 3;
-        cArgs->game->player[i]->isAlive = true;
-        cArgs->game->player[i]->bombsAvailable = 1;
-        cArgs->game->player[i]->speed = 2;
-        cArgs->game->player[i]->explosionRange = 2;
-        cArgs->game->player[i]->lastPlayer = false;
+        setPlayerToNotHurt(cArgs->game->player[i]);
+        setPlayerLives(cArgs->game->player[i], 3);
+        setPlayerToAlive(cArgs->game->player[i]);
+        setPlayerBombsAvailable(cArgs->game->player[i], 1);
+        setPlayerSpeed(cArgs->game->player[i], 2);
+        setPlayerExpRange(cArgs->game->player[i], 2);
+        setToNotLastPlayer(cArgs->game->player[i]);
     }
 
     if (cArgs->game->activePlayers >= 1) {
-        cArgs->game->player[0]->pos.x = 64;
-        cArgs->game->player[0]->pos.y = 64;
-        cArgs->game->player[0]->currentFrame = 8;
+        setPlayerPosX(cArgs->game->player[0], 64);
+        setPlayerPosY(cArgs->game->player[0], 64);
+        setPlayerFrame(cArgs->game->player[0], 8);
     }
     if (cArgs->game->activePlayers >= 2) {
-        cArgs->game->player[1]->pos.x = 960;
-        cArgs->game->player[1]->pos.y = 64;
-        cArgs->game->player[1]->currentFrame = 12;
+        setPlayerPosX(cArgs->game->player[1], 960);
+        setPlayerPosY(cArgs->game->player[1], 64);
+        setPlayerFrame(cArgs->game->player[1], 12);
     }
     if (cArgs->game->activePlayers >= 3) {
-        cArgs->game->player[2]->pos.x = 64;
-        cArgs->game->player[2]->pos.y = 698;
-        cArgs->game->player[2]->currentFrame = 8;
+        setPlayerPosX(cArgs->game->player[2], 64);
+        setPlayerPosY(cArgs->game->player[2], 698);
+        setPlayerFrame(cArgs->game->player[2], 8);
     }
     if (cArgs->game->activePlayers >= 4) {
-        cArgs->game->player[3]->pos.x = 960;
-        cArgs->game->player[3]->pos.y = 698;
-        cArgs->game->player[3]->currentFrame = 12;
+        setPlayerPosX(cArgs->game->player[3], 960);
+        setPlayerPosY(cArgs->game->player[3], 698);
+        setPlayerFrame(cArgs->game->player[3], 12);
     }
 
     for (int i = 0; i < ROW_SIZE; i++) {
@@ -646,7 +646,7 @@ PUBLIC void exitGame(Game game, Network net, udpData packetData) {
 	SDLNet_Quit();
 
     for (uint8_t i = 0; i < game->activePlayers; i++) {
-        SDL_DestroyTexture(game->player[i]->texture);
+        destroyPlayerTexture(game->player[i]);
         free(game->player[i]);
     }
 
