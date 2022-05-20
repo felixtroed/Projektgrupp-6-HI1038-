@@ -81,22 +81,22 @@ bool checkCollision(Player player, Bomb bombs[]) {
 }
 
 bool collisionMap(Player player) {
-    if (player->pos.y < SCREENMIN_Y)
+    if (getPlayerPosY(player) < SCREENMIN_Y)
     {
         return false; 
     }
 
-    if (player->pos.y > SCREENMAX_Y)
+    if (getPlayerPosY(player) > SCREENMAX_Y)
     {
         return false;
     }
 
-    if (player->pos.x < SCREENMIN_X)
+    if (getPlayerPosX(player) < SCREENMIN_X)
     {
         return false;
     }
 
-    if (player->pos.x > SCREENMAX_X)
+    if (getPlayerPosX(player) > SCREENMAX_X)
     {
         return false;
     }
@@ -117,14 +117,9 @@ bool collisionBoxes(Player player)
                 posBoxX = column * 64 + 64;
                 posBoxY = row * 64 + 64;
 
-                if (!(player->pos.x > posBoxX + sizeBox || posBoxX > player->pos.x + sizePlayer || player->pos.y > posBoxY + sizeBox ||
-                    player->pos.y + botPlayerBigger + sizePlayer < posBoxY))
-                {
-                    // printf("ROW %d COL %d \n", row, column);
-                    // printf("POS X: %d POS Y %d \n", p1->pos.x, p1->pos.y);
-                    // printf("BOX: POS X: %d POS Y:%d\n ", posBoxX, posBoxY);
+                if (!(getPlayerPosX(player) > posBoxX + sizeBox || posBoxX > getPlayerPosX(player) + sizePlayer || getPlayerPosY(player) > posBoxY + sizeBox ||
+                    getPlayerPosY(player) + botPlayerBigger + sizePlayer < posBoxY)) {
                     return false;
-
                 }
             }
         }
@@ -133,8 +128,7 @@ bool collisionBoxes(Player player)
 }
 
 
-void pickUpPowerUps(Player player,Network net, udpData packetData) {
-    //printf("char posX: %d\tposY: %d\n", p1->pos.x, p1->pos.y);
+void pickUpPowerUps(Player player, Network net, udpData packetData) {
     for (int row = 0; row < ROW_SIZE; row++) {
         for (int column = 0; column < COLUMN_SIZE; column++) {
             if (activePowers[row][column] >= 4) {
@@ -143,28 +137,29 @@ void pickUpPowerUps(Player player,Network net, udpData packetData) {
                 int powerUpUp = row * 64 + 14;
                 int powerUpDown = powerUpUp + 70;
 
-                if (player->pos.x > powerUpLeft && player->pos.x < powerUpRight && player->pos.y > powerUpUp && player->pos.y < powerUpDown)
+                if (getPlayerPosX(player) > powerUpLeft && getPlayerPosX(player) < powerUpRight && getPlayerPosY(player) > powerUpUp && getPlayerPosY(player) < powerUpDown)
                 {
                     if (activePowers[row][column] == 4) {
                         printf("Picked up power-up: Speed\n");
-                        if (player->speed < 5) {				// Speed värdet startar 2, max 3 uppgraderingar
-                            player->speed++;
+                        if (getPlayerSpeed(player) < 6) {  // Speed värdet startar 2, max 3 uppgraderingar
+                            incrementPlayerSpeed(player);
                             printf("Speed increased!\n");
                         }
                     }
                     else if (activePowers[row][column] == 5) {
                         printf("Picked up power-up: +1 Bombs\n");
-                        if (player->bombsAvailable < 5) {				// Max 5 bomber, (plockar up max 4 uppgraderingar)
-                            player->bombsAvailable++;
+                        if (getMaxBombs(player) < 5) {				// Max 5 bomber, (plockar up max 4 uppgraderingar)
+                            incrementBombsAvailable(player);
+                            incrementMaxBombs(player);
                             printf("+1 Bombs!\n");
                         }
                     }
                     else if (activePowers[row][column] == 6) {
                         printf("Picked up power-up: Longer Explosion\n");
-                        if (player->explosionRange < 5) {				// Max längd = mitten rutan + 5 rutor ut
-                            player->explosionRange++;
+                        if (getPlayerExpRange(player) < 5) {				// Max längd = mitten rutan + 5 rutor ut
+                            incrementPlayerExpRange(player);
                             printf("Explosion Range increased!\n");
-                            packetData->explosionRange = player->explosionRange;
+                            packetData->explosionRange = getPlayerExpRange(player);
                         }
                     }
                     packetData->powerUpRow = row;
@@ -186,10 +181,9 @@ bool collisionBomb(Player player, Bomb bombs[]) {
             int right = (bombs[i]->bombPos.x) + ((64 - BOMB_SIZE) / 2 + 10);
             int up = (bombs[i]->bombPos.y) - 10;
             int down = (bombs[i]->bombPos.y) + ((64 - BOMB_SIZE) / 2 + 10);
-        //    printf("Bomb pos: x: %d\ty:%d\n", bombs[i]->bombPos.x, bombs[i]->bombPos.y);
 
             if (bombs[i]->spawnInside) {
-                if (!(player->pos.x > right || left > player->pos.x + BOMB_SIZE || player->pos.y > down || player->pos.y + BOMB_SIZE < up))
+                if (!(getPlayerPosX(player) > right || left > getPlayerPosX(player) + BOMB_SIZE || getPlayerPosY(player) > down || getPlayerPosY(player) + BOMB_SIZE < up))
                 {
                     return true;
                 }
@@ -200,10 +194,8 @@ bool collisionBomb(Player player, Bomb bombs[]) {
                 }
             }
 
-            if (!(player->pos.x > right || left > player->pos.x + BOMB_SIZE || player->pos.y > down || player->pos.y + BOMB_SIZE < up))
+            if (!(getPlayerPosX(player) > right || left > getPlayerPosX(player) + BOMB_SIZE || getPlayerPosY(player) > down || getPlayerPosY(player) + BOMB_SIZE < up))
             {
-            //   printf("Char Pos: x: %d\ty: %d\n", p1->pos.x, p1->pos.y);
-            //    printf("BOMB: Left: %d\tRight: %d\tUp: %d\tDown: %d\n ", left, right, up, down);
                 return false;
             }
         }
@@ -211,157 +203,33 @@ bool collisionBomb(Player player, Bomb bombs[]) {
     return true;
 }
 
-/*
-void removeBox(Player p1, Boxes boxes) {
-    int indexRow = 0, indexCol = 0;
-    int hitOne = 0, hitTwo = 0;
-    int i = 0;
-    int j = 0;
-    bool passedGrey = false;
-    bool illegalvalue = false;
-    indexCol = ((((p1->pos.x + 32) / 64) * 64 + 7) / 64) - 1;
-    indexRow = ((((p1->pos.y + 32) / 64) * 64 + 7) / 64) - 1;
-    i = indexRow;
-    j = indexCol;
-
-
-    for (indexRow; i < indexRow + p1->explosionRange; i++)
-    {
-
-        if (boxes->activeBox[i][j] == 3)
-        {
-            passedGrey = true;
-        }
-
-        if (boxes->activeBox[i][j] == 1 && hitOne != p1->numOfBoxes && !passedGrey)
-        {
-            boxes->activeBox[i][j] = 0;
-            hitOne++;
-
-        }
-
-        if (!illegalvalue) // ifall passerar 14
-        {
-            for (indexCol; j < indexCol + p1->explosionRange; j++)
-            {
-
-                if (boxes->activeBox[indexRow][j] == 3)
-                {
-                    break;
-                }
-
-                if (boxes->activeBox[indexRow][j] == 1 && hitTwo != p1->numOfBoxes)
-                {
-                    boxes->activeBox[indexRow][j] = 0;
-                    hitTwo++;
-                }
-                if (j == 14)
-                {
-                    illegalvalue = true;
-                    break;
-                }
-
-            }
-        }
-        j = indexCol;
-
-        if (i == 10)
-        {
-            break;
-        }
-     
-
-    } // kollar h�ger och ner�t 
-
-    passedGrey = false;
-    hitOne = 0;
-    hitTwo = 0;
-    i = indexRow;
-    j = indexCol;
-    illegalvalue = false;
-
-
-
-    for (indexRow; i > indexRow - p1->explosionRange; i--)
-    {
-        if (boxes->activeBox[i][j] == 3)
-        {
-            passedGrey = true;
-        }
-
-        if (boxes->activeBox[i][j] == 1 && hitOne != p1->numOfBoxes && !passedGrey)
-        {
-            boxes->activeBox[i][j] = 0;
-            hitOne++;
-
-        }
-        if (!illegalvalue) {
-            for (indexCol; j > indexCol - p1->explosionRange; j--)
-            {
-                printf("active box value %d\n", boxes->activeBox[i][j]);
-                if (boxes->activeBox[indexRow][j] == 3)
-                {
-                    break;
-                }
-
-                if (boxes->activeBox[indexRow][j] == 1 && hitTwo != p1->numOfBoxes)
-                {
-                    boxes->activeBox[indexRow][j] = 0;
-                    hitTwo++;
-                }
-                if (j == 0)
-                {
-                    illegalvalue = true;
-                    break;
-                }
-
-            }
-        }
-        j = indexCol;
-
-        if (i == 0)
-        {
-            break;
-        }
-
-    } // kolla v�nster och upp�t
-
-} */
-
 void powerUpGone(int row, int col, int value) {
     activePowers[row][col] = value;
 }
 
-
-
-void move(Player player,int *lastMove, int *newMove, char key, Bomb bombs[], int *frames, Network net, udpData packetData) {
+void move(Player player, int *lastMove, int *newMove, char key, Bomb bombs[], int *frames, Network net, udpData packetData) {
     static int netDelay = 0;
 
-    if (player->prevPosX == 0)
-    {
-        player->prevPosX = player->pos.x;
-        player->prevPosY = player->pos.y;
-    }
     switch (key) {
     case 's':
-        player->pos.y += player->speed;
+        increasePlayerPosY(player);
         if (!checkCollision(player, bombs)) {
-            player->pos.y -= player->speed;
+            decreasePlayerPosY(player);
         }
         if (*newMove == *lastMove && player->currentFrame <= 3) {
             *frames += 1;
             if (*frames == CHAR_REFRESH_RATE / player->speed) {
                 *frames = 0;
                 *lastMove = *newMove;
-                player->currentFrame++;
-                if (player->currentFrame > 3) {
-                    player->currentFrame = 0;
+                incrementPlayerFrame(player);
+                if (getPlayerFrame(player) > 3) {
+                    setPlayerFrame(player, 0);
                 }
             }
         }
         else {
             *frames = 0;
-            player->currentFrame = 0;
+            setPlayerFrame(player, 0);
             *lastMove = *newMove = 0;
         }
         break;
@@ -369,45 +237,45 @@ void move(Player player,int *lastMove, int *newMove, char key, Bomb bombs[], int
     case 'w':
         player->pos.y -= player->speed;
         if (!checkCollision(player, bombs)) {
-            player->pos.y += player->speed;
+            increasePlayerPosY(player);
         }
-        if (*newMove == *lastMove && player->currentFrame <= 7 && player->currentFrame > 3) {
+        if (*newMove == *lastMove && getPlayerFrame(player) <= 7 && getPlayerFrame(player) > 3) {
             *frames += 1;
             if (*frames == CHAR_REFRESH_RATE / player->speed) {
                 *frames = 0;
                 *lastMove = *newMove;
-                player->currentFrame++;
-                if (player->currentFrame > 7) {
-                    player->currentFrame = 4;
+                incrementPlayerFrame(player);
+                if (getPlayerFrame(player) > 7) {
+                    setPlayerFrame(player, 4);
                 }
             }
         }
         else {
             *frames = 0;
-            player->currentFrame = 4;
+            setPlayerFrame(player, 4);
             *lastMove = *newMove = 4;
         }
         break;
 
     case 'a':
-        player->pos.x -= player->speed;
+        decreasePlayerPosX(player);
         if (!checkCollision(player, bombs)) {
-            player->pos.x += player->speed;
+            increasePlayerPosX(player);
         }
-        if (*newMove == *lastMove && player->currentFrame <= 15 && player->currentFrame > 11) {
+        if (*newMove == *lastMove && getPlayerFrame(player) <= 15 && getPlayerFrame(player) > 11) {
             *frames += 1;
             if (*frames == CHAR_REFRESH_RATE / player->speed) {
                 *frames = 0;
                 *lastMove = *newMove;
-                player->currentFrame++;
-                if (player->currentFrame > 15) {
-                    player->currentFrame = 12;
+                incrementPlayerFrame(player);
+                if (getPlayerFrame(player) > 15) {
+                    setPlayerFrame(player, 12);
                 }
             }
         }
         else {
             *frames = 0;
-            player->currentFrame = 12;
+            setPlayerFrame(player, 12);
             *lastMove = *newMove = 12;
         }
         break;
@@ -415,22 +283,22 @@ void move(Player player,int *lastMove, int *newMove, char key, Bomb bombs[], int
     case 'd':
         player->pos.x += player->speed;
         if (!checkCollision(player, bombs)) {
-            player->pos.x -= player->speed;
+            decreasePlayerPosX(player);
         }
-        if (*newMove == *lastMove && player->currentFrame <= 11 && player->currentFrame > 7) {
+        if (*newMove == *lastMove && getPlayerFrame(player) <= 11 && getPlayerFrame(player) > 7) {
             *frames += 1;
             if (*frames == CHAR_REFRESH_RATE / player->speed) {
                 *frames = 0;
                 *lastMove = *newMove;
-                player->currentFrame++;
-                if (player->currentFrame > 11) {
-                    player->currentFrame = 8;
+                incrementPlayerFrame(player);
+                if (getPlayerFrame(player) > 11) {
+                    setPlayerFrame(player, 8);
                 }
             }
         }
         else {
             *frames = 0;
-            player->currentFrame = 8;
+            setPlayerFrame(player, 8);
             *lastMove = *newMove = 8;
         }
         break;
@@ -440,11 +308,9 @@ void move(Player player,int *lastMove, int *newMove, char key, Bomb bombs[], int
 
     if (netDelay < 1) {                             // 1 = 50%, 2 = 66%, 3 = 75%, 4 = 80%, 5 = 83%...
         netDelay++;                                 // Till exempel om 5: kör på 0-4 och skippa 5. Alltså kör 5 frames och skippa frame 6
-        packetData->xPos = player->pos.x;
-        packetData->yPos = player->pos.y;
-        packetData->frame = player->currentFrame;
-        player->prevPosX = player->pos.x;
-        player->prevPosY = player->pos.y;
+        packetData->xPos = getPlayerPosX(player);
+        packetData->yPos = getPlayerPosY(player);
+        packetData->frame = getPlayerFrame(player);
         net->willSend = true;
     }
     else {

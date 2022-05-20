@@ -26,7 +26,7 @@ typedef struct PlayerSettings {
     uint8_t bombsAvailable;
     int prevPosX;
     int prevPosY;
-    int maxBombs; 
+    int maxBombs;
     bool lastPlayer;
 } *Player;
 
@@ -34,7 +34,7 @@ Player createPlayer(int playerNumber, int x, int y, Game game);
 void renderPlayers(Game game);
 bool playerIsAlive(Player player);
 bool bombsAvailable(Player player);
-void decrementBombs(Player player);
+void decrementBombsAvailable(Player player);
 int getPlayerPosX(Player player);
 int getPlayerPosY(Player player);
 int getPlayerExpRange(Player player);
@@ -57,7 +57,19 @@ bool playerHasLivesRemaining(Player player);
 bool playerIsLastPlayer(Player player);
 void setPlayerLives(Player player, uint8_t lives);
 void setBombsAvailable(Player player, uint8_t bombs);
+void incrementBombsAvailable(Player player);
 void setPlayerSpeed(Player player, int speed);
+void incrementPlayerSpeed(Player player);
+int getPlayerSpeed(Player player);
 void destroyPlayerTexture(Player player);
+int getMaxBombs(Player player);
+void incrementMaxBombs(Player player);
+void incrementPlayerExpRange(Player player);
+void increasePlayerPosY(Player player);
+void increasePlayerPosX(Player player);
+void decreasePlayerPosY(Player player);
+void decreasePlayerPosX(Player player);
+void incrementPlayerFrame(Player player);
+int getPlayerFrame(Player player);
 
 #endif /* PLAYER_H */

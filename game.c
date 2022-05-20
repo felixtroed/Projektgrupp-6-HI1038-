@@ -96,8 +96,6 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
     bool menuOptionSelected[MENUOPTIONS] = { 0,0,0,0 };
     const Uint8* currentKeyStates;
     bool resetIpAddress = true;
-    Uint32 lastTime = 0, currentTime;
-    bool timeStart = false;
 
     while (running) {
         while (SDL_PollEvent(&game->event) != 0) {

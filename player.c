@@ -7,6 +7,42 @@ PRIVATE int PLAYER_WIDTH = 64;
 PRIVATE int PLAYER_HEIGHT = 64;
 PRIVATE void initClips(Player player);
 
+PUBLIC int getPlayerFrame(Player player) {
+    return player->currentFrame;
+}
+
+PUBLIC void incrementPlayerFrame(Player player) {
+    (player->currentFrame)++;
+}
+
+PUBLIC void decreasePlayerPosX(Player player) {
+    player->pos.x -= player->speed;
+}
+
+PUBLIC void decreasePlayerPosY(Player player) {
+    player->pos.y -= player->speed;
+}
+
+PUBLIC void increasePlayerPosX(Player player) {
+    player->pos.x += player->speed;
+}
+
+PUBLIC void increasePlayerPosY(Player player) {
+    player->pos.y += player->speed;
+}
+
+PUBLIC void incrementPlayerExpRange(Player player) {
+    (player->explosionRange)++;
+}
+
+PUBLIC void incrementMaxBombs(Player player) {
+    (player->maxBombs)++;
+}
+
+PUBLIC int getMaxBombs(Player player) {
+    return player->maxBombs;
+}
+
 PUBLIC void destroyPlayerTexture(Player player) {
     SDL_DestroyTexture(player->texture);
 }
@@ -15,11 +51,23 @@ PUBLIC void setPlayerSpeed(Player player, int speed) {
     player->speed = speed;
 }
 
-void setBombsAvailable(Player player, uint8_t bombs) {
+PUBLIC int getPlayerSpeed(Player player) {
+    return player->speed;
+}
+
+PUBLIC void incrementPlayerSpeed(Player player) {
+    (player->speed)++;
+}
+
+PUBLIC void setBombsAvailable(Player player, uint8_t bombs) {
     player->bombsAvailable = bombs;
 }
 
-void setPlayerLives(Player player, uint8_t lives) {
+PUBLIC void incrementBombsAvailable(Player player) {
+    (player->bombsAvailable)++;
+}
+
+PUBLIC void setPlayerLives(Player player, uint8_t lives) {
     player->lifes = lives;
 }
 
@@ -113,7 +161,7 @@ PUBLIC int getPlayerPosY(Player player) {
     return player->pos.y;
 }
 
-PUBLIC void decrementBombs(Player player) {
+PUBLIC void decrementBombsAvailable(Player player) {
     (player->bombsAvailable)--;
 }
 
@@ -177,6 +225,7 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
     player->lifes = 3;
     player->prevPosX = 0; 
     player->prevPosY = 0;
+    player->maxBombs = 1;
     initClips(player);
     return player;
 }
