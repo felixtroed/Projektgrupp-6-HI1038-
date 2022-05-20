@@ -216,9 +216,9 @@ void move(Player player, int *lastMove, int *newMove, char key, Bomb bombs[], in
         if (!checkCollision(player, bombs)) {
             decreasePlayerPosY(player);
         }
-        if (*newMove == *lastMove && player->currentFrame <= 3) {
+        if (*newMove == *lastMove && getPlayerFrame(player) <= 3) {
             *frames += 1;
-            if (*frames == CHAR_REFRESH_RATE / player->speed) {
+            if (*frames == CHAR_REFRESH_RATE / getPlayerSpeed(player)) {
                 *frames = 0;
                 *lastMove = *newMove;
                 incrementPlayerFrame(player);
@@ -235,13 +235,13 @@ void move(Player player, int *lastMove, int *newMove, char key, Bomb bombs[], in
         break;
 
     case 'w':
-        player->pos.y -= player->speed;
+        decreasePlayerPosY(player);
         if (!checkCollision(player, bombs)) {
             increasePlayerPosY(player);
         }
         if (*newMove == *lastMove && getPlayerFrame(player) <= 7 && getPlayerFrame(player) > 3) {
             *frames += 1;
-            if (*frames == CHAR_REFRESH_RATE / player->speed) {
+            if (*frames == CHAR_REFRESH_RATE / getPlayerSpeed(player)) {
                 *frames = 0;
                 *lastMove = *newMove;
                 incrementPlayerFrame(player);
@@ -264,7 +264,7 @@ void move(Player player, int *lastMove, int *newMove, char key, Bomb bombs[], in
         }
         if (*newMove == *lastMove && getPlayerFrame(player) <= 15 && getPlayerFrame(player) > 11) {
             *frames += 1;
-            if (*frames == CHAR_REFRESH_RATE / player->speed) {
+            if (*frames == CHAR_REFRESH_RATE / getPlayerSpeed(player)) {
                 *frames = 0;
                 *lastMove = *newMove;
                 incrementPlayerFrame(player);
@@ -281,13 +281,13 @@ void move(Player player, int *lastMove, int *newMove, char key, Bomb bombs[], in
         break;
 
     case 'd':
-        player->pos.x += player->speed;
+        increasePlayerPosX(player);
         if (!checkCollision(player, bombs)) {
             decreasePlayerPosX(player);
         }
         if (*newMove == *lastMove && getPlayerFrame(player) <= 11 && getPlayerFrame(player) > 7) {
             *frames += 1;
-            if (*frames == CHAR_REFRESH_RATE / player->speed) {
+            if (*frames == CHAR_REFRESH_RATE / getPlayerSpeed(player)) {
                 *frames = 0;
                 *lastMove = *newMove;
                 incrementPlayerFrame(player);

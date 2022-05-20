@@ -685,7 +685,7 @@ PUBLIC udpData createPacketData(Game game) {
     packetData->bombDropped = 0;
     packetData->bombPosX = 0;
     packetData->bombPosY = 0;
-    packetData->explosionRange = game->player[game->pIdx]->explosionRange;
+    packetData->explosionRange = getPlayerExpRange(game->player[game->pIdx]);
     packetData->powerUpTaken = 0;
     packetData->leftBoxVal = -1;
     packetData->rightBoxVal = -1;
