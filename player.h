@@ -9,26 +9,7 @@
 #include <SDL2/SDL_image.h>
 
 typedef struct GameSettings* Game;
-
-typedef struct PlayerSettings {
-    SDL_Texture *texture;
-    SDL_Rect clip[16];
-    SDL_Rect pos;
-    SDL_Rect hitboxPos;
-    SDL_RendererFlip flip;
-    bool isHurt;
-    bool isAlive;
-    int currentFrame;
-    int speed;
-    int explosionRange; 
-    int numOfBoxes; 
-    uint8_t lifes;
-    uint8_t bombsAvailable;
-    int prevPosX;
-    int prevPosY;
-    int maxBombs;
-    bool lastPlayer;
-} *Player;
+typedef struct PlayerSettings* Player;
 
 Player createPlayer(int playerNumber, int x, int y, Game game);
 void renderPlayers(Game game);

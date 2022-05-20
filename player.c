@@ -3,6 +3,26 @@
 #define PUBLIC /* empty */
 #define PRIVATE static
 
+typedef struct PlayerSettings {
+    SDL_Texture *texture;
+    SDL_Rect clip[16];
+    SDL_Rect pos;
+    SDL_Rect hitboxPos;
+    SDL_RendererFlip flip;
+    bool isHurt;
+    bool isAlive;
+    int currentFrame;
+    int speed;
+    int explosionRange; 
+    int numOfBoxes; 
+    uint8_t lifes;
+    uint8_t bombsAvailable;
+    int prevPosX;
+    int prevPosY;
+    int maxBombs;
+    bool lastPlayer;
+} *Player;
+
 PRIVATE int PLAYER_WIDTH = 64;
 PRIVATE int PLAYER_HEIGHT = 64;
 PRIVATE void initClips(Player player);
