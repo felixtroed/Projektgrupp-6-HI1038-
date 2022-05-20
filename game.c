@@ -18,8 +18,6 @@ typedef struct ResetGameCallbackArgs {
 PRIVATE bool initWinRen(Game game);
 PRIVATE bool createStartMenu(Game game);
 PRIVATE bool createBackground(Game game);
-PRIVATE bool showBoxes(Game game);
-PRIVATE void renderBoxes(Game game);
 PUBLIC bool loadTextures(SDL_Renderer** renderer, SDL_Surface** bitmapSurface, SDL_Texture** texture, char pictureDestination[64]);
 PRIVATE bool initNetwork(Network net, char inputIPAddress[]);
 PRIVATE void sendUDPData(Network net, udpData packetData);
@@ -38,13 +36,12 @@ PUBLIC Game createGame() {
     if (initWinRen(game)) {
         if (createStartMenu(game)) {
             if (createBackground(game)) {
-                if (showBoxes(game)) {
+               
                     int imgFlags = IMG_INIT_PNG;
                     if (!(IMG_Init(imgFlags) & imgFlags))
                     {
                         printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
                     }
-                }
             }
         }
     }
@@ -74,8 +71,7 @@ PUBLIC Game createGame() {
     game->player[2] = createPlayer(3, 64, 698, game);
     game->player[3] = createPlayer(4, 960, 698, game);
     game->activePlayers = 4;
-
-    // game->boxes = createBoxes(game);
+    game->boxes = createBoxes(game); 
     game->power = createPowers(game);
     initBombs(game->bombs);                           // Sets all bombs to NULL
     game->accessToServer = false;
@@ -259,19 +255,15 @@ PUBLIC void updateGame(Game game, Network net, udpData packetData) {
             if (playerIsAlive(game->player[game->pIdx])) {
                 if (currentKeyStates[SDL_SCANCODE_W] || currentKeyStates[SDL_SCANCODE_UP]) {                // Funkar för både WASD och pilar
                     move(game->player[game->pIdx], &newMove, &lastMove, KEYUP, game->bombs, &frames, net, packetData);
-                    pickUpPowerUps(game->player[game->pIdx], net, packetData);
                 }
                 else if (currentKeyStates[SDL_SCANCODE_S] || currentKeyStates[SDL_SCANCODE_DOWN]) {
                     move(game->player[game->pIdx], &newMove, &lastMove, KEYDOWN, game->bombs, &frames, net, packetData);
-                    pickUpPowerUps(game->player[game->pIdx], net, packetData);
                 }
                 else if (currentKeyStates[SDL_SCANCODE_A] || currentKeyStates[SDL_SCANCODE_LEFT]) {
                     move(game->player[game->pIdx], &newMove, &lastMove, KEYLEFT, game->bombs, &frames, net, packetData);
-                    pickUpPowerUps(game->player[game->pIdx], net, packetData);
                 }
                 else if (currentKeyStates[SDL_SCANCODE_D] || currentKeyStates[SDL_SCANCODE_RIGHT]) {
                     move(game->player[game->pIdx], &newMove, &lastMove, KEYRIGHT, game->bombs, &frames, net, packetData);
-                    pickUpPowerUps(game->player[game->pIdx], net, packetData);
                 }
             }
 
@@ -607,13 +599,6 @@ PRIVATE bool createStartMenu(Game game) {
     return true;
 }
 
-PRIVATE bool showBoxes(Game game) {
-
-    char boxDestination[64] = "resources/Box.png";
-    loadTextures(&game->renderer, &game->bitmapSurface, &game->box, boxDestination);
-
-    return true;
-}
 
 PUBLIC bool loadTextures(SDL_Renderer** renderer, SDL_Surface** bitmapSurface, SDL_Texture** texture, char pictureDestination[64]) {
     *bitmapSurface = IMG_Load(pictureDestination);
@@ -660,19 +645,6 @@ PUBLIC void exitGame(Game game, Network net, udpData packetData) {
     SDL_Quit();
 }
 
-PRIVATE void renderBoxes(Game game) {
-     game->boxPos.w = 64;                  //Utanf�r loopen, alltid samma v�rde (h�jd/bredd p� l�dan)
-     game->boxPos.h = 64;
-     for (int row = 0; row < ROW_SIZE; row++) {
-         for (int column = 0; column < COLUMN_SIZE; column++) {
-             if (activeBox[row][column] == 1) {
-                 game->boxPos.x = column * 64 + 64;
-                 game->boxPos.y = row * 64 + 64;
-                 SDL_RenderCopyEx(game->renderer, game->box, NULL, &game->boxPos, 0, NULL, SDL_FLIP_NONE);       // Renderar en l�da i taget
-             }
-         }
-     }
- }
 
 PUBLIC udpData createPacketData(Game game) {
     udpData packetData = malloc(sizeof(struct udpData));

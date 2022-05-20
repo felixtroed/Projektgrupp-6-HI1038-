@@ -1,5 +1,8 @@
 #include "gameLogic.h"
 
+#define PUBLIC /* empty */
+#define PRIVATE static
+
 #define SCREENMAX_X 970
 #define SCREENMIN_X 48
 #define SCREENMAX_Y 700
@@ -128,7 +131,7 @@ bool collisionBoxes(Player player)
 }
 
 
-void pickUpPowerUps(Player player, Network net, udpData packetData) {
+PRIVATE void pickUpPowerUps(Player player, Network net, udpData packetData) {
     for (int row = 0; row < ROW_SIZE; row++) {
         for (int column = 0; column < COLUMN_SIZE; column++) {
             if (activePowers[row][column] >= 4) {
@@ -212,7 +215,8 @@ void move(Player player, int *lastMove, int *newMove, char key, Bomb bombs[], in
 
     switch (key) {
     case 's':
-        increasePlayerPosY(player);
+        increasePlayerPosY(player); 
+        pickUpPowerUps(player, net, packetData);
         if (!checkCollision(player, bombs)) {
             decreasePlayerPosY(player);
         }
@@ -236,6 +240,8 @@ void move(Player player, int *lastMove, int *newMove, char key, Bomb bombs[], in
 
     case 'w':
         decreasePlayerPosY(player);
+        pickUpPowerUps(player, net, packetData);
+
         if (!checkCollision(player, bombs)) {
             increasePlayerPosY(player);
         }
@@ -259,6 +265,8 @@ void move(Player player, int *lastMove, int *newMove, char key, Bomb bombs[], in
 
     case 'a':
         decreasePlayerPosX(player);
+        pickUpPowerUps(player, net, packetData);
+
         if (!checkCollision(player, bombs)) {
             increasePlayerPosX(player);
         }
@@ -282,6 +290,7 @@ void move(Player player, int *lastMove, int *newMove, char key, Bomb bombs[], in
 
     case 'd':
         increasePlayerPosX(player);
+        pickUpPowerUps(player, net, packetData);
         if (!checkCollision(player, bombs)) {
             decreasePlayerPosX(player);
         }

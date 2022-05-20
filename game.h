@@ -3,10 +3,10 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
-// #include <SDL.h>
-// #include <SDL_net.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_net.h>
+#include <SDL.h>
+#include <SDL_net.h>
+//#include <SDL2/SDL.h>
+//#include <SDL2/SDL_net.h>
 #include <string.h>
 #include "player.h"
 #include "box.h"
@@ -53,7 +53,7 @@ typedef struct GameSettings {
     SDL_TimerID invincibleTimer;
     int playersDead;
 
-    //Boxes boxes;
+    Boxes boxes;
     PowerUPS power;
     Player player[NUMPLAYERS];
     Bomb bombs[BOMBS];                // Contains all simultaneously allowed bombs

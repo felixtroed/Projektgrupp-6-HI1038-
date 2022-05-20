@@ -18,7 +18,8 @@ typedef struct BoxInit {
 	int activeBox[ROW_SIZE][COLUMN_SIZE];
 } *Boxes;
 
-//Boxes createBoxes(Game game);
+void renderBoxes(Game game);
+Boxes createBoxes(Game game);
 
 
 #endif /* BOX_H */
