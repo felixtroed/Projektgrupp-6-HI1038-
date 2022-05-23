@@ -30,7 +30,6 @@ typedef struct GameSettings {
     SDL_Renderer *renderer;
     SDL_Surface *bitmapSurface;         //Anv�nds f�r ladda upp bilder
     SDL_Texture *background;             //Anv�nds f�r att ladda in bilden av bakgrunden
-    SDL_Texture *box;                   //Anv�nds f�r att ladda in bilden av l�dan
     SDL_Texture *startMenu;
     SDL_Texture *instructionsMenu;
     SDL_Texture *redPlay;

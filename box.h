@@ -6,9 +6,8 @@
 #define W 3
 
 #include "game.h"
-#include <stdlib.h>
-#include <stdio.h>
-
+#include <SDL.h>
+//#include <SDL2/SDL.h>
 int activeBox[ROW_SIZE][COLUMN_SIZE];
 int resetBoxPos[ROW_SIZE][COLUMN_SIZE];
 
@@ -16,6 +15,8 @@ typedef struct GameSettings* Game;
 
 typedef struct BoxInit {
 	int activeBox[ROW_SIZE][COLUMN_SIZE];
+	SDL_Texture* box;                   
+
 } *Boxes;
 
 void renderBoxes(Game game);

@@ -22,7 +22,6 @@ PowerUPS createPowers(Game game)
 	return power;
 }
 
-
 void renderPowerUps(Game game) {
 
 	for (int row = 0; row < ROW_SIZE; row++) {

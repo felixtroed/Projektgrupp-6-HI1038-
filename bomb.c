@@ -336,7 +336,8 @@ PUBLIC void renderBombsAndExplosions(Game game, Network net, udpData packetData)
                   
                     activeBox[downBoxRow][downBoxColumn] =0;
                 }
-                game->bombs[i] = NULL;                                                                          // Raderar bomben
+                free(game->bombs[i]);
+                game->bombs[i] = NULL;   // Raderar bomben
             } 
         }
     }

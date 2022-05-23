@@ -6,11 +6,8 @@
 Boxes createBoxes(Game game) {
 
 		Boxes boxes = malloc(sizeof(struct BoxInit));
-
-
 		char boxDestination[64] = "resources/Box.png";
-		loadTextures(&game->renderer, &game->bitmapSurface, &game->box, boxDestination);
-
+		loadTextures(&game->renderer, &game->bitmapSurface, &boxes->box, boxDestination);
 		return boxes;
 
 } 
@@ -25,7 +22,7 @@ void renderBoxes(Game game) {
 			if (activeBox[row][column] == 1) {
 				game->boxPos.x = column * 64 + 64;
 				game->boxPos.y = row * 64 + 64;
-				SDL_RenderCopyEx(game->renderer, game->box, NULL, &game->boxPos, 0, NULL, SDL_FLIP_NONE);       // Render one box at the time.
+				SDL_RenderCopyEx(game->renderer, game->boxes->box, NULL, &game->boxPos, 0, NULL, SDL_FLIP_NONE);       // Render one box at the time.
 			}
 		}
 	}

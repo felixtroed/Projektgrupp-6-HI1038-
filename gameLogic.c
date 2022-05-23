@@ -144,7 +144,7 @@ PRIVATE void pickUpPowerUps(Player player, Network net, udpData packetData) {
                 {
                     if (activePowers[row][column] == 4) {
                         printf("Picked up power-up: Speed\n");
-                        if (getPlayerSpeed(player) < 6) {  // Speed värdet startar 2, max 3 uppgraderingar
+                        if (getPlayerSpeed(player) < 6) {  // Speed värdet startar 2, max 4 uppgraderingar
                             incrementPlayerSpeed(player);
                             printf("Speed increased!\n");
                         }

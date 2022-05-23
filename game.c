@@ -25,15 +25,15 @@ PRIVATE void receiveUDPData(Game game, Network net);
 PRIVATE Uint32 resetGame(Uint32 interval, void *args);
 
 PUBLIC Network createNet() {
-    Network net = malloc(sizeof(struct NetworkData));
-    return net;
+    Network net = malloc(sizeof(struct NetworkData)); // create a memory in heap for network struct 
+    return net; // return to main 
 }
 
 PUBLIC Game createGame() {
-    Game game = malloc(sizeof(struct GameSettings));
-    srand(time(0));
+    Game game = malloc(sizeof(struct GameSettings)); // allocate memory 
+    srand(time(0)); // make it possible to randomize powerups
 
-    if (initWinRen(game)) {
+    if (initWinRen(game))  { //init basics of SDL
         if (createStartMenu(game)) {
             if (createBackground(game)) {
                
@@ -504,7 +504,7 @@ PRIVATE bool initNetwork(Network net, char inputIPAddress[]) {
         net->willSend = true;
 	}
 
-    if (!(net->sd = SDLNet_UDP_Open(0)))
+    if (!(net->sd = SDLNet_UDP_Open(0))) // UDPSOCKET
 	{
 		fprintf(stderr, "SDLNet_UDP_Open Error: %s\n", SDLNet_GetError());
         net->willSend = true;
@@ -538,7 +538,7 @@ PRIVATE bool initWinRen(Game game) {
         printf("Window could not be created. Error code: %s\n", SDL_GetError());
         SDL_Quit();
         return false;
-    }
+    } // create 
 
     game->renderer = SDL_CreateRenderer(game->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (!game->renderer) {
@@ -636,8 +636,7 @@ PUBLIC void exitGame(Game game, Network net, udpData packetData) {
     SDL_DestroyTexture(game->power->biggerExplosions);
     SDL_DestroyTexture(game->power->moreBombs);
     SDL_DestroyTexture(game->power->biggerExplosions);
-    free(game->power);
-
+    SDL_DestroyTexture(game->boxes->box);
     SDL_DestroyRenderer(game->renderer);
     SDL_DestroyWindow(game->window);
     free(game);
