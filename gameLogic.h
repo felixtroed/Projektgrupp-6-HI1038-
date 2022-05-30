@@ -17,9 +17,7 @@ typedef struct BoxInit* Boxes;
 typedef struct NetworkData* Network;
 typedef struct udpData* udpData;
 
-bool collisionMap(Player player);
 void move(Player player, int* lastMove, int* newMove, char key, Bomb bombs[], int *frames, Network net, udpData packetData, Boxes boxes);
-bool collisionBomb(Player player, Bomb bombs[]);
 void handlePlayerExplosionCollision(Game game, Network net, udpData packetData);
 
 // void removeBox(Player p1, Boxes boxes);

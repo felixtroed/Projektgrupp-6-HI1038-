@@ -380,7 +380,6 @@ PRIVATE void sendUDPData(Network net, udpData packetData) {
         counter++;                                      // number of packets per second 
         if (SDL_GetTicks() >= timer + 1000) {           
             timer = SDL_GetTicks();
-            // printf("Sent %d packets in 1 second\n", counter);
             counter = 0;
         }
     }
@@ -643,10 +642,7 @@ PUBLIC bool loadTextures(SDL_Renderer** renderer, SDL_Surface** bitmapSurface, S
 /*When exit free packetdata and destroys texture */
 
 PUBLIC void exitGame(Game game, Network net, udpData packetData) {
-    //SDLNet_FreePacket(net->packet1);
-    //SDLNet_FreePacket(net->packet2);
     free(packetData);
-    //free(net);
 	SDLNet_Quit();
 
     for (uint8_t i = 0; i < game->activePlayers; i++) {

@@ -16,6 +16,9 @@ PRIVATE bool collisionBoxes(Player player, Boxes boxes);
 PRIVATE void powerUpGone(int row, int col, int value);
 PRIVATE bool checkCollision(Player player, Bomb bombs[], Boxes boxes);
 PRIVATE Uint32 disableInvincibility(Uint32 interval, void* args);
+PRIVATE bool checkCollision(Player player, Bomb bombs[], Boxes boxes);
+PRIVATE bool collisionMap(Player player);
+PRIVATE bool collisionBomb(Player player, Bomb bombs[]);
 
 typedef struct InvincibilityCallbackArgs {
     Player player;
@@ -50,7 +53,7 @@ PUBLIC void handlePlayerExplosionCollision(Game game, Network net, udpData packe
                             game->playersDead++;
                             
                             if (game->activePlayers == game->playersDead) {
-                                game->allPlayersDead = true; // if true an winner is decided 
+                                game->allPlayersDead = true; // if true a winner is decided 
                                 setToLastPlayer(game->player[game->pIdx]);
                             }
 
@@ -143,18 +146,18 @@ PRIVATE void pickUpPowerUps(Player player, Network net, udpData packetData) {
                 if (getPlayerPosX(player) > powerUpLeft && getPlayerPosX(player) < powerUpRight && getPlayerPosY(player) > powerUpUp && getPlayerPosY(player) < powerUpDown)
                 {
                     if (activePowers[row][column] == 4) {
-                        if (getPlayerSpeed(player) < 6) {  // Speed värdet startar 2, max 4 uppgraderingar
+                        if (getPlayerSpeed(player) < 6) {  // Speed 
                             incrementPlayerSpeed(player);
                         }
                     }
                     else if (activePowers[row][column] == 5) {
-                        if (getMaxBombs(player) < 5) {				// Max 5 bomber, (plockar up max 4 uppgraderingar)
+                        if (getMaxBombs(player) < 5) {			// number off bombs
                             incrementBombsAvailable(player);
                             incrementMaxBombs(player);
                         }
                     }
                     else if (activePowers[row][column] == 6) {
-                        if (getPlayerExpRange(player) < 5) {				// Max längd = mitten rutan + 5 rutor ut
+                        if (getPlayerExpRange(player) < 5) {				// Max range = 5 squares
                             incrementPlayerExpRange(player);
                             packetData->explosionRange = getPlayerExpRange(player);
                         }
