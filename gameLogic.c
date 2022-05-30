@@ -12,6 +12,11 @@
 
 #define BOMB_SIZE 34
 
+PRIVATE bool collisionBoxes(Player player, Boxes boxes);
+PRIVATE void powerUpGone(int row, int col, int value);
+PRIVATE bool checkCollision(Player player, Bomb bombs[], Boxes boxes);
+PRIVATE Uint32 disableInvincibility(Uint32 interval, void* args);
+
 typedef struct InvincibilityCallbackArgs {
     Player player;
     udpData packetData;
@@ -20,33 +25,32 @@ typedef struct InvincibilityCallbackArgs {
 
 Uint32 disableInvincibility(Uint32 interval, void *args);
 
-void handlePlayerExplosionCollision(Game game, Network net, udpData packetData) {
-    if (!playerIsHurt(game->player[game->pIdx])) { 
+PUBLIC void handlePlayerExplosionCollision(Game game, Network net, udpData packetData) {
+   
+    if (!playerIsHurt(game->player[game->pIdx]))  {  // wont load if player is hurt
 
         for (uint8_t i = 0; i < BOMBS; i++) {
             if (game->bombs[i] != NULL) {
-                modifyHitboxPos(game->player[game->pIdx]);
+                modifyHitboxPos(game->player[game->pIdx]); // moves character  +16 in x direction and +14 in y direction 
 
                 if (game->bombs[i]->startExplosion == true && game->bombs[i]->endExplosion == false) {
                     if (SDL_HasIntersection(getPlayerHitboxPos(game->player[game->pIdx]), &game->bombs[i]->explosionHor) || SDL_HasIntersection(getPlayerHitboxPos(game->player[game->pIdx]), &game->bombs[i]->explosionVer)) {
-                        setPlayerToHurt(game->player[game->pIdx]);
+                        setPlayerToHurt(game->player[game->pIdx]); // if an intersection occurs player takes damage 
                         packetData->isHurt = 1;
                         net->willSend = true;
 
-                        InvincibilityCallbackArgs *callbackArgs = malloc(sizeof(InvincibilityCallbackArgs));
-                        callbackArgs->player = game->player[game->pIdx];
+                        InvincibilityCallbackArgs *callbackArgs = malloc(sizeof(InvincibilityCallbackArgs)); // makes space for the struct InvincibilityCallbackArgs
+                        callbackArgs->player = game->player[game->pIdx]; 
                         callbackArgs->net = net;
                         callbackArgs->packetData = packetData;
 
                         decrementPlayerLives(game->player[game->pIdx]);
                         if (!playerHasLivesRemaining(game->player[game->pIdx])) {
-                            setPlayerToDead(game->player[game->pIdx]);
-                            printf("Player died.\n");
-                            
+                            setPlayerToDead(game->player[game->pIdx]);                            
                             game->playersDead++;
                             
                             if (game->activePlayers == game->playersDead) {
-                                game->allPlayersDead = true;
+                                game->allPlayersDead = true; // if true an winner is decided 
                                 setToLastPlayer(game->player[game->pIdx]);
                             }
 
@@ -54,7 +58,7 @@ void handlePlayerExplosionCollision(Game game, Network net, udpData packetData) 
                             return;
                         }
 
-                        game->invincibleTimer = SDL_AddTimer(2000, disableInvincibility, callbackArgs);
+                        game->invincibleTimer = SDL_AddTimer(2000, disableInvincibility, callbackArgs); // makes a thread after 2 seconds to make player take damage again
                     }
                 }  
             } 
@@ -62,28 +66,26 @@ void handlePlayerExplosionCollision(Game game, Network net, udpData packetData) 
     }
 }
 
-Uint32 disableInvincibility(Uint32 interval, void *args) {
+PRIVATE Uint32 disableInvincibility(Uint32 interval, void *args) {
     InvincibilityCallbackArgs *cArgs = (InvincibilityCallbackArgs*) args;
     setPlayerToNotHurt(cArgs->player);
     cArgs->packetData->isHurt = 0;
     cArgs->net->willSend = true;
-
     free(cArgs);
     return 0;
 }
 
-bool checkCollision(Player player, Bomb bombs[]) {
+PRIVATE bool checkCollision(Player player, Bomb bombs[],Boxes boxes) {
     if (!collisionMap(player))
         return false; 
-    if (!collisionBoxes(player))
+    if (!collisionBoxes(player,boxes))
         return false; 
     if (!collisionBomb(player, bombs))
         return false;
-
     return true; 
 }
 
-bool collisionMap(Player player) {
+PRIVATE bool collisionMap(Player player) {
     if (getPlayerPosY(player) < SCREENMIN_Y)
     {
         return false; 
@@ -106,22 +108,20 @@ bool collisionMap(Player player) {
     return true;
 }
 
-bool collisionBoxes(Player player)
+PRIVATE bool collisionBoxes(Player player,Boxes boxes)
 {
     int posBoxX = 0, posBoxY = 0;
     int sizeBox = 32;
-    int sizePlayer = 32;
-    const int botPlayerBigger = 16;
 
     for (int row = 0; row < ROW_SIZE; row++) {
         for (int column = 0; column < COLUMN_SIZE; column++) {
-            if (activeBox[row][column] == 1 || activeBox[row][column] == 3)
+            if (getActiveBox(boxes,row,column) == 1 || getActiveBox(boxes,row,column) == 3)
             {
                 posBoxX = column * 64 + 64;
                 posBoxY = row * 64 + 64;
 
-                if (!(getPlayerPosX(player) > posBoxX + sizeBox || posBoxX > getPlayerPosX(player) + sizePlayer || getPlayerPosY(player) > posBoxY + sizeBox ||
-                    getPlayerPosY(player) + botPlayerBigger + sizePlayer < posBoxY)) {
+                if (!(getPlayerPosX(player) > posBoxX + sizeBox || posBoxX > getPlayerPosX(player) + getPlayerWidth() || getPlayerPosY(player) > posBoxY + sizeBox ||
+                    getPlayerPosY(player) + getPlayerHeight()< posBoxY)) {
                     return false;
                 }
             }
@@ -143,25 +143,19 @@ PRIVATE void pickUpPowerUps(Player player, Network net, udpData packetData) {
                 if (getPlayerPosX(player) > powerUpLeft && getPlayerPosX(player) < powerUpRight && getPlayerPosY(player) > powerUpUp && getPlayerPosY(player) < powerUpDown)
                 {
                     if (activePowers[row][column] == 4) {
-                        printf("Picked up power-up: Speed\n");
                         if (getPlayerSpeed(player) < 6) {  // Speed värdet startar 2, max 4 uppgraderingar
                             incrementPlayerSpeed(player);
-                            printf("Speed increased!\n");
                         }
                     }
                     else if (activePowers[row][column] == 5) {
-                        printf("Picked up power-up: +1 Bombs\n");
                         if (getMaxBombs(player) < 5) {				// Max 5 bomber, (plockar up max 4 uppgraderingar)
                             incrementBombsAvailable(player);
                             incrementMaxBombs(player);
-                            printf("+1 Bombs!\n");
                         }
                     }
                     else if (activePowers[row][column] == 6) {
-                        printf("Picked up power-up: Longer Explosion\n");
                         if (getPlayerExpRange(player) < 5) {				// Max längd = mitten rutan + 5 rutor ut
                             incrementPlayerExpRange(player);
-                            printf("Explosion Range increased!\n");
                             packetData->explosionRange = getPlayerExpRange(player);
                         }
                     }
@@ -177,7 +171,7 @@ PRIVATE void pickUpPowerUps(Player player, Network net, udpData packetData) {
 }
 
 
-bool collisionBomb(Player player, Bomb bombs[]) {
+PRIVATE bool collisionBomb(Player player, Bomb bombs[]) {
     for (uint8_t i = 0; i < BOMBS; i++) {
         if (bombs[i] != NULL) {
             int left = (bombs[i]->bombPos.x) - 5;
@@ -206,18 +200,20 @@ bool collisionBomb(Player player, Bomb bombs[]) {
     return true;
 }
 
-void powerUpGone(int row, int col, int value) {
+PRIVATE void powerUpGone(int row, int col, int value) {
     activePowers[row][col] = value;
 }
 
-void move(Player player, int *lastMove, int *newMove, char key, Bomb bombs[], int *frames, Network net, udpData packetData) {
+
+
+void move(Player player, int *lastMove, int *newMove, char key, Bomb bombs[], int *frames, Network net, udpData packetData,Boxes boxes) {
     static int netDelay = 0;
 
     switch (key) {
     case 's':
         increasePlayerPosY(player); 
         pickUpPowerUps(player, net, packetData);
-        if (!checkCollision(player, bombs)) {
+        if (!checkCollision(player, bombs,boxes)) {
             decreasePlayerPosY(player);
         }
         if (*newMove == *lastMove && getPlayerFrame(player) <= 3) {
@@ -242,7 +238,7 @@ void move(Player player, int *lastMove, int *newMove, char key, Bomb bombs[], in
         decreasePlayerPosY(player);
         pickUpPowerUps(player, net, packetData);
 
-        if (!checkCollision(player, bombs)) {
+        if (!checkCollision(player, bombs,boxes)) {
             increasePlayerPosY(player);
         }
         if (*newMove == *lastMove && getPlayerFrame(player) <= 7 && getPlayerFrame(player) > 3) {
@@ -267,7 +263,7 @@ void move(Player player, int *lastMove, int *newMove, char key, Bomb bombs[], in
         decreasePlayerPosX(player);
         pickUpPowerUps(player, net, packetData);
 
-        if (!checkCollision(player, bombs)) {
+        if (!checkCollision(player, bombs,boxes)) {
             increasePlayerPosX(player);
         }
         if (*newMove == *lastMove && getPlayerFrame(player) <= 15 && getPlayerFrame(player) > 11) {
@@ -291,7 +287,7 @@ void move(Player player, int *lastMove, int *newMove, char key, Bomb bombs[], in
     case 'd':
         increasePlayerPosX(player);
         pickUpPowerUps(player, net, packetData);
-        if (!checkCollision(player, bombs)) {
+        if (!checkCollision(player, bombs,boxes)) {
             decreasePlayerPosX(player);
         }
         if (*newMove == *lastMove && getPlayerFrame(player) <= 11 && getPlayerFrame(player) > 7) {
@@ -316,7 +312,7 @@ void move(Player player, int *lastMove, int *newMove, char key, Bomb bombs[], in
     }
 
     if (netDelay < 1) {                             // 1 = 50%, 2 = 66%, 3 = 75%, 4 = 80%, 5 = 83%...
-        netDelay++;                                 // Till exempel om 5: kör på 0-4 och skippa 5. Alltså kör 5 frames och skippa frame 6
+        netDelay++;                                 
         packetData->xPos = getPlayerPosX(player);
         packetData->yPos = getPlayerPosY(player);
         packetData->frame = getPlayerFrame(player);

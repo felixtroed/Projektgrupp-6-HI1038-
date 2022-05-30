@@ -3,10 +3,15 @@
 #include "player.h"
 
 int main(int argc, char* argv[]) {
-    Network net = createNet(); // saves memory for network struct in heap 
-    Game game = createGame(); // 
+    /*Network net creates a struct for network settings allocates memory in heap*/
+    Network net = createNet();  
+    /*Game */
+    Game game = createGame();     
+    /*Creates UDPpacketData */
     udpData packetData = createPacketData(game);
+    /*Game loop */
     updateGame(game, net, packetData);
+    /*Frees everything */
     exitGame(game, net, packetData);
     return 0;
 }

@@ -23,8 +23,10 @@ typedef struct PlayerSettings {
     bool lastPlayer;
 } *Player;
 
-PRIVATE int PLAYER_WIDTH = 64;
-PRIVATE int PLAYER_HEIGHT = 64;
+PRIVATE int PLAYER_WIDTH_IMAGE = 64;
+PRIVATE int PLAYER_HEIGHT_IMAGE = 64;
+PRIVATE int PLAYER_HEIGHT = 46; 
+PRIVATE int PLAYER_WIDTH = 34;
 PRIVATE void initClips(Player player);
 
 PUBLIC int getPlayerFrame(Player player) {
@@ -129,6 +131,17 @@ PUBLIC void setToLastPlayer(Player player) {
     player->lastPlayer = true;
 }
 
+PUBLIC int getPlayerWidth() {
+
+    return PLAYER_WIDTH;
+}
+
+PUBLIC int getPlayerHeight() {
+
+    return PLAYER_HEIGHT;
+}
+
+
 PUBLIC void setToNotLastPlayer(Player player) {
     player->lastPlayer = false;
 }
@@ -204,7 +217,9 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
 
     char pictureDestination[64];
 
-    switch (playerNumber) {                                                 // Laddar upp rätt bild för rätt player
+    //PLAYERNUMBER DECIDE WHAT CHARACTER PLAYER HAVE //
+
+    switch (playerNumber) {                                                 
     case 1:
         SDL_strlcpy(pictureDestination, "resources/old-man.png", sizeof pictureDestination);
         loadTextures(&game->renderer, &game->bitmapSurface, &player->texture, pictureDestination);
@@ -220,7 +235,7 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
     case 3:
         SDL_strlcpy(pictureDestination, "resources/blue-man.png", sizeof pictureDestination);
         loadTextures(&game->renderer, &game->bitmapSurface, &player->texture, pictureDestination);
-        player->currentFrame = 8;
+        player->currentFrame = 8;                               
         break;
 
     case 4:
@@ -232,10 +247,10 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
 
     player->pos.x = x;
     player->pos.y = y;
-    player->pos.w = PLAYER_WIDTH;
-    player->pos.h = PLAYER_HEIGHT;
-    player->hitboxPos.w = 34;            // The actual width of the character in each clip
-    player->hitboxPos.h = 46;            // The actual height of the character in each clip
+    player->pos.w = PLAYER_WIDTH_IMAGE;
+    player->pos.h = PLAYER_HEIGHT_IMAGE;
+    player->hitboxPos.w = PLAYER_WIDTH;            // The actual width of the character in each clip
+    player->hitboxPos.h = PLAYER_HEIGHT;            // The actual height of the character in each clip
     player->speed = 2;
     player->bombsAvailable = 1;
     player->explosionRange = 2;
@@ -253,83 +268,83 @@ PUBLIC Player createPlayer(int playerNumber, int x, int y, Game game) {
 PRIVATE void initClips(Player player) {
     player->clip[0].x = 0;
     player->clip[0].y = 0;
-    player->clip[0].w = PLAYER_WIDTH;
-    player->clip[0].h = PLAYER_HEIGHT;
+    player->clip[0].w = PLAYER_WIDTH_IMAGE;
+    player->clip[0].h = PLAYER_HEIGHT_IMAGE;
 
     player->clip[1].x = 64;
     player->clip[1].y = 0;
-    player->clip[1].w = PLAYER_WIDTH;
-    player->clip[1].h = PLAYER_HEIGHT;
+    player->clip[1].w = PLAYER_WIDTH_IMAGE;
+    player->clip[1].h = PLAYER_HEIGHT_IMAGE;
 
     player->clip[2].x = 128;
     player->clip[2].y = 0;
-    player->clip[2].w = PLAYER_WIDTH;
-    player->clip[2].h = PLAYER_HEIGHT;
+    player->clip[2].w = PLAYER_WIDTH_IMAGE;
+    player->clip[2].h = PLAYER_HEIGHT_IMAGE;
 
     player->clip[3].x = 192;
     player->clip[3].y = 0;
-    player->clip[3].w = PLAYER_WIDTH;
-    player->clip[3].h = PLAYER_HEIGHT; // gubben g�r ner
+    player->clip[3].w = PLAYER_WIDTH_IMAGE;
+    player->clip[3].h = PLAYER_HEIGHT_IMAGE; // player moves down
 
     player->clip[4].x = 0;
     player->clip[4].y = 192;
-    player->clip[4].w = PLAYER_WIDTH;
-    player->clip[4].h = PLAYER_HEIGHT; 
+    player->clip[4].w = PLAYER_WIDTH_IMAGE;
+    player->clip[4].h = PLAYER_HEIGHT_IMAGE; 
 
     player->clip[5].x = 64;
     player->clip[5].y = 192;
-    player->clip[5].w = PLAYER_WIDTH;
-    player->clip[5].h = PLAYER_HEIGHT;
+    player->clip[5].w = PLAYER_WIDTH_IMAGE;
+    player->clip[5].h = PLAYER_HEIGHT_IMAGE;
 
     player->clip[6].x = 128;
     player->clip[6].y = 192;
-    player->clip[6].w = PLAYER_WIDTH;
-    player->clip[6].h = PLAYER_HEIGHT;
+    player->clip[6].w = PLAYER_WIDTH_IMAGE;
+    player->clip[6].h = PLAYER_HEIGHT_IMAGE;
 
     player->clip[7].x = 192;
     player->clip[7].y = 192;
-    player->clip[7].w = PLAYER_WIDTH;
-    player->clip[7].h = PLAYER_HEIGHT; // gubben g�r upp
+    player->clip[7].w = PLAYER_WIDTH_IMAGE;
+    player->clip[7].h = PLAYER_HEIGHT_IMAGE; // player moves up
 
     player->clip[8].x = 0;
     player->clip[8].y = 128;
-    player->clip[8].w = PLAYER_WIDTH;
-    player->clip[8].h = PLAYER_HEIGHT;
+    player->clip[8].w = PLAYER_WIDTH_IMAGE;
+    player->clip[8].h = PLAYER_HEIGHT_IMAGE;
 
     player->clip[9].x = 64;
     player->clip[9].y = 128;
-    player->clip[9].w = PLAYER_WIDTH;
-    player->clip[9].h = PLAYER_HEIGHT;
+    player->clip[9].w = PLAYER_WIDTH_IMAGE;
+    player->clip[9].h = PLAYER_HEIGHT_IMAGE;
 
     player->clip[10].x = 128;
     player->clip[10].y = 128;
-    player->clip[10].w = PLAYER_WIDTH;
-    player->clip[10].h = PLAYER_HEIGHT;
+    player->clip[10].w = PLAYER_WIDTH_IMAGE;
+    player->clip[10].h = PLAYER_HEIGHT_IMAGE;
 
     player->clip[11].x = 192;
     player->clip[11].y = 128;
-    player->clip[11].w = PLAYER_WIDTH;
-    player->clip[11].h = PLAYER_HEIGHT; // gubben g�r h�ger
+    player->clip[11].w = PLAYER_WIDTH_IMAGE;
+    player->clip[11].h = PLAYER_HEIGHT_IMAGE; // player moves right
 
     player->clip[12].x = 0;
     player->clip[12].y = 64;
-    player->clip[12].w = PLAYER_WIDTH;
-    player->clip[12].h = PLAYER_HEIGHT;
+    player->clip[12].w = PLAYER_WIDTH_IMAGE;
+    player->clip[12].h = PLAYER_HEIGHT_IMAGE;
 
     player->clip[13].x = 64;
     player->clip[13].y = 64;
-    player->clip[13].w = PLAYER_WIDTH;
-    player->clip[13].h = PLAYER_HEIGHT;
+    player->clip[13].w = PLAYER_WIDTH_IMAGE;
+    player->clip[13].h = PLAYER_HEIGHT_IMAGE;
 
     player->clip[14].x = 128;
     player->clip[14].y = 64;
-    player->clip[14].w = PLAYER_WIDTH;
-    player->clip[14].h = PLAYER_HEIGHT;
+    player->clip[14].w = PLAYER_WIDTH_IMAGE;
+    player->clip[14].h = PLAYER_HEIGHT_IMAGE;
 
     player->clip[15].x = 192;
     player->clip[15].y = 64;
-    player->clip[15].w = PLAYER_WIDTH;
-    player->clip[15].h = PLAYER_HEIGHT; // gubben g�r v�nster
+    player->clip[15].w = PLAYER_WIDTH_IMAGE;
+    player->clip[15].h = PLAYER_HEIGHT_IMAGE; // player moves left
  }
 
 PUBLIC void renderPlayers(Game game) {

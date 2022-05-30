@@ -52,5 +52,7 @@ void decreasePlayerPosY(Player player);
 void decreasePlayerPosX(Player player);
 void incrementPlayerFrame(Player player);
 int getPlayerFrame(Player player);
+int getPlayerHeight();
+int getPlayerWidth();
 
 #endif /* PLAYER_H */

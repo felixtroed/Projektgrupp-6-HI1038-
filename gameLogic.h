@@ -18,12 +18,9 @@ typedef struct NetworkData* Network;
 typedef struct udpData* udpData;
 
 bool collisionMap(Player player);
-void move(Player player, int* lastMove, int* newMove, char key, Bomb bombs[], int *frames, Network net, udpData packetData);
-bool collisionBoxes(Player player);
-bool checkCollision(Player player, Bomb bombs[]);
+void move(Player player, int* lastMove, int* newMove, char key, Bomb bombs[], int *frames, Network net, udpData packetData, Boxes boxes);
 bool collisionBomb(Player player, Bomb bombs[]);
 void handlePlayerExplosionCollision(Game game, Network net, udpData packetData);
-void powerUpGone(int row,int col,int value); 
 
 // void removeBox(Player p1, Boxes boxes);
 

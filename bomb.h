@@ -44,15 +44,17 @@ typedef struct BombTimerCallbackArgs {
     uint8_t pIdx;
     udpData packetData;
     Network net;
+    Boxes boxes;
 } BombTimerCallbackArgs;
 
-void bombPlacement(Player p, Bomb bombs[], uint8_t pIdx, SDL_Renderer *renderer, Network net, udpData packetData);
+void bombPlacement(Player player, Bomb bombs[], uint8_t pIdx, SDL_Renderer *renderer, Network net, udpData packetData,Boxes boxes);
 void initBombs(Bomb bombs[]);
 Bomb createBomb(int playerPosX, int playerPosY, uint8_t pIdx, SDL_Renderer *renderer, int explosionRange);
-void renderBombsAndExplosions(Game game, Network net, udpData packetData);
+void renderBombsAndExplosions(Game game, Network net, udpData packetData,Boxes boxes);
 uint8_t getBombIdx(Bomb bombs[]);
 Uint32 redBomb(Uint32 interval, void *switchToRedBomb);
 Uint32 explodeBomb(Uint32 interval, void *args);
 Uint32 explosionDoneClient(Uint32 interval, void *args);
+
 
 #endif /* BOMB_H */

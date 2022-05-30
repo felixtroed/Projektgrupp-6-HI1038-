@@ -28,8 +28,8 @@ typedef struct PowerUPS* PowerUPS;
 typedef struct GameSettings {
     SDL_Window *window;
     SDL_Renderer *renderer;
-    SDL_Surface *bitmapSurface;         //Anv�nds f�r ladda upp bilder
-    SDL_Texture *background;             //Anv�nds f�r att ladda in bilden av bakgrunden
+    SDL_Surface *bitmapSurface;        
+    SDL_Texture *background;            
     SDL_Texture *startMenu;
     SDL_Texture *instructionsMenu;
     SDL_Texture *redPlay;
@@ -42,7 +42,6 @@ typedef struct GameSettings {
     SDL_Texture* player3Wins;
     SDL_Texture* player4Wins;
     SDL_Rect menuOptionPos[MENUOPTIONS];
-    SDL_Rect boxPos;                  //Anv�nds f�r positionen av l�dorna
     SDL_Event event;
     bool accessToServer;
     bool inMenu;
@@ -51,11 +50,10 @@ typedef struct GameSettings {
     SDL_TimerID resetGameTime;
     SDL_TimerID invincibleTimer;
     int playersDead;
-
     Boxes boxes;
     PowerUPS power;
     Player player[NUMPLAYERS];
-    Bomb bombs[BOMBS];                // Contains all simultaneously allowed bombs
+    Bomb bombs[BOMBS];               
     uint8_t activePlayers;
     uint8_t pIdx;
 } *Game;
